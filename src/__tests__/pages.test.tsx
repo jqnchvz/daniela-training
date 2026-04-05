@@ -18,26 +18,30 @@ vi.mock("next-themes", () => ({
 afterEach(cleanup);
 
 describe("Home page", () => {
-  it("renders greeting and workout info", () => {
+  it("renders greeting and name", () => {
     render(<HomePage />);
-    expect(screen.getByText(/Daniela/)).toBeInTheDocument();
+    expect(screen.getByText("Daniela")).toBeInTheDocument();
   });
 
-  it("renders quick stats", () => {
+  it("renders phase badge", () => {
     render(<HomePage />);
-    expect(screen.getByText("Streak")).toBeInTheDocument();
+    expect(screen.getByText(/Phase 1/)).toBeInTheDocument();
+  });
+
+  it("renders wellness section", () => {
+    render(<HomePage />);
+    expect(screen.getByText("Last session wellness")).toBeInTheDocument();
+  });
+
+  it("renders stats section", () => {
+    render(<HomePage />);
     expect(screen.getByText("This week")).toBeInTheDocument();
-    expect(screen.getByText("Energy")).toBeInTheDocument();
+    expect(screen.getByText("Sessions done")).toBeInTheDocument();
   });
 
-  it("renders check-in prompt", () => {
+  it("renders phase progress", () => {
     render(<HomePage />);
-    expect(screen.getByText("Check in")).toBeInTheDocument();
-  });
-
-  it("renders last session section", () => {
-    render(<HomePage />);
-    expect(screen.getByText("Last session")).toBeInTheDocument();
+    expect(screen.getByText("Phase progress")).toBeInTheDocument();
   });
 });
 
