@@ -6,6 +6,7 @@ import { useAppStore } from "@/store/app-store";
 import { getExerciseById, WORKOUT_PLANS } from "@/lib/exercises";
 import { EnergySlider } from "@/components/session/energy-slider";
 import { RestTimer } from "@/components/session/rest-timer";
+import { ExerciseDemo } from "@/components/session/exercise-demo";
 import { Checklist } from "@/components/session/checklist";
 import { useState } from "react";
 
@@ -193,13 +194,19 @@ function WorkingPhase({
         />
       </div>
 
-      {/* Exercise name */}
+      {/* Exercise demo + name */}
       <div className="pt-2">
         <h2 className="text-2xl font-bold">{exercise.name}</h2>
         <p className="text-sm text-muted-foreground mt-1">
           Target: {currentPlanExercise.sets} x {currentPlanExercise.reps} reps
         </p>
-        {exercise.notes && (
+        <ExerciseDemo
+          gifUrl={exercise.gifUrl}
+          exerciseName={exercise.name}
+          instructions={exercise.instructions}
+          muscleGroups={exercise.muscleGroups}
+        />
+        {exercise.notes && !exercise.instructions.length && (
           <p className="text-xs text-muted-foreground mt-1 italic">
             {exercise.notes}
           </p>

@@ -9,6 +9,8 @@ export type Database = {
           muscle_groups: string[];
           equipment: string[];
           notes: string | null;
+          gif_url: string | null;
+          instructions: string[] | null;
         };
         Insert: Omit<Database["public"]["Tables"]["exercises"]["Row"], "id"> & {
           id?: string;
