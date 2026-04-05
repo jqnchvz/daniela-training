@@ -5,28 +5,30 @@ export interface Exercise {
   muscleGroups: string[];
   equipment: string[];
   notes: string;
+  gifUrl: string | null;
+  instructions: string[];
 }
 
 export const EXERCISES: Exercise[] = [
   // Compound
-  { id: "a0000000-0000-4000-8000-000000000001", name: "Dumbbell Goblet Squat", category: "compound", muscleGroups: ["quads", "glutes", "core"], equipment: ["dumbbell"], notes: "Hold dumbbell at chest level. Keep elbows inside knees." },
-  { id: "a0000000-0000-4000-8000-000000000002", name: "Romanian Deadlift (DB)", category: "compound", muscleGroups: ["hamstrings", "glutes", "lower_back"], equipment: ["dumbbell"], notes: "Hinge at hips, slight knee bend. Feel stretch in hamstrings." },
-  { id: "a0000000-0000-4000-8000-000000000003", name: "Dumbbell Bench Press", category: "compound", muscleGroups: ["chest", "triceps", "shoulders"], equipment: ["dumbbell"], notes: "Flat bench. Control the eccentric." },
-  { id: "a0000000-0000-4000-8000-000000000004", name: "Dumbbell Overhead Press", category: "compound", muscleGroups: ["shoulders", "triceps", "core"], equipment: ["dumbbell"], notes: "Seated or standing. Brace core throughout." },
-  { id: "a0000000-0000-4000-8000-000000000005", name: "Dumbbell Bent-Over Row", category: "compound", muscleGroups: ["back", "biceps", "rear_delts"], equipment: ["dumbbell"], notes: "Hinge forward 45 degrees. Pull to hip." },
-  { id: "a0000000-0000-4000-8000-000000000006", name: "Dumbbell Lunges", category: "compound", muscleGroups: ["quads", "glutes", "hamstrings"], equipment: ["dumbbell"], notes: "Alternating or walking. Knee tracks over toe." },
-  { id: "a0000000-0000-4000-8000-000000000007", name: "Hip Thrust", category: "compound", muscleGroups: ["glutes", "hamstrings"], equipment: ["machine", "dumbbell"], notes: "Machine or DB on hips. Squeeze glutes at top." },
-  { id: "a0000000-0000-4000-8000-000000000008", name: "Lat Pulldown", category: "compound", muscleGroups: ["back", "biceps", "rear_delts"], equipment: ["machine"], notes: "Wide grip. Pull to upper chest." },
-  { id: "a0000000-0000-4000-8000-000000000009", name: "Leg Press", category: "compound", muscleGroups: ["quads", "glutes", "hamstrings"], equipment: ["machine"], notes: "Feet shoulder-width. Do not lock knees." },
-  { id: "a0000000-0000-4000-8000-00000000000a", name: "Cable Face Pulls", category: "multi_joint", muscleGroups: ["rear_delts", "upper_back", "rotator_cuff"], equipment: ["cable"], notes: "Pull to face level. External rotation at top." },
+  { id: "a0000000-0000-4000-8000-000000000001", name: "Dumbbell Goblet Squat", category: "compound", muscleGroups: ["quads", "glutes", "core"], equipment: ["dumbbell"], notes: "Hold dumbbell at chest level. Keep elbows inside knees.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-000000000002", name: "Romanian Deadlift (DB)", category: "compound", muscleGroups: ["hamstrings", "glutes", "lower_back"], equipment: ["dumbbell"], notes: "Hinge at hips, slight knee bend. Feel stretch in hamstrings.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-000000000003", name: "Dumbbell Bench Press", category: "compound", muscleGroups: ["chest", "triceps", "shoulders"], equipment: ["dumbbell"], notes: "Flat bench. Control the eccentric.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-000000000004", name: "Dumbbell Overhead Press", category: "compound", muscleGroups: ["shoulders", "triceps", "core"], equipment: ["dumbbell"], notes: "Seated or standing. Brace core throughout.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-000000000005", name: "Dumbbell Bent-Over Row", category: "compound", muscleGroups: ["back", "biceps", "rear_delts"], equipment: ["dumbbell"], notes: "Hinge forward 45 degrees. Pull to hip.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-000000000006", name: "Dumbbell Lunges", category: "compound", muscleGroups: ["quads", "glutes", "hamstrings"], equipment: ["dumbbell"], notes: "Alternating or walking. Knee tracks over toe.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-000000000007", name: "Hip Thrust", category: "compound", muscleGroups: ["glutes", "hamstrings"], equipment: ["machine", "dumbbell"], notes: "Machine or DB on hips. Squeeze glutes at top.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-000000000008", name: "Lat Pulldown", category: "compound", muscleGroups: ["back", "biceps", "rear_delts"], equipment: ["machine"], notes: "Wide grip. Pull to upper chest.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-000000000009", name: "Leg Press", category: "compound", muscleGroups: ["quads", "glutes", "hamstrings"], equipment: ["machine"], notes: "Feet shoulder-width. Do not lock knees.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-00000000000a", name: "Cable Face Pulls", category: "multi_joint", muscleGroups: ["rear_delts", "upper_back", "rotator_cuff"], equipment: ["cable"], notes: "Pull to face level. External rotation at top.", gifUrl: null, instructions: [] },
   // Isolation / Accessory
-  { id: "a0000000-0000-4000-8000-00000000000b", name: "Dumbbell Bicep Curls", category: "isolation", muscleGroups: ["biceps"], equipment: ["dumbbell"], notes: "Standing or seated. No swinging." },
-  { id: "a0000000-0000-4000-8000-00000000000c", name: "Tricep Pushdowns", category: "isolation", muscleGroups: ["triceps"], equipment: ["cable"], notes: "Cable machine. Keep elbows pinned to sides." },
-  { id: "a0000000-0000-4000-8000-00000000000d", name: "Lateral Raises", category: "isolation", muscleGroups: ["shoulders"], equipment: ["dumbbell"], notes: "Slight bend in elbows. Raise to shoulder height." },
-  { id: "a0000000-0000-4000-8000-00000000000e", name: "Calf Raises", category: "isolation", muscleGroups: ["calves"], equipment: ["dumbbell", "machine"], notes: "Full range of motion. Pause at top." },
-  { id: "a0000000-0000-4000-8000-00000000000f", name: "Plank", category: "isolation", muscleGroups: ["core", "shoulders"], equipment: ["bodyweight"], notes: "Hold position. Keep hips level with shoulders." },
-  { id: "a0000000-0000-4000-8000-000000000010", name: "Dead Bug", category: "isolation", muscleGroups: ["core"], equipment: ["bodyweight"], notes: "Opposite arm/leg extension. Press lower back into floor." },
-  { id: "a0000000-0000-4000-8000-000000000011", name: "Cable Woodchops", category: "multi_joint", muscleGroups: ["core", "obliques"], equipment: ["cable"], notes: "Rotate through core. Control the return." },
+  { id: "a0000000-0000-4000-8000-00000000000b", name: "Dumbbell Bicep Curls", category: "isolation", muscleGroups: ["biceps"], equipment: ["dumbbell"], notes: "Standing or seated. No swinging.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-00000000000c", name: "Tricep Pushdowns", category: "isolation", muscleGroups: ["triceps"], equipment: ["cable"], notes: "Cable machine. Keep elbows pinned to sides.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-00000000000d", name: "Lateral Raises", category: "isolation", muscleGroups: ["shoulders"], equipment: ["dumbbell"], notes: "Slight bend in elbows. Raise to shoulder height.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-00000000000e", name: "Calf Raises", category: "isolation", muscleGroups: ["calves"], equipment: ["dumbbell", "machine"], notes: "Full range of motion. Pause at top.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-00000000000f", name: "Plank", category: "isolation", muscleGroups: ["core", "shoulders"], equipment: ["bodyweight"], notes: "Hold position. Keep hips level with shoulders.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-000000000010", name: "Dead Bug", category: "isolation", muscleGroups: ["core"], equipment: ["bodyweight"], notes: "Opposite arm/leg extension. Press lower back into floor.", gifUrl: null, instructions: [] },
+  { id: "a0000000-0000-4000-8000-000000000011", name: "Cable Woodchops", category: "multi_joint", muscleGroups: ["core", "obliques"], equipment: ["cable"], notes: "Rotate through core. Control the return.", gifUrl: null, instructions: [] },
 ];
 
 export const EXERCISE_MAP = new Map(EXERCISES.map((e) => [e.id, e]));
