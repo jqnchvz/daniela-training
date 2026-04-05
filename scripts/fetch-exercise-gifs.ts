@@ -20,7 +20,7 @@ const FREE_EXERCISE_DB_BASE =
 // Mapping from our exercise names to free-exercise-db exercise IDs
 const EXERCISE_MAPPINGS = [
   { ourName: "Dumbbell Goblet Squat", searchId: "Dumbbell_Goblet_Squat", fallbackId: "Goblet_Squat" },
-  { ourName: "Romanian Deadlift (DB)", searchId: "Dumbbell_Stiff_Leg_Deadlift", fallbackId: "Romanian_Deadlift_With_Dumbbells" },
+  { ourName: "Romanian Deadlift (DB)", searchId: "Romanian_Deadlift", fallbackId: "Stiff-Legged_Barbell_Deadlift" },
   { ourName: "Dumbbell Bench Press", searchId: "Dumbbell_Bench_Press", fallbackId: null },
   { ourName: "Dumbbell Overhead Press", searchId: "Dumbbell_Shoulder_Press", fallbackId: "Standing_Dumbbell_Shoulder_Press" },
   { ourName: "Dumbbell Bent-Over Row", searchId: "Bent_Over_Two-Dumbbell_Row", fallbackId: "Dumbbell_Bent_Over_Row" },
