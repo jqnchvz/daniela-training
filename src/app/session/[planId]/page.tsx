@@ -1,25 +1,26 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
+import Image from "next/image";
 import { useSessionStore } from "@/store/session-store";
 import { useAppStore } from "@/store/app-store";
 import { getExerciseById, WORKOUT_PLANS } from "@/lib/exercises";
 import { EnergySlider } from "@/components/session/energy-slider";
 import { RestTimer } from "@/components/session/rest-timer";
-import { ExerciseDemo } from "@/components/session/exercise-demo";
-import { Checklist } from "@/components/session/checklist";
-import { useState } from "react";
 
 const WARMUP_ITEMS = [
-  "5 min light cardio (walking/cycling)",
-  "5 min dynamic stretches",
-  "2-3 min movement prep (light weight)",
+  { icon: "🏃", text: "Treadmill walk — 5 min, 3% incline" },
+  { icon: "🔄", text: "Arm circles + shoulder rolls — 2 min" },
+  { icon: "💪", text: "Band pull-aparts — 2×15" },
+  { icon: "🧱", text: "Wall slides — 2×10 slow" },
+  { icon: "🐱", text: "Cat-cow + thoracic rotation — 3 min" },
 ];
 
 const COOLDOWN_ITEMS = [
-  "5 min light walking",
-  "5 min static stretches",
-  "2 min breathing (4-7-8 pattern)",
+  { icon: "🌊", text: "Lat stretch — 60s each side" },
+  { icon: "🔄", text: "Supine spinal twist — 60s each" },
+  { icon: "💪", text: "Bicep/forearm stretch — 45s each" },
+  { icon: "🌬", text: "Diaphragmatic breathing — 3 min" },
 ];
 
 export default function ActiveSessionPage({
@@ -32,38 +33,30 @@ export default function ActiveSessionPage({
   const store = useSessionStore();
   const isOnline = useAppStore((s) => s.isOnline);
 
-  // Initialize session if not started
   if (!store.planId && plan) {
     store.startSession(planId);
   }
 
   if (!plan) {
     return (
-      <div className="px-4 py-6">
+      <div className="px-5 py-6">
         <p className="text-muted-foreground">Workout plan not found.</p>
       </div>
     );
   }
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto">
+    <div className="min-h-screen flex flex-col">
       {!isOnline && (
-        <div className="mb-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 px-3 py-2 text-xs text-yellow-600 dark:text-yellow-400">
+        <div className="mx-5 mt-3 rounded-[10px] bg-gold-bg border border-[#5a4a1a] px-3 py-2 text-xs text-gold">
           Offline — data will sync when reconnected
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-lg font-bold">{plan.name}</h1>
-        <span className="text-xs text-muted-foreground uppercase tracking-wider">
-          {store.phase.replace("-", " ")}
-        </span>
-      </div>
-
       {store.phase === "pre-check" && <PreCheckPhase />}
       {store.phase === "warmup" && <WarmupPhase />}
       {store.phase === "working" && <WorkingPhase plan={plan} />}
-      {store.phase === "cooldown" && <CooldownPhase plan={plan} />}
+      {store.phase === "cooldown" && <CooldownPhase />}
       {store.phase === "summary" && <SummaryPhase plan={plan} />}
     </div>
   );
@@ -73,92 +66,109 @@ function PreCheckPhase() {
   const { energyPre, setEnergyPre, setPhase } = useSessionStore();
 
   return (
-    <div className="space-y-6">
-      <EnergySlider
-        value={energyPre}
-        onChange={setEnergyPre}
-        label="How's your energy right now?"
-      />
-      <button
-        onClick={() => setPhase("warmup")}
-        disabled={energyPre === null}
-        className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
-      >
-        Start Warm-up
-      </button>
+    <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+      <div className="text-6xl mb-4">⚡</div>
+      <h2 className="font-heading text-[1.35rem] font-bold mb-2">Pre-session Check</h2>
+      <p className="text-sm text-muted-foreground mb-8 max-w-[280px]">
+        Quick energy check before we start.
+      </p>
+      <div className="w-full max-w-[320px]">
+        <EnergySlider value={energyPre} onChange={setEnergyPre} label="How's your energy?" />
+        <button
+          onClick={() => setPhase("warmup")}
+          disabled={energyPre === null}
+          className="mt-6 w-full rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#0f1f10] disabled:opacity-50 transition-all hover:bg-[#8dc88f]"
+        >
+          Start Warm-up →
+        </button>
+      </div>
     </div>
   );
 }
 
 function WarmupPhase() {
-  const { warmupChecklist, toggleWarmup, setPhase } = useSessionStore();
-  const allChecked = warmupChecklist.every(Boolean);
+  const { setPhase } = useSessionStore();
 
   return (
-    <div className="space-y-6">
-      <Checklist
-        items={WARMUP_ITEMS}
-        checked={warmupChecklist}
-        onToggle={toggleWarmup}
-      />
+    <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+      <div className="text-6xl mb-4">🔥</div>
+      <h2 className="font-heading text-[1.35rem] font-bold mb-2">Warm-up</h2>
+      <p className="text-sm text-muted-foreground mb-6 max-w-[280px] leading-relaxed">
+        Start with 5 min incline treadmill, then dynamic stretches. Take your time — this is non-negotiable for recovery.
+      </p>
+      <div className="w-full max-w-[320px] rounded-[16px] border border-border bg-card p-4 text-left">
+        <div className="flex flex-col gap-2.5">
+          {WARMUP_ITEMS.map((item, i) => (
+            <div key={i} className="flex items-center gap-2.5 text-sm">
+              <span>{item.icon}</span>
+              <span>{item.text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
       <button
         onClick={() => setPhase("working")}
-        disabled={!allChecked}
-        className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+        className="mt-6 w-full max-w-[320px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#0f1f10] transition-all hover:bg-[#8dc88f]"
       >
-        Start Workout
+        Done with Warm-up →
       </button>
     </div>
   );
 }
 
-function WorkingPhase({
-  plan,
-}: {
-  plan: (typeof WORKOUT_PLANS)[number];
-}) {
+function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const store = useSessionStore();
   const currentPlanExercise = plan.exercises[store.currentExerciseIndex];
-  const exercise = currentPlanExercise
-    ? getExerciseById(currentPlanExercise.exerciseId)
-    : null;
+  const exercise = currentPlanExercise ? getExerciseById(currentPlanExercise.exerciseId) : null;
+  const [setInputs, setSetInputs] = useState<Array<{ weight: string; reps: string }>>([]);
 
-  const [weight, setWeight] = useState(0);
-  const [reps, setReps] = useState(currentPlanExercise?.reps ?? 10);
-  const [rpe, setRpe] = useState<number | null>(null);
+  // Initialize inputs when exercise changes
+  const setsForExercise = store.completedSets.filter(
+    (s) => s.exerciseId === exercise?.id,
+  );
 
   if (!currentPlanExercise || !exercise) {
-    // All exercises done
     return (
-      <div className="space-y-6 text-center">
-        <p className="text-lg font-medium">All exercises complete!</p>
+      <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+        <div className="text-6xl mb-4">💪</div>
+        <h2 className="font-heading text-lg font-bold mb-3">All exercises complete!</h2>
         <button
           onClick={() => store.setPhase("cooldown")}
-          className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground"
+          className="rounded-[16px] bg-sage px-8 py-4 font-heading text-[15px] font-bold text-[#0f1f10]"
         >
-          Start Cool-down
+          Start Cool-down →
         </button>
       </div>
     );
   }
 
-  const setsForExercise = store.completedSets.filter(
-    (s) => s.exerciseId === exercise.id,
-  );
-  const setsRemaining = currentPlanExercise.sets - setsForExercise.length;
-  const allSetsDone = setsRemaining <= 0;
+  const nextExIndex = store.currentExerciseIndex + 1;
+  const nextPlanEx = plan.exercises[nextExIndex];
+  const nextExercise = nextPlanEx ? getExerciseById(nextPlanEx.exerciseId) : null;
 
-  const handleLogSet = () => {
+  // Initialize set inputs if needed
+  if (setInputs.length === 0 && currentPlanExercise) {
+    const initial = Array.from({ length: currentPlanExercise.sets }, () => ({
+      weight: "0",
+      reps: String(currentPlanExercise.reps),
+    }));
+    setSetInputs(initial);
+  }
+
+  const handleLogSet = (setIndex: number) => {
+    const input = setInputs[setIndex];
+    if (!input) return;
+
     store.logSet({
       exerciseId: exercise.id,
-      setNumber: setsForExercise.length + 1,
-      weight,
-      reps,
-      rpe,
+      setNumber: setIndex + 1,
+      weight: Number(input.weight),
+      reps: Number(input.reps),
+      rpe: null,
       completed: true,
     });
 
-    // Start rest timer if more sets remaining
+    // Start rest timer if not last set
     if (setsForExercise.length + 1 < currentPlanExercise.sets) {
       store.setRestTimer(Date.now() + currentPlanExercise.restSeconds * 1000);
     }
@@ -166,296 +176,289 @@ function WorkingPhase({
 
   const handleNextExercise = () => {
     store.nextExercise();
-    setWeight(0);
-    setReps(plan.exercises[store.currentExerciseIndex + 1]?.reps ?? 10);
-    setRpe(null);
+    setSetInputs([]);
   };
 
+  const allSetsDone = setsForExercise.length >= currentPlanExercise.sets;
+  const progressPercent = Math.round(
+    ((store.currentExerciseIndex + (allSetsDone ? 1 : 0)) / plan.exercises.length) * 100,
+  );
+
   return (
-    <div className="space-y-4">
-      {/* Progress indicator */}
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>
-          Exercise {store.currentExerciseIndex + 1}/{plan.exercises.length}
-        </span>
-        <span>
-          Set {Math.min(setsForExercise.length + 1, currentPlanExercise.sets)}/
-          {currentPlanExercise.sets}
+    <>
+      {/* Header */}
+      <div className="px-5 pt-5 flex items-center justify-between">
+        <button onClick={() => (window.location.href = "/")} className="text-[13px] text-muted-foreground">
+          ← End
+        </button>
+        <span className="rounded-full bg-sage-bg text-sage border border-sage-dim px-2.5 py-1 text-[11px] font-semibold">
+          {plan.name.split("—")[0].trim()}
         </span>
       </div>
 
-      {/* Progress bar */}
-      <div className="h-1.5 rounded-full bg-secondary">
-        <div
-          className="h-full rounded-full bg-primary transition-all"
-          style={{
-            width: `${(store.currentExerciseIndex / plan.exercises.length) * 100}%`,
-          }}
-        />
+      {/* Progress */}
+      <div className="px-5 pt-4">
+        <div className="flex justify-between text-xs text-muted-foreground mb-2">
+          <span>Exercise {store.currentExerciseIndex + 1} of {plan.exercises.length}</span>
+          <span className="text-sage">Main Work</span>
+        </div>
+        <div className="h-1 rounded-full bg-surface3">
+          <div className="h-full rounded-full bg-sage transition-all" style={{ width: `${progressPercent}%` }} />
+        </div>
       </div>
 
-      {/* Exercise demo + name */}
-      <div className="pt-2">
-        <h2 className="text-2xl font-bold">{exercise.name}</h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Target: {currentPlanExercise.sets} x {currentPlanExercise.reps} reps
-        </p>
-        <ExerciseDemo
-          gifUrl={exercise.gifUrl}
-          exerciseName={exercise.name}
-          instructions={exercise.instructions}
-          muscleGroups={exercise.muscleGroups}
-        />
-        {exercise.notes && !exercise.instructions.length && (
-          <p className="text-xs text-muted-foreground mt-1 italic">
+      {/* Exercise card */}
+      <div className="mx-5 mt-4 rounded-[20px] border border-border bg-card overflow-hidden">
+        {/* Image area */}
+        <div className="relative h-[200px] bg-surface2 flex items-center justify-center border-b border-border">
+          {exercise.gifUrl ? (
+            <Image src={exercise.gifUrl} alt={exercise.name} fill className="object-contain" unoptimized />
+          ) : (
+            <span className="text-6xl">💪</span>
+          )}
+          <div className="absolute bottom-2.5 left-2.5 flex gap-1.5 flex-wrap">
+            {exercise.muscleGroups.slice(0, 3).map((mg) => (
+              <span key={mg} className="rounded-full bg-sage-bg text-sage border border-sage-dim px-2 py-0.5 text-[10px] font-semibold">
+                {mg.replace("_", " ")}
+              </span>
+            ))}
+          </div>
+        </div>
+        {/* Info */}
+        <div className="p-[18px]">
+          <h2 className="font-heading text-[1.3rem] font-extrabold">{exercise.name}</h2>
+          <p className="text-[13px] text-muted-foreground leading-relaxed mt-1 mb-3.5">
             {exercise.notes}
           </p>
-        )}
+          <div className="flex gap-2.5">
+            <TargetBox value={String(currentPlanExercise.sets)} label="Sets" highlight />
+            <TargetBox value={String(currentPlanExercise.reps)} label="Reps" highlight />
+            <TargetBox value={`${Math.floor(currentPlanExercise.restSeconds / 60)} min`} label="Rest" />
+            <TargetBox value="—" label="Last wt." />
+          </div>
+        </div>
       </div>
 
-      {/* Completed sets */}
-      {setsForExercise.length > 0 && (
-        <div className="space-y-1">
-          {setsForExercise.map((s, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-2 rounded-lg bg-card border border-border px-3 py-2 text-sm"
-            >
-              <span className="text-primary">✓</span>
-              <span>
-                Set {s.setNumber}: {s.weight}kg x {s.reps}
-              </span>
-              {s.rpe && (
-                <span className="text-xs text-muted-foreground ml-auto">
-                  RPE {s.rpe}
-                </span>
-              )}
+      {/* Set logger */}
+      <div className="px-5 mt-4">
+        <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mb-3">
+          Log your sets
+        </p>
+        {Array.from({ length: currentPlanExercise.sets }, (_, i) => {
+          const isDone = i < setsForExercise.length;
+          const input = setInputs[i] || { weight: "0", reps: String(currentPlanExercise.reps) };
+          return (
+            <div key={i} className="flex items-center gap-2.5 py-2.5 border-b border-border last:border-b-0">
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border shrink-0 transition-colors ${
+                isDone ? "bg-sage-dim text-sage border-sage-dim" : "bg-surface2 text-muted-foreground border-border"
+              }`}>
+                {i + 1}
+              </div>
+              <input
+                type="number"
+                value={isDone ? setsForExercise[i].weight : input.weight}
+                disabled={isDone}
+                onChange={(e) => {
+                  const updated = [...setInputs];
+                  updated[i] = { ...input, weight: e.target.value };
+                  setSetInputs(updated);
+                }}
+                className="w-full rounded-lg border border-border bg-surface2 px-2.5 py-2 font-mono text-sm text-center disabled:opacity-50"
+                placeholder="kg"
+              />
+              <span className="text-[11px] text-[#5a5550] shrink-0 w-5 text-center">×</span>
+              <input
+                type="number"
+                value={isDone ? setsForExercise[i].reps : input.reps}
+                disabled={isDone}
+                onChange={(e) => {
+                  const updated = [...setInputs];
+                  updated[i] = { ...input, reps: e.target.value };
+                  setSetInputs(updated);
+                }}
+                className="w-16 rounded-lg border border-border bg-surface2 px-2.5 py-2 font-mono text-sm text-center disabled:opacity-50"
+                placeholder="reps"
+              />
+              <button
+                disabled={isDone}
+                onClick={() => handleLogSet(i)}
+                className={`w-9 h-9 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                  isDone
+                    ? "bg-sage border-sage text-[#0f1f10]"
+                    : "border-[#3a3a3a] hover:border-sage"
+                }`}
+              >
+                {isDone ? "✓" : ""}
+              </button>
             </div>
-          ))}
+          );
+        })}
+      </div>
+
+      {/* Next exercise preview */}
+      {nextExercise && (
+        <div className="mx-5 mt-4 flex items-center gap-3 rounded-[16px] border border-border bg-surface2 p-3.5">
+          <span className="text-[22px] w-11 text-center shrink-0">👁</span>
+          <div className="flex-1">
+            <p className="text-[10px] text-[#5a5550] tracking-[1px] uppercase font-semibold">Next up</p>
+            <p className="font-semibold text-sm mt-0.5">{nextExercise.name}</p>
+          </div>
+          <span className="rounded-full bg-surface2 border border-border px-2 py-0.5 text-[11px] text-muted-foreground">
+            {nextPlanEx.sets}×{nextPlanEx.reps}
+          </span>
         </div>
       )}
 
-      {/* Rest timer */}
-      <RestTimer />
-
-      {/* Input controls */}
-      {!allSetsDone && !store.restTimerEnd && (
-        <div className="space-y-4 pt-2">
-          {/* Weight input */}
-          <div>
-            <label className="text-xs text-muted-foreground">Weight (kg)</label>
-            <div className="flex items-center gap-2 mt-1">
-              <button
-                onClick={() => setWeight(Math.max(0, weight - 2.5))}
-                className="flex h-12 w-14 items-center justify-center rounded-lg border border-border bg-card text-lg font-medium"
-              >
-                -2.5
-              </button>
-              <input
-                type="number"
-                value={weight}
-                onChange={(e) => setWeight(Number(e.target.value))}
-                step={0.5}
-                min={0}
-                className="h-12 flex-1 rounded-lg border border-border bg-card px-3 text-center text-xl font-bold"
-              />
-              <button
-                onClick={() => setWeight(weight + 2.5)}
-                className="flex h-12 w-14 items-center justify-center rounded-lg border border-border bg-card text-lg font-medium"
-              >
-                +2.5
-              </button>
-            </div>
-          </div>
-
-          {/* Reps input */}
-          <div>
-            <label className="text-xs text-muted-foreground">Reps</label>
-            <div className="flex items-center gap-2 mt-1">
-              <button
-                onClick={() => setReps(Math.max(1, reps - 1))}
-                className="flex h-12 w-14 items-center justify-center rounded-lg border border-border bg-card text-lg font-medium"
-              >
-                -1
-              </button>
-              <input
-                type="number"
-                value={reps}
-                onChange={(e) => setReps(Number(e.target.value))}
-                min={1}
-                className="h-12 flex-1 rounded-lg border border-border bg-card px-3 text-center text-xl font-bold"
-              />
-              <button
-                onClick={() => setReps(reps + 1)}
-                className="flex h-12 w-14 items-center justify-center rounded-lg border border-border bg-card text-lg font-medium"
-              >
-                +1
-              </button>
-            </div>
-          </div>
-
-          {/* RPE (compact) */}
-          <div>
-            <label className="text-xs text-muted-foreground">
-              RPE (optional)
-            </label>
-            <div className="flex gap-1 mt-1">
-              {[6, 7, 8, 9, 10].map((v) => (
-                <button
-                  key={v}
-                  onClick={() => setRpe(rpe === v ? null : v)}
-                  className={`flex-1 rounded-lg border py-2 text-sm font-medium transition-colors ${
-                    rpe === v
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-card"
-                  }`}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Log set button */}
+      {/* Nav buttons */}
+      <div className="flex gap-2.5 px-5 mt-4 pb-28">
+        {store.currentExerciseIndex > 0 && (
           <button
-            onClick={handleLogSet}
-            className="w-full rounded-lg bg-primary px-4 py-4 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            onClick={() => {
+              useSessionStore.setState((s) => ({
+                currentExerciseIndex: Math.max(0, s.currentExerciseIndex - 1),
+              }));
+              setSetInputs([]);
+            }}
+            className="flex-[0.5] rounded-[16px] border border-[#3a3a3a] bg-surface2 py-3.5 font-heading text-sm font-semibold transition-colors hover:bg-surface3"
           >
-            Log Set ✓
+            ‹ Prev
           </button>
-        </div>
-      )}
-
-      {/* Next exercise / Skip */}
-      {allSetsDone && (
+        )}
         <button
           onClick={handleNextExercise}
-          className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground"
+          className="flex-1 rounded-[16px] bg-sage py-3.5 font-heading text-[15px] font-bold text-[#0f1f10] transition-all hover:bg-[#8dc88f]"
         >
-          Next Exercise →
+          {allSetsDone ? "Next Exercise →" : "Skip →"}
         </button>
-      )}
+      </div>
 
-      {!allSetsDone && (
-        <button
-          onClick={handleNextExercise}
-          className="w-full text-xs text-muted-foreground underline py-2"
-        >
-          Skip exercise
-        </button>
-      )}
-    </div>
+      {/* Rest timer overlay */}
+      <RestTimer />
+    </>
   );
 }
 
-function CooldownPhase({
-  plan,
-}: {
-  plan: (typeof WORKOUT_PLANS)[number];
-}) {
+function CooldownPhase() {
   const store = useSessionStore();
-  const allChecked = store.cooldownChecklist.every(Boolean);
 
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-muted-foreground">
-        Great work! Time to cool down.
+    <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+      <div className="text-6xl mb-4">🧘</div>
+      <h2 className="font-heading text-[1.35rem] font-bold mb-2">Cool-down</h2>
+      <p className="text-sm text-muted-foreground mb-6 max-w-[280px] leading-relaxed">
+        10 minutes of stretching. This is when recovery begins — don&apos;t skip it.
       </p>
-      <Checklist
-        items={COOLDOWN_ITEMS}
-        checked={store.cooldownChecklist}
-        onToggle={store.toggleCooldown}
-      />
-      <EnergySlider
-        value={store.energyPost}
-        onChange={store.setEnergyPost}
-        label="How's your energy now?"
-      />
+      <div className="w-full max-w-[320px] rounded-[16px] border border-border bg-card p-4 text-left">
+        <div className="flex flex-col gap-2.5">
+          {COOLDOWN_ITEMS.map((item, i) => (
+            <div key={i} className="text-sm">
+              {item.icon} {item.text}
+            </div>
+          ))}
+        </div>
+      </div>
       <button
         onClick={() => store.setPhase("summary")}
-        disabled={!allChecked}
-        className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground disabled:opacity-50"
+        className="mt-6 w-full max-w-[320px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#0f1f10]"
       >
-        View Summary
+        Complete Session ✓
       </button>
     </div>
   );
 }
 
-function SummaryPhase({
-  plan,
-}: {
-  plan: (typeof WORKOUT_PLANS)[number];
-}) {
+function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const store = useSessionStore();
-  const [notes, setNotes] = useState(store.notes);
+  const [energy, setEnergy] = useState(4);
+  const [sleep, setSleep] = useState(3);
+  const [soreness, setSoreness] = useState(1);
 
-  const totalVolume = store.completedSets.reduce(
-    (sum, s) => sum + s.weight * s.reps,
-    0,
-  );
-
-  const exercisesCompleted = new Set(
-    store.completedSets.map((s) => s.exerciseId),
-  ).size;
-
-  const duration = store.startedAt
-    ? Math.round((Date.now() - new Date(store.startedAt).getTime()) / 60000)
-    : 0;
+  const totalVolume = store.completedSets.reduce((sum, s) => sum + s.weight * s.reps, 0);
+  const exercisesCompleted = new Set(store.completedSets.map((s) => s.exerciseId)).size;
 
   const handleComplete = () => {
-    store.setNotes(notes);
-    // In a full implementation, this would save to Supabase
-    // For now, just reset the session
     store.reset();
     window.location.href = "/";
   };
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-xl border border-border bg-card p-5">
-        <h2 className="text-lg font-bold mb-3">Session Complete!</h2>
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div>
-            <p className="text-muted-foreground">Duration</p>
-            <p className="font-medium">{duration} min</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Exercises</p>
-            <p className="font-medium">
-              {exercisesCompleted}/{plan.exercises.length}
-            </p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Total volume</p>
-            <p className="font-medium">{totalVolume.toLocaleString()} kg</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Energy</p>
-            <p className="font-medium">
-              {store.energyPre ?? "-"} → {store.energyPost ?? "-"}
-            </p>
-          </div>
-        </div>
+    <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 text-center">
+      <div className="w-[100px] h-[100px] rounded-full bg-sage-bg border-2 border-sage flex items-center justify-center text-[40px] mb-6">
+        ✓
       </div>
+      <h1 className="font-heading text-[2rem] font-extrabold leading-tight mb-2">
+        Session<br />Complete!
+      </h1>
+      <p className="text-sm text-muted-foreground mb-8">
+        {plan.name} · {exercisesCompleted} exercises · {totalVolume.toLocaleString()}kg volume
+      </p>
 
-      <div>
-        <label className="text-xs text-muted-foreground">Notes (optional)</label>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="How did the session feel?"
-          maxLength={200}
-          className="mt-1 w-full rounded-lg border border-border bg-card p-3 text-sm resize-none h-20"
-        />
+      {/* Wellness inputs */}
+      <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left mb-4">
+        <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mb-3">
+          How did it feel?
+        </p>
+        <ScoreRow label="Energy" value={energy} onChange={setEnergy} />
+        <ScoreRow label="Sleep last night" value={sleep} onChange={setSleep} />
+        <ScoreRow label="Soreness" value={soreness} onChange={setSoreness} />
       </div>
 
       <button
         onClick={handleComplete}
-        className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground"
+        className="w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#0f1f10]"
       >
-        Complete Session
+        Back to Dashboard
       </button>
+    </div>
+  );
+}
+
+function ScoreRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="mb-3 last:mb-0">
+      <p className="text-[13px] text-muted-foreground mb-1.5">{label}</p>
+      <div className="flex gap-2">
+        {[1, 2, 3, 4, 5].map((v) => (
+          <button
+            key={v}
+            onClick={() => onChange(v)}
+            className={`flex-1 rounded-[10px] border py-2.5 font-heading text-[15px] font-bold transition-colors ${
+              value === v
+                ? "bg-sage-bg text-sage border-sage-dim"
+                : "bg-surface2 text-muted-foreground border-border hover:border-[#3a3a3a]"
+            }`}
+          >
+            {v}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TargetBox({
+  value,
+  label,
+  highlight = false,
+}: {
+  value: string;
+  label: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="flex-1 rounded-[10px] bg-surface2 p-2.5 text-center">
+      <p className={`font-heading text-[1.1rem] font-bold ${highlight ? "text-sage" : "text-muted-foreground text-[0.9rem]"}`}>
+        {value}
+      </p>
+      <p className="text-[10px] text-[#5a5550] mt-0.5">{label}</p>
     </div>
   );
 }
