@@ -1,0 +1,22 @@
+{
+  "name": "Daniela's Training",
+  "short_name": "Training",
+  "description": "Personal training tracker for workout logging, progressive overload, and wellbeing check-ins",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#7F77DD",
+  "background_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
