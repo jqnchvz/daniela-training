@@ -120,7 +120,7 @@ export default function CheckinPage() {
 
         <button
           onClick={handleSave}
-          className="w-full rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#1A1625] transition-all hover:bg-[#B0A4D4]"
+          className="w-full rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
         >
           Save Check-in ✓
         </button>
@@ -156,7 +156,7 @@ function ScoreDisplay({ label, value, color }: { label: string; value: number; c
   return (
     <div className="text-center rounded-[10px] bg-surface2 p-2.5">
       <p className={`font-heading text-xl font-extrabold ${color}`}>{value}</p>
-      <p className="text-[10px] text-[#8A847E]">{label}</p>
+      <p className="text-[10px] text-muted-foreground">{label}</p>
     </div>
   );
 }

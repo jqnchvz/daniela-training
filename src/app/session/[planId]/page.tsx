@@ -39,7 +39,7 @@ export default function ActiveSessionPage({
   return (
     <div className="min-h-screen flex flex-col">
       {!isOnline && (
-        <div className="mx-5 mt-3 rounded-[10px] bg-gold-bg border border-[#3A3018] px-3 py-2 text-xs text-gold">
+        <div className="mx-5 mt-3 rounded-[10px] bg-gold-bg border border-gold/30 px-3 py-2 text-xs text-gold">
           Offline — data will sync when reconnected
         </div>
       )}
@@ -68,7 +68,7 @@ function PreCheckPhase() {
         <button
           onClick={() => setPhase("warmup")}
           disabled={energyPre === null}
-          className="mt-6 w-full rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#1A1625] disabled:opacity-50 transition-all hover:bg-[#B0A4D4]"
+          className="mt-6 w-full rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground disabled:opacity-50 transition-all hover:bg-sage/80"
         >
           Start Warm-up →
         </button>
@@ -99,7 +99,7 @@ function WarmupPhase({ planId }: { planId: string }) {
                 <span>{item.icon}</span>
                 <span>{item.text}</span>
               </span>
-              <span className="text-[10px] text-[#8A847E] font-mono shrink-0 ml-2">
+              <span className="text-[10px] text-muted-foreground font-mono shrink-0 ml-2">
                 {item.duration}
               </span>
             </div>
@@ -108,7 +108,7 @@ function WarmupPhase({ planId }: { planId: string }) {
       </div>
       <button
         onClick={() => setPhase("working")}
-        className="mt-6 w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#1A1625] transition-all hover:bg-[#B0A4D4]"
+        className="mt-6 w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
       >
         Done with Warm-up →
       </button>
@@ -147,7 +147,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         <h2 className="font-heading text-lg font-bold mb-3">All exercises complete!</h2>
         <button
           onClick={() => store.setPhase("cooldown")}
-          className="rounded-[16px] bg-sage px-8 py-4 font-heading text-[15px] font-bold text-[#1A1625]"
+          className="rounded-[16px] bg-sage px-8 py-4 font-heading text-[15px] font-bold text-primary-foreground"
         >
           Start Cool-down →
         </button>
@@ -286,7 +286,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
                 className="w-full rounded-lg border border-border bg-surface2 px-2.5 py-2 font-mono text-sm text-center disabled:opacity-40"
                 placeholder="kg"
               />
-              <span className="text-[11px] text-[#8A847E] shrink-0 w-5 text-center">×</span>
+              <span className="text-[11px] text-muted-foreground shrink-0 w-5 text-center">×</span>
               <input
                 type="number"
                 value={isDone ? setsForExercise[i].reps : input.reps}
@@ -304,10 +304,10 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
                 onClick={() => handleLogSet(i)}
                 className={`w-9 h-9 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
                   isDone
-                    ? "bg-sage border-sage text-[#1A1625]"
+                    ? "bg-sage border-sage text-primary-foreground"
                     : isNext
                       ? "border-sage hover:bg-sage/20 cursor-pointer"
-                      : "border-[#3A3530] opacity-40"
+                      : "border-border opacity-40"
                 }`}
               >
                 {isDone ? "✓" : ""}
@@ -322,7 +322,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         <div className="mx-5 mt-4 flex items-center gap-3 rounded-[16px] border border-border bg-surface2 p-3.5">
           <span className="text-[22px] w-11 text-center shrink-0">👁</span>
           <div className="flex-1">
-            <p className="text-[10px] text-[#8A847E] tracking-[1px] uppercase font-semibold">Next up</p>
+            <p className="text-[10px] text-muted-foreground tracking-[1px] uppercase font-semibold">Next up</p>
             <p className="font-semibold text-sm mt-0.5">{nextExercise.name}</p>
           </div>
           <span className="rounded-full bg-surface2 border border-border px-2 py-0.5 text-[11px] text-muted-foreground">
@@ -336,14 +336,14 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         {currentExIndex > 0 && (
           <button
             onClick={handlePrevExercise}
-            className="flex-[0.5] rounded-[16px] border border-[#3A3530] bg-surface2 py-3.5 font-heading text-sm font-semibold transition-colors hover:bg-surface3"
+            className="flex-[0.5] rounded-[16px] border border-border bg-surface2 py-3.5 font-heading text-sm font-semibold transition-colors hover:bg-surface3"
           >
             ‹ Prev
           </button>
         )}
         <button
           onClick={handleNextExercise}
-          className="flex-1 rounded-[16px] bg-sage py-3.5 font-heading text-[15px] font-bold text-[#1A1625] transition-all hover:bg-[#B0A4D4]"
+          className="flex-1 rounded-[16px] bg-sage py-3.5 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
         >
           {allSetsDone ? "Next Exercise →" : "Skip →"}
         </button>
@@ -377,7 +377,7 @@ function CooldownPhase({ planId }: { planId: string }) {
                 <span>{item.icon}</span>
                 <span>{item.text}</span>
               </span>
-              <span className="text-[10px] text-[#8A847E] font-mono shrink-0 ml-2">
+              <span className="text-[10px] text-muted-foreground font-mono shrink-0 ml-2">
                 {item.duration}
               </span>
             </div>
@@ -386,7 +386,7 @@ function CooldownPhase({ planId }: { planId: string }) {
       </div>
       <button
         onClick={() => store.setPhase("summary")}
-        className="mt-6 w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#1A1625]"
+        className="mt-6 w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground"
       >
         Complete Session ✓
       </button>
@@ -470,7 +470,7 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
       <button
         onClick={handleComplete}
-        className="w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#1A1625]"
+        className="w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground"
       >
         Back to Dashboard
       </button>
@@ -498,7 +498,7 @@ function ScoreRow({
             className={`flex-1 rounded-[10px] border py-2.5 font-heading text-[15px] font-bold transition-colors ${
               value === v
                 ? "bg-sage-bg text-sage border-sage-dim"
-                : "bg-surface2 text-muted-foreground border-border hover:border-[#3A3530]"
+                : "bg-surface2 text-muted-foreground border-border hover:border-border"
             }`}
           >
             {v}
@@ -523,7 +523,7 @@ function TargetBox({
       <p className={`font-heading text-[1.1rem] font-bold ${highlight ? "text-sage" : "text-muted-foreground text-[0.9rem]"}`}>
         {value}
       </p>
-      <p className="text-[10px] text-[#8A847E] mt-0.5">{label}</p>
+      <p className="text-[10px] text-muted-foreground mt-0.5">{label}</p>
     </div>
   );
 }

@@ -85,7 +85,7 @@ export function RestTimer() {
 
       <button
         onClick={() => setRestTimer(null)}
-        className="rounded-full bg-surface2 border border-[#3A3530] px-8 py-3 text-sm font-semibold transition-colors hover:bg-surface3"
+        className="rounded-full bg-surface2 border border-border px-8 py-3 text-sm font-semibold transition-colors hover:bg-surface3"
       >
         Skip rest →
       </button>

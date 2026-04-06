@@ -17,7 +17,7 @@ export function BottomNav() {
   const t = useT();
 
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-[420px] border-t border-border bg-[rgba(26,24,22,0.92)] backdrop-blur-[20px] pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-[420px] border-t border-border bg-background/92 backdrop-blur-[20px] pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-center py-3">
         {navItems.map((item) => {
           const isActive =
@@ -33,7 +33,7 @@ export function BottomNav() {
               <span className="text-xl leading-none">{item.icon}</span>
               <span
                 className={`text-[10px] font-semibold tracking-[0.5px] transition-colors ${
-                  isActive ? "text-sage" : "text-[#8A847E]"
+                  isActive ? "text-sage" : "text-muted-foreground"
                 }`}
               >
                 {t(item.labelKey)}

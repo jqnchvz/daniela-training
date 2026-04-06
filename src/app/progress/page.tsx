@@ -46,9 +46,9 @@ export default function ProgressPage() {
 
       {/* Red flag banner */}
       {(redFlags.hasEnergyFlag || redFlags.hasMoodFlag) && (
-        <div className="rounded-[16px] bg-dt-red-bg border border-[#3A1820] p-3.5 flex gap-2.5 items-start mb-3">
+        <div className="rounded-[16px] bg-dt-red-bg border border-destructive/30 p-3.5 flex gap-2.5 items-start mb-3">
           <span className="text-lg shrink-0">⚠️</span>
-          <p className="text-[13px] text-[#D48A8E] leading-relaxed">
+          <p className="text-[13px] text-[var(--dt-red)] leading-relaxed">
             {redFlags.hasEnergyFlag && (
               <>
                 Your 7-day energy average (<strong>{redFlags.energyAvg7}</strong>) is significantly
@@ -163,7 +163,7 @@ export default function ProgressPage() {
           <MetricBox value="—" label="Hip cm" />
           <MetricBox value="—" label="Thigh cm" />
         </div>
-        <button className="w-full mt-3 rounded-[16px] border border-[#3A3530] bg-surface2 py-2.5 text-[13px] font-semibold transition-colors hover:bg-surface3">
+        <button className="w-full mt-3 rounded-[16px] border border-border bg-surface2 py-2.5 text-[13px] font-semibold transition-colors hover:bg-surface3">
           + Log measurements
         </button>
       </div>
@@ -329,7 +329,7 @@ function StrengthChart({ data }: { data: ExerciseDataPoint[] }) {
           {data[data.length - 1].label}
         </text>
       </svg>
-      <div className="flex justify-between mt-2 text-xs text-[#8A847E]">
+      <div className="flex justify-between mt-2 text-xs text-muted-foreground">
         <span>Started: <span className="text-muted-foreground">{data[0].maxWeight} kg</span></span>
         {data.length > 1 && (
           <span>
@@ -415,7 +415,7 @@ function MetricBox({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex-1 text-center rounded-[10px] bg-surface2 p-3">
       <p className="font-heading text-[1.2rem] font-extrabold">{value}</p>
-      <p className="text-[10px] text-[#8A847E] mt-1">{label}</p>
+      <p className="text-[10px] text-muted-foreground mt-1">{label}</p>
     </div>
   );
 }
