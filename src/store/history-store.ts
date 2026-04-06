@@ -58,6 +58,7 @@ interface HistoryState {
   addCheckin: (checkin: SavedCheckin) => void;
   addMeasurement: (m: BodyMeasurement) => void;
   getLatestMeasurement: (userId?: string) => BodyMeasurement | null;
+  getMeasurementsForUser: (userId?: string) => BodyMeasurement[];
   getSessionsByWeek: (userId?: string) => { thisWeek: number; total: number };
   getLatestCheckin: (userId?: string) => SavedCheckin | null;
   getCheckinForDate: (date: string) => SavedCheckin | null;
@@ -95,6 +96,13 @@ export const useHistoryStore = create<HistoryState>()(
           ? get().measurements.filter((m) => !m.userId || m.userId === userId)
           : get().measurements;
         return measurements[0] ?? null;
+      },
+
+      getMeasurementsForUser: (userId) => {
+        const all = userId
+          ? get().measurements.filter((m) => !m.userId || m.userId === userId)
+          : get().measurements;
+        return [...all].reverse(); // chronological order for charts
       },
 
       getSessionsForUser: (userId) => {

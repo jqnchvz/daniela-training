@@ -14,8 +14,10 @@ export default function ProgressPage() {
   const checkins = useHistoryStore((s) => s.checkins);
   const addMeasurement = useHistoryStore((s) => s.addMeasurement);
   const getLatestMeasurement = useHistoryStore((s) => s.getLatestMeasurement);
+  const getMeasurements = useHistoryStore((s) => s.getMeasurementsForUser);
   const activeUserId = useAuthStore((s) => s.activeUserId);
   const latestMeasurement = getLatestMeasurement(activeUserId ?? undefined);
+  const allMeasurements = getMeasurements(activeUserId ?? undefined);
   const [selectedExercise, setSelectedExercise] = useState(EXERCISES[0]?.id ?? "");
   const [showMeasForm, setShowMeasForm] = useState(false);
   const [waist, setWaist] = useState(latestMeasurement?.waist?.toString() ?? "");
@@ -172,6 +174,12 @@ export default function ProgressPage() {
           <MetricBox value={latestMeasurement?.hip ? `${latestMeasurement.hip}` : "—"} label="Hip cm" />
           <MetricBox value={latestMeasurement?.thigh ? `${latestMeasurement.thigh}` : "—"} label="Thigh cm" />
         </div>
+
+        {allMeasurements.length >= 2 && (
+          <div className="mt-3">
+            <MeasurementsChart data={allMeasurements} />
+          </div>
+        )}
 
         {showMeasForm ? (
           <div className="mt-3 space-y-2">
@@ -455,6 +463,45 @@ function RuleItem({ status, name, detail, weight, last = false }: {
       </div>
       <span className="font-mono text-[13px] text-sage shrink-0">{weight}</span>
     </div>
+  );
+}
+
+function MeasurementsChart({ data }: { data: Array<{ date: string; waist: number | null; hip: number | null; thigh: number | null }> }) {
+  const width = 300;
+  const height = 80;
+  const padding = 5;
+
+  // Gather all non-null values to find min/max
+  const allValues = data.flatMap((d) => [d.waist, d.hip, d.thigh].filter((v): v is number => v !== null));
+  if (allValues.length === 0) return null;
+  const min = Math.min(...allValues) - 2;
+  const max = Math.max(...allValues) + 2;
+  const range = max - min || 1;
+
+  const makePoints = (values: (number | null)[]) => {
+    const valid = values.map((v, i) => v !== null ? { i, v } : null).filter(Boolean) as { i: number; v: number }[];
+    if (valid.length < 2) return null;
+    return valid.map(({ i, v }) => {
+      const x = data.length === 1 ? width / 2 : (i / (data.length - 1)) * (width - padding * 2) + padding;
+      const y = height - padding - ((v - min) / range) * (height - padding * 2 - 10);
+      return `${x},${y}`;
+    }).join(" ");
+  };
+
+  const waistPts = makePoints(data.map((d) => d.waist));
+  const hipPts = makePoints(data.map((d) => d.hip));
+  const thighPts = makePoints(data.map((d) => d.thigh));
+
+  return (
+    <svg className="w-full h-20" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+      {waistPts && <polyline points={waistPts} stroke="#9B8EC4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />}
+      {hipPts && <polyline points={hipPts} stroke="#E4A0A0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />}
+      {thighPts && <polyline points={thighPts} stroke="#5a9fd4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />}
+      {/* Legend */}
+      {waistPts && <><line x1="10" y1="8" x2="22" y2="8" stroke="#9B8EC4" strokeWidth="2" /><text x="25" y="11" fill="#9B8EC4" fontSize="8">Waist</text></>}
+      {hipPts && <><line x1="65" y1="8" x2="77" y2="8" stroke="#E4A0A0" strokeWidth="2" /><text x="80" y="11" fill="#E4A0A0" fontSize="8">Hip</text></>}
+      {thighPts && <><line x1="110" y1="8" x2="122" y2="8" stroke="#5a9fd4" strokeWidth="2" /><text x="125" y="11" fill="#5a9fd4" fontSize="8">Thigh</text></>}
+    </svg>
   );
 }
 
