@@ -76,6 +76,17 @@ const translations: Record<string, Record<Locale, string>> = {
     en: "Your last check-in showed high soreness ({score}/10). Consider a rest day or lighter session if your body needs it.",
     es: "Tu último registro mostró dolor muscular alto ({score}/10). Considera un día de descanso o sesión más ligera si tu cuerpo lo necesita.",
   },
+  "session.lowEnergyPrompt": {
+    en: "Low energy? A shorter session still counts.",
+    es: "¿Poca energía? Una sesión más corta también cuenta.",
+  },
+  "session.fullSession": { en: "Full session", es: "Sesión completa" },
+  "session.liteSession": { en: "Lite session", es: "Sesión ligera" },
+  "session.liteDesc": {
+    en: "Compounds only, fewer sets",
+    es: "Solo compuestos, menos series",
+  },
+  "session.liteActive": { en: "Lite mode", es: "Modo ligero" },
   "session.startWarmup": { en: "Start Warm-up →", es: "Iniciar Calentamiento →" },
   "session.doneWarmup": { en: "Done with Warm-up →", es: "Calentamiento Listo →" },
   "session.warmupDesc": {

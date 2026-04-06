@@ -4,6 +4,7 @@ import {
   WORKOUT_PLANS,
   getExerciseById,
   getPlanByDayOfWeek,
+  getLiteExercises,
 } from "@/lib/exercises";
 
 describe("Exercise database", () => {
@@ -104,5 +105,44 @@ describe("Workout plans", () => {
   it("getPlanByDayOfWeek returns undefined for rest days", () => {
     expect(getPlanByDayOfWeek(0)).toBeUndefined(); // Sunday
     expect(getPlanByDayOfWeek(2)).toBeUndefined(); // Tuesday
+  });
+});
+
+describe("getLiteExercises", () => {
+  it("filters to compound and multi_joint only", () => {
+    const dayA = WORKOUT_PLANS[0];
+    const lite = getLiteExercises(dayA.exercises);
+    for (const pe of lite) {
+      const ex = getExerciseById(pe.exerciseId)!;
+      expect(["compound", "multi_joint"]).toContain(ex.category);
+    }
+  });
+
+  it("excludes isolation exercises", () => {
+    const dayA = WORKOUT_PLANS[0];
+    const lite = getLiteExercises(dayA.exercises);
+    const liteIds = new Set(lite.map((pe) => pe.exerciseId));
+    for (const pe of dayA.exercises) {
+      const ex = getExerciseById(pe.exerciseId)!;
+      if (ex.category === "isolation") {
+        expect(liteIds.has(pe.exerciseId)).toBe(false);
+      }
+    }
+  });
+
+  it("reduces sets by 1 with minimum 2", () => {
+    const dayA = WORKOUT_PLANS[0];
+    const lite = getLiteExercises(dayA.exercises);
+    for (const pe of lite) {
+      const original = dayA.exercises.find((e) => e.exerciseId === pe.exerciseId)!;
+      expect(pe.sets).toBe(Math.max(2, original.sets - 1));
+    }
+  });
+
+  it("Day A lite has fewer exercises than full", () => {
+    const dayA = WORKOUT_PLANS[0];
+    const lite = getLiteExercises(dayA.exercises);
+    expect(lite.length).toBeLessThan(dayA.exercises.length);
+    expect(lite.length).toBeGreaterThan(0);
   });
 });

@@ -100,3 +100,15 @@ export const WORKOUT_PLANS: WorkoutPlan[] = [
 export function getPlanByDayOfWeek(dayOfWeek: number): WorkoutPlan | undefined {
   return WORKOUT_PLANS.find((p) => p.dayOfWeek === dayOfWeek);
 }
+
+/**
+ * Get lite-mode exercises: compounds/multi_joint only, sets reduced by 1 (min 2).
+ */
+export function getLiteExercises(exercises: PlanExercise[]): PlanExercise[] {
+  return exercises
+    .filter((pe) => {
+      const ex = EXERCISE_MAP.get(pe.exerciseId);
+      return ex && (ex.category === "compound" || ex.category === "multi_joint");
+    })
+    .map((pe) => ({ ...pe, sets: Math.max(2, pe.sets - 1) }));
+}

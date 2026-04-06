@@ -85,6 +85,18 @@ describe("Session Store", () => {
     expect(state.energyPost).toBe(8);
   });
 
+  it("sets session mode", () => {
+    expect(useSessionStore.getState().sessionMode).toBe("full");
+    useSessionStore.getState().setSessionMode("lite");
+    expect(useSessionStore.getState().sessionMode).toBe("lite");
+  });
+
+  it("resets session mode on reset", () => {
+    useSessionStore.getState().setSessionMode("lite");
+    useSessionStore.getState().reset();
+    expect(useSessionStore.getState().sessionMode).toBe("full");
+  });
+
   it("resets to initial state", () => {
     useSessionStore.getState().startSession("plan-1");
     useSessionStore.getState().setPhase("working");
