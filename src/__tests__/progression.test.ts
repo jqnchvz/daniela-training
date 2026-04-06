@@ -152,6 +152,54 @@ describe("getDeloadStatus", () => {
     expect(status.shouldDeload).toBe(false);
     vi.useRealTimers();
   });
+
+  it("suggests early deload when energy red flag is active", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-04-08")); // week 2
+    const status = getDeloadStatus("2026-04-01", null, {
+      hasEnergyFlag: true,
+      hasMoodFlag: false,
+    });
+    expect(status.earlyDeloadSuggested).toBe(true);
+    expect(status.message).toContain("declining energy or mood");
+    vi.useRealTimers();
+  });
+
+  it("suggests early deload when mood red flag is active", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-04-08")); // week 2
+    const status = getDeloadStatus("2026-04-01", null, {
+      hasEnergyFlag: false,
+      hasMoodFlag: true,
+    });
+    expect(status.earlyDeloadSuggested).toBe(true);
+    vi.useRealTimers();
+  });
+
+  it("does not suggest early deload without red flags", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-04-08")); // week 2
+    const status = getDeloadStatus("2026-04-01", null, {
+      hasEnergyFlag: false,
+      hasMoodFlag: false,
+    });
+    expect(status.earlyDeloadSuggested).toBe(false);
+    expect(status.message).toBeNull();
+    vi.useRealTimers();
+  });
+
+  it("does not suggest early deload at week 3+ (already approaching scheduled deload)", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-04-17")); // week 3
+    const status = getDeloadStatus("2026-04-01", null, {
+      hasEnergyFlag: true,
+      hasMoodFlag: true,
+    });
+    // Week 3 already shows "deload coming up" — no need for early suggestion
+    expect(status.earlyDeloadSuggested).toBe(false);
+    expect(status.shouldDeload).toBe(true);
+    vi.useRealTimers();
+  });
 });
 
 describe("applyDeload", () => {

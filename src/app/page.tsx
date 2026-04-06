@@ -9,17 +9,28 @@ import {
   getDayName,
 } from "@/lib/workout-schedule";
 import { getCurrentPhase } from "@/lib/phases";
+import { getDeloadStatus } from "@/lib/progression";
+import { detectRedFlags } from "@/lib/checkin";
 import { useCycleStore } from "@/store/cycle-store";
 import { useHistoryStore } from "@/store/history-store";
 import { useT } from "@/lib/i18n";
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
+  const [earlyDeloadDismissed, setEarlyDeloadDismissed] = useState(false);
   const t = useT();
   const cycle = useCycleStore();
   const history = useHistoryStore();
   const weekStats = history.getSessionsByWeek();
   const latestCheckin = history.getLatestCheckin();
+
+  // Compute early deload suggestion from red flags
+  const redFlags = detectRedFlags(
+    history.checkins.map((c) => ({ ...c, sleepHours: c.sleepHours ?? null })),
+  );
+  const deloadStatus = cycle.cycleStartDate
+    ? getDeloadStatus(cycle.cycleStartDate, cycle.lastDeloadDate ?? null, redFlags)
+    : null;
 
   useEffect(() => {
     setMounted(true);
@@ -79,6 +90,21 @@ export default function HomePage() {
           <span className="h-2 w-2 rounded-full bg-sage" />
           {t("home.startProgram")}
         </button>
+      )}
+
+      {/* Early deload suggestion */}
+      {deloadStatus?.earlyDeloadSuggested && !earlyDeloadDismissed && (
+        <div className="mt-3 rounded-[12px] bg-gold-bg border border-gold/30 px-4 py-3 flex items-start gap-3">
+          <p className="text-[13px] text-gold leading-relaxed flex-1">
+            ⚠️ {t("home.earlyDeload")}
+          </p>
+          <button
+            onClick={() => setEarlyDeloadDismissed(true)}
+            className="text-[11px] text-gold/70 font-semibold shrink-0 mt-0.5"
+          >
+            {t("home.dismiss")}
+          </button>
+        </div>
       )}
 
       {/* Week strip */}

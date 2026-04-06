@@ -63,6 +63,11 @@ const translations: Record<string, Record<Locale, string>> = {
   "home.totalSessions": { en: "Total sessions", es: "Sesiones totales" },
   "home.checkins": { en: "Check-ins", es: "Registros" },
   "home.phaseProgress": { en: "Phase progress", es: "Progreso de fase" },
+  "home.earlyDeload": {
+    en: "Your recent check-ins show declining energy or mood. Consider taking a deload week early.",
+    es: "Tus registros recientes muestran energía o ánimo en descenso. Considera tomar una semana de descarga antes.",
+  },
+  "home.dismiss": { en: "Dismiss", es: "Descartar" },
 
   // Session
   "session.workoutSessions": { en: "Workout Sessions", es: "Sesiones de Entrenamiento" },
