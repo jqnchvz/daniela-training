@@ -27,6 +27,7 @@ interface SessionState {
   startedAt: string | null;
   notes: string;
   restTimerEnd: number | null;
+  restTimerNextInfo: string | null;
 
   startSession: (planId: string) => void;
   setPhase: (phase: SessionPhase) => void;
@@ -37,7 +38,7 @@ interface SessionState {
   nextExercise: () => void;
   toggleWarmup: (index: number) => void;
   toggleCooldown: (index: number) => void;
-  setRestTimer: (endTime: number | null) => void;
+  setRestTimer: (endTime: number | null, nextInfo?: string | null) => void;
   setNotes: (notes: string) => void;
   reset: () => void;
 }
@@ -55,6 +56,7 @@ const initialState = {
   startedAt: null,
   notes: "",
   restTimerEnd: null,
+  restTimerNextInfo: null,
 };
 
 export const useSessionStore = create<SessionState>()(
@@ -92,7 +94,7 @@ export const useSessionStore = create<SessionState>()(
           return { cooldownChecklist: list };
         }),
 
-      setRestTimer: (endTime) => set({ restTimerEnd: endTime }),
+      setRestTimer: (endTime, nextInfo) => set({ restTimerEnd: endTime, restTimerNextInfo: nextInfo ?? null }),
       setNotes: (notes) => set({ notes }),
       reset: () => set(initialState),
     }),

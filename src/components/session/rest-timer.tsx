@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useSessionStore } from "@/store/session-store";
+import { useI18n } from "@/lib/i18n";
 
 export function RestTimer() {
   const restTimerEnd = useSessionStore((s) => s.restTimerEnd);
+  const restTimerNextInfo = useSessionStore((s) => s.restTimerNextInfo);
   const setRestTimer = useSessionStore((s) => s.setRestTimer);
+  const locale = useI18n((s) => s.locale);
   const [remaining, setRemaining] = useState(0);
   const [totalSeconds, setTotalSeconds] = useState(0);
 
@@ -44,6 +47,8 @@ export function RestTimer() {
   const progress = totalSeconds > 0 ? remaining / totalSeconds : 0;
   const dashOffset = circumference * (1 - progress);
 
+  const isEs = locale === "es";
+
   return (
     <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/85 backdrop-blur-[10px]">
       {/* Circular ring */}
@@ -74,20 +79,32 @@ export function RestTimer() {
             {minutes}:{seconds.toString().padStart(2, "0")}
           </span>
           <span className="text-xs tracking-[2px] uppercase text-muted-foreground">
-            REST
+            {isEs ? "DESCANSO" : "REST"}
           </span>
         </div>
       </div>
 
-      <p className="text-[15px] text-muted-foreground mb-8 text-center">
-        Great set! Rest and<br />prepare for the next one.
+      <p className="text-[15px] text-muted-foreground mb-4 text-center">
+        {isEs
+          ? "¡Gran serie! Descansa y\nprepárate para la siguiente."
+          : "Great set! Rest and\nprepare for the next one."}
       </p>
+
+      {/* Next exercise info */}
+      {restTimerNextInfo && (
+        <div className="rounded-[12px] border border-border bg-surface2/50 px-4 py-2.5 mb-6 text-center">
+          <p className="text-[10px] text-muted-foreground tracking-[1px] uppercase font-semibold">
+            {isEs ? "Siguiente" : "Next up"}
+          </p>
+          <p className="text-[14px] font-semibold mt-0.5">{restTimerNextInfo}</p>
+        </div>
+      )}
 
       <button
         onClick={() => setRestTimer(null)}
         className="rounded-full bg-surface2 border border-border px-8 py-3 text-sm font-semibold transition-colors hover:bg-surface3"
       >
-        Skip rest →
+        {isEs ? "Saltar descanso →" : "Skip rest →"}
       </button>
     </div>
   );

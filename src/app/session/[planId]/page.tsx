@@ -251,7 +251,14 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
     // Start rest timer if not last set
     if (setsForExercise.length + 1 < currentPlanExercise.sets) {
-      store.setRestTimer(Date.now() + currentPlanExercise.restSeconds * 1000);
+      // Show next set info, or next exercise if this is the penultimate set
+      const remainingSets = currentPlanExercise.sets - (setsForExercise.length + 1);
+      const nextInfo = remainingSets > 1
+        ? `Set ${setsForExercise.length + 2}/${currentPlanExercise.sets} · ${locale === "es" ? (exercise?.nameEs ?? exercise?.name) : exercise?.name}`
+        : nextExercise
+          ? `${locale === "es" ? nextExercise.nameEs : nextExercise.name} · ${nextPlanEx.sets}×${nextPlanEx.reps}`
+          : null;
+      store.setRestTimer(Date.now() + currentPlanExercise.restSeconds * 1000, nextInfo);
     }
   };
 
@@ -329,6 +336,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
             <TargetBox value={`${Math.floor(currentPlanExercise.restSeconds / 60)} min`} label="Rest" />
             <TargetBox value={lastWeight ? `${lastWeight} kg` : "—"} label={t("session.lastWt")} />
           </div>
+          <HypothyroidInfo restSeconds={currentPlanExercise.restSeconds} reps={currentPlanExercise.reps} isCompound={exercise.category === "compound"} />
         </div>
       </div>
 
@@ -587,6 +595,65 @@ function ScoreRow({
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+function HypothyroidInfo({
+  restSeconds,
+  reps,
+  isCompound,
+}: {
+  restSeconds: number;
+  reps: number;
+  isCompound: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const locale = useI18n((s) => s.locale);
+  const isEs = locale === "es";
+
+  const restMin = Math.floor(restSeconds / 60);
+  const restSec = restSeconds % 60;
+  const restLabel = restSec > 0 ? `${restMin}:${String(restSec).padStart(2, "0")}` : `${restMin} min`;
+
+  return (
+    <div className="mt-3">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-1.5 text-[11px] text-sage font-semibold"
+      >
+        <span>ℹ️</span>
+        <span>{isEs ? "¿Por qué estos valores?" : "Why these values?"}</span>
+        <span className="text-[9px]">{expanded ? "▲" : "▼"}</span>
+      </button>
+      {expanded && (
+        <div className="mt-2 rounded-[10px] bg-surface2 border border-border p-3 text-[12px] text-muted-foreground leading-relaxed space-y-2">
+          <p>
+            <span className="font-semibold text-foreground">{isEs ? "Descanso" : "Rest"} ({restLabel}):</span>{" "}
+            {isEs
+              ? isCompound
+                ? "Los descansos más largos en ejercicios compuestos permiten una recuperación completa del sistema nervioso central, algo crucial con hipotiroidismo ya que el metabolismo más lento afecta la capacidad de recuperación."
+                : "Los ejercicios accesorios requieren menos descanso al trabajar grupos musculares más pequeños con menor carga sobre el sistema nervioso."
+              : isCompound
+                ? "Longer rest on compound lifts allows full CNS recovery — crucial with hypothyroidism since slower metabolism affects recovery capacity."
+                : "Accessory exercises need less rest as they work smaller muscle groups with less nervous system demand."}
+          </p>
+          <p>
+            <span className="font-semibold text-foreground">{isEs ? "Repeticiones" : "Reps"} ({reps}):</span>{" "}
+            {isEs
+              ? reps >= 12
+                ? "Las repeticiones más altas construyen capacidad de trabajo y resistencia muscular — ideal en la fase de estabilización para perfeccionar la técnica."
+                : reps >= 8
+                  ? "El rango de hipertrofia estándar promueve el crecimiento muscular mientras mantiene un esfuerzo moderado sobre la tiroides."
+                  : "Menos repeticiones con más peso desarrollan fuerza máxima — los descansos más largos compensan la mayor demanda al sistema."
+              : reps >= 12
+                ? "Higher reps build work capacity and muscular endurance — ideal in the stabilization phase for mastering form."
+                : reps >= 8
+                  ? "Standard hypertrophy range promotes muscle growth while keeping moderate thyroid stress."
+                  : "Lower reps with heavier weight build maximal strength — longer rest compensates for the higher system demand."}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
