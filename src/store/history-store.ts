@@ -4,6 +4,7 @@ import { syncSessionToDb, syncCheckinToDb } from "@/lib/db/sync";
 
 export interface CompletedSession {
   id: string;
+  userId?: string;
   planId: string;
   planName: string;
   date: string;
@@ -29,6 +30,7 @@ export interface CompletedSet {
 
 export interface SavedCheckin {
   id: string;
+  userId?: string;
   date: string;
   energy: number;
   sleepQuality: number;
@@ -44,10 +46,12 @@ interface HistoryState {
 
   addSession: (session: CompletedSession) => void;
   addCheckin: (checkin: SavedCheckin) => void;
-  getSessionsByWeek: () => { thisWeek: number; total: number };
-  getLatestCheckin: () => SavedCheckin | null;
+  getSessionsByWeek: (userId?: string) => { thisWeek: number; total: number };
+  getLatestCheckin: (userId?: string) => SavedCheckin | null;
   getCheckinForDate: (date: string) => SavedCheckin | null;
-  getLastWeightForExercise: (exerciseId: string) => number | null;
+  getLastWeightForExercise: (exerciseId: string, userId?: string) => number | null;
+  getSessionsForUser: (userId?: string) => CompletedSession[];
+  getCheckinsForUser: (userId?: string) => SavedCheckin[];
 }
 
 export const useHistoryStore = create<HistoryState>()(
@@ -69,22 +73,39 @@ export const useHistoryStore = create<HistoryState>()(
         syncCheckinToDb(checkin);
       },
 
-      getSessionsByWeek: () => {
+      getSessionsForUser: (userId) => {
+        if (!userId) return get().sessions;
+        return get().sessions.filter((s) => !s.userId || s.userId === userId);
+      },
+
+      getCheckinsForUser: (userId) => {
+        if (!userId) return get().checkins;
+        return get().checkins.filter((c) => !c.userId || c.userId === userId);
+      },
+
+      getSessionsByWeek: (userId) => {
         const now = new Date();
         const startOfWeek = new Date(now);
         const day = startOfWeek.getDay();
         startOfWeek.setDate(startOfWeek.getDate() - (day === 0 ? 6 : day - 1));
         startOfWeek.setHours(0, 0, 0, 0);
 
-        const thisWeek = get().sessions.filter(
+        const sessions = userId
+          ? get().sessions.filter((s) => !s.userId || s.userId === userId)
+          : get().sessions;
+
+        const thisWeek = sessions.filter(
           (s) => new Date(s.date) >= startOfWeek,
         ).length;
 
-        return { thisWeek, total: get().sessions.length };
+        return { thisWeek, total: sessions.length };
       },
 
-      getLatestCheckin: () => {
-        const sorted = [...get().checkins].sort(
+      getLatestCheckin: (userId) => {
+        const checkins = userId
+          ? get().checkins.filter((c) => !c.userId || c.userId === userId)
+          : get().checkins;
+        const sorted = [...checkins].sort(
           (a, b) => b.date.localeCompare(a.date),
         );
         return sorted[0] ?? null;
@@ -93,8 +114,11 @@ export const useHistoryStore = create<HistoryState>()(
       getCheckinForDate: (date) =>
         get().checkins.find((c) => c.date === date) ?? null,
 
-      getLastWeightForExercise: (exerciseId) => {
-        for (const session of get().sessions) {
+      getLastWeightForExercise: (exerciseId, userId) => {
+        const sessions = userId
+          ? get().sessions.filter((s) => !s.userId || s.userId === userId)
+          : get().sessions;
+        for (const session of sessions) {
           const sets = session.sets.filter(
             (s) => s.exerciseId === exerciseId && s.weight > 0,
           );

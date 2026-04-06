@@ -177,6 +177,20 @@ const translations: Record<string, Record<Locale, string>> = {
   "checkin.none": { en: "None", es: "Ninguno" },
   "checkin.verySore": { en: "Very sore", es: "Muy adolorido" },
 
+  // Auth
+  "auth.welcome": { en: "Welcome", es: "Bienvenido" },
+  "auth.selectUser": { en: "Who's training today?", es: "¿Quién entrena hoy?" },
+  "auth.enterPin": { en: "Enter PIN", es: "Ingresa tu PIN" },
+  "auth.wrongPin": { en: "Incorrect PIN", es: "PIN incorrecto" },
+  "auth.addUser": { en: "Add user", es: "Agregar usuario" },
+  "auth.newUserName": { en: "Name", es: "Nombre" },
+  "auth.newUserPin": { en: "PIN (optional)", es: "PIN (opcional)" },
+  "auth.newUserEmoji": { en: "Choose avatar", es: "Elige avatar" },
+  "auth.create": { en: "Create", es: "Crear" },
+  "auth.cancel": { en: "Cancel", es: "Cancelar" },
+  "auth.switchUser": { en: "Switch user", es: "Cambiar usuario" },
+  "auth.noPin": { en: "No PIN", es: "Sin PIN" },
+
   // Days
   "day.mon": { en: "MON", es: "LUN" },
   "day.tue": { en: "TUE", es: "MAR" },

@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { EnergySlider } from "@/components/session/energy-slider";
 import { useHistoryStore } from "@/store/history-store";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function CheckinPage() {
   const addCheckin = useHistoryStore((s) => s.addCheckin);
   const getCheckinForDate = useHistoryStore((s) => s.getCheckinForDate);
+  const activeUserId = useAuthStore((s) => s.activeUserId);
 
   const today = new Date().toISOString().split("T")[0];
   const existing = getCheckinForDate(today);
@@ -36,6 +38,7 @@ export default function CheckinPage() {
   const handleSave = () => {
     addCheckin({
       id: crypto.randomUUID(),
+      userId: activeUserId ?? undefined,
       date: today,
       energy,
       sleepQuality,

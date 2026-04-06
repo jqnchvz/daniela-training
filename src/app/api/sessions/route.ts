@@ -2,12 +2,17 @@ import { db } from "@/lib/db";
 import { sessions, sessionSets } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
 
-export async function GET() {
-  const rows = await db.query.sessions.findMany({
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get("userId");
+
+  const query = db.query.sessions.findMany({
     with: { sets: true },
     orderBy: [desc(sessions.date)],
+    ...(userId ? { where: eq(sessions.userId, userId) } : {}),
   });
 
+  const rows = await query;
   return Response.json(rows);
 }
 
@@ -15,12 +20,12 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { sets, ...sessionData } = body;
 
-  // Use a transaction to ensure session + sets are saved atomically
   const result = await db.transaction(async (tx) => {
     const [session] = await tx
       .insert(sessions)
       .values({
         id: sessionData.id,
+        userId: sessionData.userId ?? null,
         planId: sessionData.planId,
         planName: sessionData.planName,
         date: sessionData.date,
@@ -40,7 +45,6 @@ export async function POST(request: Request) {
     const sessionId = session?.id ?? sessionData.id;
 
     if (sets && sets.length > 0) {
-      // Check if sets already exist for this session (idempotent re-sync)
       const existingSets = await tx
         .select()
         .from(sessionSets)

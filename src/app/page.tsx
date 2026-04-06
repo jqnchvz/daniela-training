@@ -14,6 +14,7 @@ import { detectRedFlags } from "@/lib/checkin";
 import { useCycleStore } from "@/store/cycle-store";
 import { useHistoryStore } from "@/store/history-store";
 import { useT } from "@/lib/i18n";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
@@ -21,8 +22,12 @@ export default function HomePage() {
   const t = useT();
   const cycle = useCycleStore();
   const history = useHistoryStore();
-  const weekStats = history.getSessionsByWeek();
-  const latestCheckin = history.getLatestCheckin();
+  const activeUserName = useAuthStore((s) => s.activeUserName);
+  const activeUserEmoji = useAuthStore((s) => s.activeUserEmoji);
+  const activeUserId = useAuthStore((s) => s.activeUserId);
+  const logout = useAuthStore((s) => s.logout);
+  const weekStats = history.getSessionsByWeek(activeUserId ?? undefined);
+  const latestCheckin = history.getLatestCheckin(activeUserId ?? undefined);
 
   // Compute early deload suggestion from red flags
   const redFlags = detectRedFlags(
@@ -66,11 +71,20 @@ export default function HomePage() {
     <div className="px-5 py-5">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-[13px] text-muted-foreground">
-            {mounted ? t(greetingKey) : t("home.goodMorning")} ☀️
-          </p>
-          <h1 className="font-heading text-[1.35rem] font-bold">Daniela</h1>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={logout}
+            className="w-10 h-10 rounded-full bg-surface2 border border-border flex items-center justify-center text-xl"
+            title={t("auth.switchUser")}
+          >
+            {activeUserEmoji ?? "💪"}
+          </button>
+          <div>
+            <p className="text-[13px] text-muted-foreground">
+              {mounted ? t(greetingKey) : t("home.goodMorning")} ☀️
+            </p>
+            <h1 className="font-heading text-[1.35rem] font-bold">{activeUserName ?? "Daniela"}</h1>
+          </div>
         </div>
         <ThemeToggle />
       </div>

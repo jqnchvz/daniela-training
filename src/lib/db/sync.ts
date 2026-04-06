@@ -90,9 +90,10 @@ if (typeof window !== "undefined") {
 
 // ── Read helpers (hydrate from DB on new device) ────────────────────────────
 
-export async function fetchSessionsFromDb(): Promise<Record<string, unknown>[] | null> {
+export async function fetchSessionsFromDb(userId?: string): Promise<Record<string, unknown>[] | null> {
   try {
-    const res = await fetch("/api/sessions");
+    const url = userId ? `/api/sessions?userId=${userId}` : "/api/sessions";
+    const res = await fetch(url);
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -100,9 +101,10 @@ export async function fetchSessionsFromDb(): Promise<Record<string, unknown>[] |
   }
 }
 
-export async function fetchCheckinsFromDb(): Promise<Record<string, unknown>[] | null> {
+export async function fetchCheckinsFromDb(userId?: string): Promise<Record<string, unknown>[] | null> {
   try {
-    const res = await fetch("/api/checkins");
+    const url = userId ? `/api/checkins?userId=${userId}` : "/api/checkins";
+    const res = await fetch(url);
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -110,9 +112,20 @@ export async function fetchCheckinsFromDb(): Promise<Record<string, unknown>[] |
   }
 }
 
-export async function fetchCycleFromDb(): Promise<Record<string, unknown> | null> {
+export async function fetchCycleFromDb(userId?: string): Promise<Record<string, unknown> | null> {
   try {
-    const res = await fetch("/api/cycle");
+    const url = userId ? `/api/cycle?userId=${userId}` : "/api/cycle";
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchUsers(): Promise<Record<string, unknown>[] | null> {
+  try {
+    const res = await fetch("/api/users");
     if (!res.ok) return null;
     return await res.json();
   } catch {
