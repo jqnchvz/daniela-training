@@ -40,12 +40,24 @@ export interface SavedCheckin {
   notes: string;
 }
 
+export interface BodyMeasurement {
+  id: string;
+  userId?: string;
+  date: string;
+  waist: number | null;
+  hip: number | null;
+  thigh: number | null;
+}
+
 interface HistoryState {
   sessions: CompletedSession[];
   checkins: SavedCheckin[];
+  measurements: BodyMeasurement[];
 
   addSession: (session: CompletedSession) => void;
   addCheckin: (checkin: SavedCheckin) => void;
+  addMeasurement: (m: BodyMeasurement) => void;
+  getLatestMeasurement: (userId?: string) => BodyMeasurement | null;
   getSessionsByWeek: (userId?: string) => { thisWeek: number; total: number };
   getLatestCheckin: (userId?: string) => SavedCheckin | null;
   getCheckinForDate: (date: string) => SavedCheckin | null;
@@ -59,6 +71,7 @@ export const useHistoryStore = create<HistoryState>()(
     (set, get) => ({
       sessions: [],
       checkins: [],
+      measurements: [],
 
       addSession: (session) => {
         set((s) => ({ sessions: [session, ...s.sessions] }));
@@ -71,6 +84,17 @@ export const useHistoryStore = create<HistoryState>()(
           return { checkins: [checkin, ...filtered] };
         });
         syncCheckinToDb(checkin);
+      },
+
+      addMeasurement: (m) => {
+        set((s) => ({ measurements: [m, ...s.measurements] }));
+      },
+
+      getLatestMeasurement: (userId) => {
+        const measurements = userId
+          ? get().measurements.filter((m) => !m.userId || m.userId === userId)
+          : get().measurements;
+        return measurements[0] ?? null;
       },
 
       getSessionsForUser: (userId) => {

@@ -7,11 +7,20 @@ import {
 } from "@/store/history-store";
 import { EXERCISES, getExerciseById } from "@/lib/exercises";
 import { detectRedFlags, type CheckinData } from "@/lib/checkin";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function ProgressPage() {
   const sessions = useHistoryStore((s) => s.sessions);
   const checkins = useHistoryStore((s) => s.checkins);
+  const addMeasurement = useHistoryStore((s) => s.addMeasurement);
+  const getLatestMeasurement = useHistoryStore((s) => s.getLatestMeasurement);
+  const activeUserId = useAuthStore((s) => s.activeUserId);
+  const latestMeasurement = getLatestMeasurement(activeUserId ?? undefined);
   const [selectedExercise, setSelectedExercise] = useState(EXERCISES[0]?.id ?? "");
+  const [showMeasForm, setShowMeasForm] = useState(false);
+  const [waist, setWaist] = useState(latestMeasurement?.waist?.toString() ?? "");
+  const [hip, setHip] = useState(latestMeasurement?.hip?.toString() ?? "");
+  const [thigh, setThigh] = useState(latestMeasurement?.thigh?.toString() ?? "");
 
   // Convert checkins to the format detectRedFlags expects
   const checkinData: CheckinData[] = checkins.map((c) => ({
@@ -159,13 +168,51 @@ export default function ProgressPage() {
       </p>
       <div className="rounded-[16px] border border-border bg-card p-3.5">
         <div className="flex gap-2.5">
-          <MetricBox value="—" label="Waist cm" />
-          <MetricBox value="—" label="Hip cm" />
-          <MetricBox value="—" label="Thigh cm" />
+          <MetricBox value={latestMeasurement?.waist ? `${latestMeasurement.waist}` : "—"} label="Waist cm" />
+          <MetricBox value={latestMeasurement?.hip ? `${latestMeasurement.hip}` : "—"} label="Hip cm" />
+          <MetricBox value={latestMeasurement?.thigh ? `${latestMeasurement.thigh}` : "—"} label="Thigh cm" />
         </div>
-        <button className="w-full mt-3 rounded-[16px] border border-border bg-surface2 py-2.5 text-[13px] font-semibold transition-colors hover:bg-surface3">
-          + Log measurements
-        </button>
+
+        {showMeasForm ? (
+          <div className="mt-3 space-y-2">
+            <div className="flex gap-2">
+              <MeasInput label="Waist" value={waist} onChange={setWaist} />
+              <MeasInput label="Hip" value={hip} onChange={setHip} />
+              <MeasInput label="Thigh" value={thigh} onChange={setThigh} />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowMeasForm(false)}
+                className="flex-1 rounded-[12px] border border-border bg-surface2 py-2 text-[13px] font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  addMeasurement({
+                    id: crypto.randomUUID(),
+                    userId: activeUserId ?? undefined,
+                    date: new Date().toISOString().split("T")[0],
+                    waist: waist ? Number(waist) : null,
+                    hip: hip ? Number(hip) : null,
+                    thigh: thigh ? Number(thigh) : null,
+                  });
+                  setShowMeasForm(false);
+                }}
+                className="flex-1 rounded-[12px] bg-sage py-2 text-[13px] font-bold text-primary-foreground"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowMeasForm(true)}
+            className="w-full mt-3 rounded-[16px] border border-border bg-surface2 py-2.5 text-[13px] font-semibold transition-colors hover:bg-surface3"
+          >
+            + Log measurements
+          </button>
+        )}
       </div>
     </div>
   );
@@ -407,6 +454,22 @@ function RuleItem({ status, name, detail, weight, last = false }: {
         <p className="text-xs text-muted-foreground mt-0.5">{detail}</p>
       </div>
       <span className="font-mono text-[13px] text-sage shrink-0">{weight}</span>
+    </div>
+  );
+}
+
+function MeasInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="flex-1">
+      <label className="text-[10px] text-muted-foreground mb-1 block">{label} (cm)</label>
+      <input
+        type="number"
+        inputMode="decimal"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-lg border border-border bg-surface2 px-2 py-2 font-mono text-sm text-center"
+        placeholder="—"
+      />
     </div>
   );
 }
