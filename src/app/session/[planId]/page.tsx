@@ -14,6 +14,7 @@ import { useI18n, useT } from "@/lib/i18n";
 import { detectRedFlags, type CheckinData } from "@/lib/checkin";
 import { t } from "@/lib/i18n";
 import { useAuthStore } from "@/store/auth-store";
+import { getDefaultWeight } from "@/lib/default-weights";
 
 export default function ActiveSessionPage({
   params,
@@ -207,9 +208,11 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
     if (currentExIndex !== lastExIndex || setInputs.length === 0) {
       if (currentPlanExercise) {
         const prefillWeight = exercise ? getLastWeight(exercise.id) : null;
+        const defaultWt = exercise ? getDefaultWeight(exercise.id) : 0;
+        const suggestedWeight = prefillWeight ?? defaultWt;
         setSetInputs(
           Array.from({ length: currentPlanExercise.sets }, () => ({
-            weight: prefillWeight ? String(prefillWeight) : "0",
+            weight: String(suggestedWeight),
             reps: String(currentPlanExercise.reps),
           })),
         );
@@ -264,7 +267,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
     if (setsForExercise.length + 1 < currentPlanExercise.sets) {
       // Show next set info, or next exercise if this is the penultimate set
       const remainingSets = currentPlanExercise.sets - (setsForExercise.length + 1);
-      const nextInfo = remainingSets > 1
+      const nextInfo = remainingSets > 0
         ? `Set ${setsForExercise.length + 2}/${currentPlanExercise.sets} · ${locale === "es" ? (exercise?.nameEs ?? exercise?.name) : exercise?.name}`
         : nextExercise
           ? `${locale === "es" ? nextExercise.nameEs : nextExercise.name} · ${nextPlanEx.sets}×${nextPlanEx.reps}`
@@ -357,7 +360,10 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
             <TargetBox value={String(currentPlanExercise.sets)} label="Sets" highlight />
             <TargetBox value={String(currentPlanExercise.reps)} label="Reps" highlight />
             <TargetBox value={`${Math.floor(currentPlanExercise.restSeconds / 60)} min`} label="Rest" />
-            <TargetBox value={lastWeight ? `${lastWeight} kg` : "—"} label={t("session.lastWt")} />
+            <TargetBox
+              value={lastWeight ? `${lastWeight} kg` : getDefaultWeight(exercise.id) > 0 ? `~${getDefaultWeight(exercise.id)} kg` : "—"}
+              label={lastWeight ? t("session.lastWt") : (locale === "es" ? "Sugerido" : "Suggested")}
+            />
           </div>
           <HypothyroidInfo restSeconds={currentPlanExercise.restSeconds} reps={currentPlanExercise.reps} isCompound={exercise.category === "compound"} />
         </div>
@@ -520,8 +526,9 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const exercisesCompleted = new Set(store.completedSets.map((s) => s.exerciseId)).size;
   const totalSets = store.completedSets.length;
 
-  const duration = store.startedAt
-    ? Math.round((Date.now() - new Date(store.startedAt).getTime()) / 60000)
+  const sessionStart = store.workingStartedAt ?? store.startedAt;
+  const duration = sessionStart
+    ? Math.round((Date.now() - new Date(sessionStart).getTime()) / 60000)
     : 0;
 
   const handleComplete = () => {
