@@ -13,6 +13,7 @@ import { getSessionProtocol } from "@/lib/session-protocols";
 import { useI18n, useT } from "@/lib/i18n";
 import { detectRedFlags, type CheckinData } from "@/lib/checkin";
 import { t } from "@/lib/i18n";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function ActiveSessionPage({
   params,
@@ -510,6 +511,7 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const store = useSessionStore();
   const addSession = useHistoryStore((s) => s.addSession);
   const incrementSessions = useCycleStore((s) => s.incrementSessions);
+  const activeUserId = useAuthStore((s) => s.activeUserId);
   const [energy, setEnergy] = useState(4);
   const [sleep, setSleep] = useState(3);
   const [soreness, setSoreness] = useState(1);
@@ -526,6 +528,7 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
     // Save session to persistent history
     addSession({
       id: crypto.randomUUID(),
+      userId: activeUserId ?? undefined,
       planId: plan.id,
       planName: plan.name,
       date: new Date().toISOString().split("T")[0],

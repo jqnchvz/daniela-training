@@ -10,10 +10,26 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
+// ── Users ──────────────────────────────────────────────────────────────────
+
+export const users = pgTable("users", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  avatarEmoji: text("avatar_emoji").notNull().default("💪"),
+  pinHash: text("pin_hash"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+  sessions: many(sessions),
+  checkins: many(checkins),
+}));
+
 // ── Sessions ────────────────────────────────────────────────────────────────
 
 export const sessions = pgTable("sessions", {
   id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   planId: text("plan_id").notNull(),
   planName: text("plan_name").notNull(),
   date: date("date").notNull(),
@@ -29,8 +45,9 @@ export const sessions = pgTable("sessions", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const sessionsRelations = relations(sessions, ({ many }) => ({
+export const sessionsRelations = relations(sessions, ({ many, one }) => ({
   sets: many(sessionSets),
+  user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
 // ── Session Sets ────────────────────────────────────────────────────────────
@@ -59,6 +76,7 @@ export const sessionSetsRelations = relations(sessionSets, ({ one }) => ({
 
 export const checkins = pgTable("checkins", {
   id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   date: date("date").notNull().unique(),
   energy: integer("energy").notNull(),
   sleepQuality: integer("sleep_quality").notNull(),
@@ -69,13 +87,22 @@ export const checkins = pgTable("checkins", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const checkinsRelations = relations(checkins, ({ one }) => ({
+  user: one(users, { fields: [checkins.userId], references: [users.id] }),
+}));
+
 // ── Cycle State ─────────────────────────────────────────────────────────────
 
 export const cycleState = pgTable("cycle_state", {
   id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   cycleStartDate: date("cycle_start_date"),
   extensionWeeks: integer("extension_weeks").notNull().default(0),
   lastDeloadDate: date("last_deload_date"),
   completedSessions: integer("completed_sessions").notNull().default(0),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const cycleStateRelations = relations(cycleState, ({ one }) => ({
+  user: one(users, { fields: [cycleState.userId], references: [users.id] }),
+}));
