@@ -135,16 +135,23 @@ export function suggestProgression(
 /**
  * Deload detection based on weeks since start or last deload.
  */
+export interface RedFlagInput {
+  hasEnergyFlag: boolean;
+  hasMoodFlag: boolean;
+}
+
 export interface DeloadStatus {
   weekNumber: number;
   shouldDeload: boolean;
   isDeloadWeek: boolean;
+  earlyDeloadSuggested: boolean;
   message: string | null;
 }
 
 export function getDeloadStatus(
   programStartDate: string,
   lastDeloadDate: string | null,
+  redFlags?: RedFlagInput,
 ): DeloadStatus {
   const referenceDate = lastDeloadDate ?? programStartDate;
   const daysSince = Math.floor(
@@ -152,11 +159,18 @@ export function getDeloadStatus(
   );
   const weekNumber = Math.floor(daysSince / 7) + 1;
 
+  const earlyDeloadSuggested = !!(
+    redFlags &&
+    (redFlags.hasEnergyFlag || redFlags.hasMoodFlag) &&
+    weekNumber < 3
+  );
+
   if (weekNumber >= 4) {
     return {
       weekNumber,
       shouldDeload: false,
       isDeloadWeek: true,
+      earlyDeloadSuggested: false,
       message:
         "DELOAD WEEK: Same exercises, half the sets. Your body needs this to get stronger.",
     };
@@ -167,6 +181,7 @@ export function getDeloadStatus(
       weekNumber,
       shouldDeload: true,
       isDeloadWeek: false,
+      earlyDeloadSuggested: false,
       message:
         "Deload week coming up! Next week, same exercises but half the sets. Recovery is where progress happens.",
     };
@@ -176,7 +191,10 @@ export function getDeloadStatus(
     weekNumber,
     shouldDeload: false,
     isDeloadWeek: false,
-    message: null,
+    earlyDeloadSuggested,
+    message: earlyDeloadSuggested
+      ? "Your recent check-ins show declining energy or mood. Consider taking a deload week early — recovery is where progress happens."
+      : null,
   };
 }
 
