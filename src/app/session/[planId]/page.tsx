@@ -188,6 +188,16 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
   const lastWeight = exercise ? getLastWeight(exercise.id) : null;
 
+  // Animate between exercise image frames
+  const [showFrame2, setShowFrame2] = useState(false);
+  useEffect(() => {
+    if (!exercise?.gifUrl || !exercise?.gifUrl2) return;
+    const interval = setInterval(() => setShowFrame2((prev) => !prev), 1200);
+    return () => clearInterval(interval);
+  }, [exercise?.gifUrl, exercise?.gifUrl2]);
+
+  const currentImageUrl = showFrame2 && exercise?.gifUrl2 ? exercise.gifUrl2 : exercise?.gifUrl;
+
   // Track set inputs per exercise — reset when exercise index changes
   const [setInputs, setSetInputs] = useState<Array<{ weight: string; reps: string }>>([]);
   const [lastExIndex, setLastExIndex] = useState(currentExIndex);
@@ -324,8 +334,8 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       {/* Exercise card */}
       <div className="mx-5 mt-4 rounded-[20px] border border-border bg-card overflow-hidden">
         <div className="relative h-[200px] bg-surface2 flex items-center justify-center border-b border-border">
-          {exercise.gifUrl ? (
-            <Image src={exercise.gifUrl} alt={exercise.name} fill className="object-contain" unoptimized />
+          {currentImageUrl ? (
+            <Image key={currentImageUrl} src={currentImageUrl} alt={exercise.name} fill className="object-contain transition-opacity duration-300" unoptimized />
           ) : (
             <span className="text-6xl">💪</span>
           )}
