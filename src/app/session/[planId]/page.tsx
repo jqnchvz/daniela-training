@@ -263,6 +263,18 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   };
 
   const handleNextExercise = () => {
+    // Trigger inter-exercise rest only when all sets are completed (not skipping)
+    if (allSetsDone && nextExercise && nextPlanEx) {
+      const currentCategory = exercise?.category ?? "compound";
+      const nextCategory = nextExercise.category;
+      // Rest duration based on exercise types being transitioned
+      const interRestSeconds =
+        currentCategory === "compound" && nextCategory === "compound" ? 180
+        : currentCategory === "compound" || nextCategory === "compound" ? 150
+        : 120;
+      const nextInfo = `${locale === "es" ? nextExercise.nameEs : nextExercise.name} · ${nextPlanEx.sets}×${nextPlanEx.reps}`;
+      store.setRestTimer(Date.now() + interRestSeconds * 1000, nextInfo);
+    }
     store.nextExercise();
   };
 
