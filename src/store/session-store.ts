@@ -12,9 +12,12 @@ interface SetLog {
   completed: boolean;
 }
 
+export type SessionMode = "full" | "lite";
+
 interface SessionState {
   planId: string | null;
   phase: SessionPhase;
+  sessionMode: SessionMode;
   energyPre: number | null;
   energyPost: number | null;
   currentExerciseIndex: number;
@@ -27,6 +30,7 @@ interface SessionState {
 
   startSession: (planId: string) => void;
   setPhase: (phase: SessionPhase) => void;
+  setSessionMode: (mode: SessionMode) => void;
   setEnergyPre: (energy: number) => void;
   setEnergyPost: (energy: number) => void;
   logSet: (set: SetLog) => void;
@@ -41,6 +45,7 @@ interface SessionState {
 const initialState = {
   planId: null,
   phase: "pre-check" as SessionPhase,
+  sessionMode: "full" as SessionMode,
   energyPre: null,
   energyPost: null,
   currentExerciseIndex: 0,
@@ -61,6 +66,7 @@ export const useSessionStore = create<SessionState>()(
         set({ ...initialState, planId, startedAt: new Date().toISOString() }),
 
       setPhase: (phase) => set({ phase }),
+      setSessionMode: (mode) => set({ sessionMode: mode }),
       setEnergyPre: (energy) => set({ energyPre: energy }),
       setEnergyPost: (energy) => set({ energyPost: energy }),
 

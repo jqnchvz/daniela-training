@@ -6,7 +6,7 @@ import { useSessionStore } from "@/store/session-store";
 import { useAppStore } from "@/store/app-store";
 import { useHistoryStore } from "@/store/history-store";
 import { useCycleStore } from "@/store/cycle-store";
-import { getExerciseById, WORKOUT_PLANS } from "@/lib/exercises";
+import { getExerciseById, getLiteExercises, WORKOUT_PLANS } from "@/lib/exercises";
 import { EnergySlider } from "@/components/session/energy-slider";
 import { RestTimer } from "@/components/session/rest-timer";
 import { getSessionProtocol } from "@/lib/session-protocols";
@@ -56,13 +56,15 @@ export default function ActiveSessionPage({
 }
 
 function PreCheckPhase() {
-  const { energyPre, setEnergyPre, setPhase } = useSessionStore();
+  const { energyPre, setEnergyPre, setPhase, sessionMode, setSessionMode } = useSessionStore();
   const checkins = useHistoryStore((s) => s.checkins);
 
   // Check soreness from latest check-in
   const redFlags = detectRedFlags(
     checkins.map((c) => ({ ...c, sleepHours: c.sleepHours ?? null })),
   );
+
+  const showModeSelector = energyPre !== null && energyPre <= 4;
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
@@ -82,6 +84,40 @@ function PreCheckPhase() {
 
       <div className="w-full max-w-[320px]">
         <EnergySlider value={energyPre} onChange={setEnergyPre} label="How's your energy?" />
+
+        {showModeSelector && (
+          <div className="mt-5 rounded-[12px] border border-border bg-card p-4 text-left">
+            <p className="text-[13px] text-muted-foreground mb-3">
+              {t("session.lowEnergyPrompt")}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSessionMode("full")}
+                className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+                  sessionMode === "full"
+                    ? "bg-sage-bg text-sage border-sage-dim"
+                    : "bg-surface2 text-muted-foreground border-border"
+                }`}
+              >
+                {t("session.fullSession")}
+              </button>
+              <button
+                onClick={() => setSessionMode("lite")}
+                className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+                  sessionMode === "lite"
+                    ? "bg-sage-bg text-sage border-sage-dim"
+                    : "bg-surface2 text-muted-foreground border-border"
+                }`}
+              >
+                {t("session.liteSession")}
+              </button>
+            </div>
+            {sessionMode === "lite" && (
+              <p className="text-[11px] text-sage mt-2">{t("session.liteDesc")}</p>
+            )}
+          </div>
+        )}
+
         <button
           onClick={() => setPhase("warmup")}
           disabled={energyPre === null}
@@ -135,8 +171,11 @@ function WarmupPhase({ planId }: { planId: string }) {
 
 function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const store = useSessionStore();
+  const exercises = store.sessionMode === "lite"
+    ? getLiteExercises(plan.exercises)
+    : plan.exercises;
   const currentExIndex = store.currentExerciseIndex;
-  const currentPlanExercise = plan.exercises[currentExIndex];
+  const currentPlanExercise = exercises[currentExIndex];
   const exercise = currentPlanExercise ? getExerciseById(currentPlanExercise.exerciseId) : null;
 
   // Track set inputs per exercise — reset when exercise index changes
@@ -177,7 +216,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   );
 
   const nextExIndex = currentExIndex + 1;
-  const nextPlanEx = plan.exercises[nextExIndex];
+  const nextPlanEx = exercises[nextExIndex];
   const nextExercise = nextPlanEx ? getExerciseById(nextPlanEx.exerciseId) : null;
 
   const handleLogSet = (setIndex: number) => {
@@ -219,7 +258,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
   const allSetsDone = setsForExercise.length >= currentPlanExercise.sets;
   const progressPercent = Math.round(
-    ((currentExIndex + (allSetsDone ? 1 : 0)) / plan.exercises.length) * 100,
+    ((currentExIndex + (allSetsDone ? 1 : 0)) / exercises.length) * 100,
   );
 
   return (
@@ -229,15 +268,22 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         <button onClick={() => (window.location.href = "/")} className="text-[13px] text-muted-foreground">
           ← End
         </button>
-        <span className="rounded-full bg-sage-bg text-sage border border-sage-dim px-2.5 py-1 text-[11px] font-semibold">
-          {plan.name.split("—")[0].trim()}
-        </span>
+        <div className="flex items-center gap-2">
+          {store.sessionMode === "lite" && (
+            <span className="rounded-full bg-gold-bg text-gold border border-gold/30 px-2 py-0.5 text-[10px] font-semibold">
+              {t("session.liteActive")}
+            </span>
+          )}
+          <span className="rounded-full bg-sage-bg text-sage border border-sage-dim px-2.5 py-1 text-[11px] font-semibold">
+            {plan.name.split("—")[0].trim()}
+          </span>
+        </div>
       </div>
 
       {/* Progress */}
       <div className="px-5 pt-4">
         <div className="flex justify-between text-xs text-muted-foreground mb-2">
-          <span>Exercise {currentExIndex + 1} of {plan.exercises.length}</span>
+          <span>Exercise {currentExIndex + 1} of {exercises.length}</span>
           <span className="text-sage">Main Work</span>
         </div>
         <div className="h-1 rounded-full bg-surface3">
