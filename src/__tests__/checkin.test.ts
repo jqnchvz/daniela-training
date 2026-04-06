@@ -97,6 +97,26 @@ describe("detectRedFlags", () => {
     expect(result.hasSleepFlag).toBe(false);
   });
 
+  it("detects soreness flag when latest check-in soreness >= 8", () => {
+    const checkins = [makeCheckin(0, { soreness: 9 }), makeCheckin(1, { soreness: 3 })];
+    const result = detectRedFlags(checkins);
+    expect(result.hasSorenessFlag).toBe(true);
+    expect(result.latestSoreness).toBe(9);
+  });
+
+  it("no soreness flag when latest soreness < 8", () => {
+    const checkins = [makeCheckin(0, { soreness: 7 }), makeCheckin(1, { soreness: 9 })];
+    const result = detectRedFlags(checkins);
+    expect(result.hasSorenessFlag).toBe(false);
+    expect(result.latestSoreness).toBe(7);
+  });
+
+  it("no soreness flag with empty checkins", () => {
+    const result = detectRedFlags([]);
+    expect(result.hasSorenessFlag).toBe(false);
+    expect(result.latestSoreness).toBe(0);
+  });
+
   it("excludes null sleepHours from sleep average", () => {
     const checkins = [
       makeCheckin(0, { sleepHours: 6 }),

@@ -10,6 +10,8 @@ import { getExerciseById, WORKOUT_PLANS } from "@/lib/exercises";
 import { EnergySlider } from "@/components/session/energy-slider";
 import { RestTimer } from "@/components/session/rest-timer";
 import { getSessionProtocol } from "@/lib/session-protocols";
+import { detectRedFlags, type CheckinData } from "@/lib/checkin";
+import { t } from "@/lib/i18n";
 
 export default function ActiveSessionPage({
   params,
@@ -55,6 +57,12 @@ export default function ActiveSessionPage({
 
 function PreCheckPhase() {
   const { energyPre, setEnergyPre, setPhase } = useSessionStore();
+  const checkins = useHistoryStore((s) => s.checkins);
+
+  // Check soreness from latest check-in
+  const redFlags = detectRedFlags(
+    checkins.map((c) => ({ ...c, sleepHours: c.sleepHours ?? null })),
+  );
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
@@ -63,6 +71,15 @@ function PreCheckPhase() {
       <p className="text-sm text-muted-foreground mb-8 max-w-[280px]">
         Quick energy check before we start.
       </p>
+
+      {redFlags.hasSorenessFlag && (
+        <div className="w-full max-w-[320px] mb-6 rounded-[12px] bg-gold-bg border border-gold/30 px-4 py-3 text-left">
+          <p className="text-[13px] text-gold leading-relaxed">
+            ⚠️ {t("session.sorenessWarning").replace("{score}", String(redFlags.latestSoreness))}
+          </p>
+        </div>
+      )}
+
       <div className="w-full max-w-[320px]">
         <EnergySlider value={energyPre} onChange={setEnergyPre} label="How's your energy?" />
         <button

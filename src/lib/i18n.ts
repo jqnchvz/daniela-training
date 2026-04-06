@@ -72,6 +72,10 @@ const translations: Record<string, Record<Locale, string>> = {
   "session.preCheck": { en: "Pre-session Check", es: "Chequeo Pre-sesión" },
   "session.energyQuestion": { en: "How's your energy?", es: "¿Cómo está tu energía?" },
   "session.quickCheck": { en: "Quick energy check before we start.", es: "Revisión rápida de energía antes de empezar." },
+  "session.sorenessWarning": {
+    en: "Your last check-in showed high soreness ({score}/10). Consider a rest day or lighter session if your body needs it.",
+    es: "Tu último registro mostró dolor muscular alto ({score}/10). Considera un día de descanso o sesión más ligera si tu cuerpo lo necesita.",
+  },
   "session.startWarmup": { en: "Start Warm-up →", es: "Iniciar Calentamiento →" },
   "session.doneWarmup": { en: "Done with Warm-up →", es: "Calentamiento Listo →" },
   "session.warmupDesc": {
