@@ -19,10 +19,12 @@ export interface CheckinData {
 export interface RedFlagResult {
   hasEnergyFlag: boolean;
   hasMoodFlag: boolean;
+  hasSleepFlag: boolean;
   energyAvg7: number;
   energyAvg30: number;
   moodAvg7: number;
   moodAvg30: number;
+  sleepAvg7: number;
 }
 
 export function detectRedFlags(checkins: CheckinData[]): RedFlagResult {
@@ -41,13 +43,23 @@ export function detectRedFlags(checkins: CheckinData[]): RedFlagResult {
   const moodAvg7 = avg(last7.map((c) => c.mood));
   const moodAvg30 = avg(last30.map((c) => c.mood));
 
+  // Sleep: use absolute threshold (< 7h) — chronic deprivation worsens thyroid function
+  const sleepHours7 = last7
+    .map((c) => c.sleepHours)
+    .filter((h): h is number => h !== null);
+  const sleepAvg7 = sleepHours7.length > 0
+    ? sleepHours7.reduce((s, v) => s + v, 0) / sleepHours7.length
+    : 0;
+
   return {
     hasEnergyFlag: last7.length >= 3 && last30.length >= 7 && energyAvg30 - energyAvg7 >= 2,
     hasMoodFlag: last7.length >= 3 && last30.length >= 7 && moodAvg30 - moodAvg7 >= 2,
+    hasSleepFlag: sleepHours7.length >= 3 && sleepAvg7 < 7,
     energyAvg7: Math.round(energyAvg7 * 10) / 10,
     energyAvg30: Math.round(energyAvg30 * 10) / 10,
     moodAvg7: Math.round(moodAvg7 * 10) / 10,
     moodAvg30: Math.round(moodAvg30 * 10) / 10,
+    sleepAvg7: Math.round(sleepAvg7 * 10) / 10,
   };
 }
 

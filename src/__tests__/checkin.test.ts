@@ -69,6 +69,47 @@ describe("detectRedFlags", () => {
     expect(result.hasEnergyFlag).toBe(false);
     expect(result.hasMoodFlag).toBe(false);
   });
+
+  it("detects sleep flag when 7-day avg < 7 hours", () => {
+    const checkins = Array.from({ length: 7 }, (_, i) =>
+      makeCheckin(i, { sleepHours: 5.5 }),
+    );
+    const result = detectRedFlags(checkins);
+    expect(result.hasSleepFlag).toBe(true);
+    expect(result.sleepAvg7).toBe(5.5);
+  });
+
+  it("no sleep flag when avg >= 7 hours", () => {
+    const checkins = Array.from({ length: 7 }, (_, i) =>
+      makeCheckin(i, { sleepHours: 7.5 }),
+    );
+    const result = detectRedFlags(checkins);
+    expect(result.hasSleepFlag).toBe(false);
+    expect(result.sleepAvg7).toBe(7.5);
+  });
+
+  it("no sleep flag with fewer than 3 data points", () => {
+    const checkins = [
+      makeCheckin(0, { sleepHours: 4 }),
+      makeCheckin(1, { sleepHours: 4 }),
+    ];
+    const result = detectRedFlags(checkins);
+    expect(result.hasSleepFlag).toBe(false);
+  });
+
+  it("excludes null sleepHours from sleep average", () => {
+    const checkins = [
+      makeCheckin(0, { sleepHours: 6 }),
+      makeCheckin(1, { sleepHours: null }),
+      makeCheckin(2, { sleepHours: 6 }),
+      makeCheckin(3, { sleepHours: null }),
+      makeCheckin(4, { sleepHours: 6 }),
+    ];
+    const result = detectRedFlags(checkins);
+    // 3 non-null entries averaging 6h — should flag
+    expect(result.hasSleepFlag).toBe(true);
+    expect(result.sleepAvg7).toBe(6);
+  });
 });
 
 describe("calculateStreak", () => {
