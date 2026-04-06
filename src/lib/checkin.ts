@@ -20,6 +20,8 @@ export interface RedFlagResult {
   hasEnergyFlag: boolean;
   hasMoodFlag: boolean;
   hasSleepFlag: boolean;
+  hasSorenessFlag: boolean;
+  latestSoreness: number;
   energyAvg7: number;
   energyAvg30: number;
   moodAvg7: number;
@@ -51,10 +53,15 @@ export function detectRedFlags(checkins: CheckinData[]): RedFlagResult {
     ? sleepHours7.reduce((s, v) => s + v, 0) / sleepHours7.length
     : 0;
 
+  // Soreness: flag when most recent check-in reports ≥ 8/10
+  const latestSoreness = sorted.length > 0 ? sorted[0].soreness : 0;
+
   return {
     hasEnergyFlag: last7.length >= 3 && last30.length >= 7 && energyAvg30 - energyAvg7 >= 2,
     hasMoodFlag: last7.length >= 3 && last30.length >= 7 && moodAvg30 - moodAvg7 >= 2,
     hasSleepFlag: sleepHours7.length >= 3 && sleepAvg7 < 7,
+    hasSorenessFlag: sorted.length > 0 && latestSoreness >= 8,
+    latestSoreness,
     energyAvg7: Math.round(energyAvg7 * 10) / 10,
     energyAvg30: Math.round(energyAvg30 * 10) / 10,
     moodAvg7: Math.round(moodAvg7 * 10) / 10,
