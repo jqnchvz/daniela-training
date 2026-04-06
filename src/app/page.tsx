@@ -9,10 +9,17 @@ import {
   getNextWorkout,
   getDayName,
 } from "@/lib/workout-schedule";
+import { getCurrentPhase } from "@/lib/phases";
+import { useCycleStore } from "@/store/cycle-store";
+import { useHistoryStore } from "@/store/history-store";
 
 export default function HomePage() {
   const [greeting, setGreeting] = useState("Good morning");
   const [mounted, setMounted] = useState(false);
+  const cycle = useCycleStore();
+  const history = useHistoryStore();
+  const weekStats = history.getSessionsByWeek();
+  const latestCheckin = history.getLatestCheckin();
 
   useEffect(() => {
     setMounted(true);
@@ -22,6 +29,10 @@ export default function HomePage() {
   const todaysWorkout = getTodaysWorkout();
   const nextWorkout = getNextWorkout();
   const today = new Date().getDay();
+
+  const phaseStatus = cycle.cycleStartDate
+    ? getCurrentPhase(cycle.cycleStartDate, cycle.extensionWeeks)
+    : null;
 
   const weekDays = [
     { name: "MON", dow: 1, isWorkout: true },
@@ -47,16 +58,27 @@ export default function HomePage() {
       </div>
 
       {/* Phase badge */}
-      <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-secondary border border-border px-3.5 py-1.5 text-xs font-semibold text-muted-foreground">
-        <span className="h-2 w-2 rounded-full bg-sage" />
-        Phase 1 · Week 3 of 4
-      </div>
+      {phaseStatus ? (
+        <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-secondary border border-border px-3.5 py-1.5 text-xs font-semibold text-muted-foreground">
+          <span className="h-2 w-2 rounded-full bg-sage" />
+          Phase {phaseStatus.phase.phase} · Week {phaseStatus.weekNumber} of{" "}
+          {phaseStatus.totalWeeks}
+        </div>
+      ) : (
+        <button
+          onClick={cycle.startCycle}
+          className="mt-3 inline-flex items-center gap-2 rounded-full bg-sage-bg border border-sage-dim px-3.5 py-1.5 text-xs font-semibold text-sage transition-colors hover:bg-sage/20"
+        >
+          <span className="h-2 w-2 rounded-full bg-sage" />
+          Start your 16-week program →
+        </button>
+      )}
 
       {/* Week strip */}
       <div className="flex gap-1.5 mt-4">
         {weekDays.map((day) => {
           const isToday = day.dow === today;
-          const isPast = day.dow < today && day.dow !== 0;
+          const isPast = day.dow !== 0 && day.dow < today;
           return (
             <div
               key={day.name}
@@ -74,10 +96,12 @@ export default function HomePage() {
                 {day.name}
               </p>
               <p className="text-sm leading-none mt-1">
-                {isPast && day.isWorkout
-                  ? "✓"
+                {isToday && day.isWorkout
+                  ? "💪"
                   : day.isWorkout
-                    ? "💪"
+                    ? isPast
+                      ? "✓"
+                      : "💪"
                     : day.dow === 6
                       ? "🧘"
                       : day.dow === 0
@@ -101,8 +125,15 @@ export default function HomePage() {
               {todaysWorkout.label}
             </h2>
             <p className="text-[13px] text-muted-foreground mt-1.5">
-              Push · Chest · Shoulders · Triceps
+              {todaysWorkout.exercises} exercises &middot; {todaysWorkout.duration}
             </p>
+            {phaseStatus && (
+              <p className="text-[11px] text-sage mt-1">
+                Phase {phaseStatus.phase.phase}: aim for{" "}
+                {phaseStatus.phase.setsMax}×{phaseStatus.phase.repsMin}-
+                {phaseStatus.phase.repsMax}
+              </p>
+            )}
             <div className="flex gap-4 mt-4 mb-5">
               <span className="text-xs text-muted-foreground flex items-center gap-1.5">
                 ⏱ {todaysWorkout.duration}
@@ -138,9 +169,9 @@ export default function HomePage() {
         Last session wellness
       </p>
       <div className="flex gap-2">
-        <WellnessCard label="Energy" value="--" color="text-sage" />
-        <WellnessCard label="Sleep" value="--" color="text-dt-blue" />
-        <WellnessCard label="Soreness" value="--" color="text-gold" />
+        <WellnessCard label="Energy" value={latestCheckin ? String(latestCheckin.energy) : "--"} color="text-sage" />
+        <WellnessCard label="Sleep" value={latestCheckin ? String(latestCheckin.sleepQuality) : "--"} color="text-dt-blue" />
+        <WellnessCard label="Soreness" value={latestCheckin ? String(latestCheckin.soreness) : "--"} color="text-gold" />
       </div>
 
       {/* Stats row */}
@@ -148,23 +179,43 @@ export default function HomePage() {
         This week
       </p>
       <div className="flex gap-2.5">
-        <StatBox value="0" label="Sessions done" color="text-sage" />
-        <StatBox value="--" label="Day streak" color="text-gold" />
-        <StatBox value="--" label="PRs this week" color="text-dt-blue" />
+        <StatBox
+          value={`${weekStats.thisWeek}/3`}
+          label="This week"
+          color="text-sage"
+        />
+        <StatBox value={String(weekStats.total)} label="Total sessions" color="text-gold" />
+        <StatBox value={String(history.checkins.length)} label="Check-ins" color="text-dt-blue" />
       </div>
 
       {/* Phase progress */}
-      <div className="mt-3 rounded-[16px] border border-border bg-card p-4">
-        <p className="text-xs font-semibold tracking-[1px] uppercase text-muted-foreground font-mono mb-1.5">
-          Phase progress
-        </p>
-        <p className="text-[13px] text-muted-foreground mb-2.5">
-          Week 3 of 4 · Deload in 7 days
-        </p>
-        <div className="h-1 rounded-full bg-surface3">
-          <div className="h-full rounded-full bg-sage transition-all" style={{ width: "75%" }} />
+      {phaseStatus && (
+        <div className="mt-3 rounded-[16px] border border-border bg-card p-4">
+          <p className="text-xs font-semibold tracking-[1px] uppercase text-muted-foreground font-mono mb-1.5">
+            Phase progress
+          </p>
+          <p className="text-[13px] text-muted-foreground mb-2.5">
+            {phaseStatus.phase.name} · Week {phaseStatus.weekInPhase} &middot;{" "}
+            {phaseStatus.phase.focus}
+          </p>
+          <div className="h-1 rounded-full bg-surface3">
+            <div
+              className="h-full rounded-full bg-sage transition-all"
+              style={{ width: `${phaseStatus.progressPercent}%` }}
+            />
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* No cycle prompt */}
+      {!phaseStatus && (
+        <div className="mt-3 rounded-[16px] border border-border bg-card p-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            Start your 16-week training cycle to track phase progress, deload
+            reminders, and progressive overload.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -180,7 +231,9 @@ function WellnessCard({
 }) {
   return (
     <div className="flex-1 rounded-[10px] border border-border bg-surface2 p-3 text-center">
-      <p className={`font-heading text-[1.4rem] font-extrabold ${color}`}>{value}</p>
+      <p className={`font-heading text-[1.4rem] font-extrabold ${color}`}>
+        {value}
+      </p>
       <p className="text-[10px] text-[#5a5550] mt-0.5">{label}</p>
     </div>
   );
@@ -197,7 +250,9 @@ function StatBox({
 }) {
   return (
     <div className="flex-1 text-center rounded-[10px] border border-border bg-surface2 p-3">
-      <p className={`font-heading text-[1.5rem] font-extrabold leading-none ${color}`}>
+      <p
+        className={`font-heading text-[1.5rem] font-extrabold leading-none ${color}`}
+      >
         {value}
       </p>
       <p className="text-[10px] text-[#5a5550] mt-1">{label}</p>

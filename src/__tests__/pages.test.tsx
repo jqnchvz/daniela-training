@@ -23,9 +23,11 @@ describe("Home page", () => {
     expect(screen.getByText("Daniela")).toBeInTheDocument();
   });
 
-  it("renders phase badge", () => {
+  it("shows start cycle prompt when no cycle active", () => {
     render(<HomePage />);
-    expect(screen.getByText(/Phase 1/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Start your 16-week training cycle/),
+    ).toBeInTheDocument();
   });
 
   it("renders wellness section", () => {
@@ -35,13 +37,8 @@ describe("Home page", () => {
 
   it("renders stats section", () => {
     render(<HomePage />);
-    expect(screen.getByText("This week")).toBeInTheDocument();
-    expect(screen.getByText("Sessions done")).toBeInTheDocument();
-  });
-
-  it("renders phase progress", () => {
-    render(<HomePage />);
-    expect(screen.getByText("Phase progress")).toBeInTheDocument();
+    expect(screen.getByText("Total sessions")).toBeInTheDocument();
+    expect(screen.getByText("Check-ins")).toBeInTheDocument();
   });
 });
 
@@ -55,7 +52,7 @@ describe("Session page", () => {
 describe("Progress page", () => {
   it("renders", () => {
     render(<ProgressPage />);
-    expect(screen.getByText("Progress")).toBeInTheDocument();
+    expect(screen.getByText("2-Week Rule Status")).toBeInTheDocument();
   });
 });
 
