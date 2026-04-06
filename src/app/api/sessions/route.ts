@@ -33,7 +33,13 @@ export async function POST(request: Request) {
       sessionMode: sessionData.sessionMode ?? "full",
       notes: sessionData.notes ?? "",
     })
+    .onConflictDoNothing()
     .returning();
+
+  if (!session) {
+    // Already exists — idempotent success
+    return Response.json({ id: sessionData.id }, { status: 200 });
+  }
 
   if (sets && sets.length > 0) {
     await db.insert(sessionSets).values(

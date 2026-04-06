@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { checkins } from "@/lib/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 
 export async function GET() {
   const rows = await db
