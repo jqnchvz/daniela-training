@@ -1,38 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useI18n } from "@/lib/i18n";
 
 interface ExerciseDemoProps {
   gifUrl: string | null;
+  gifUrl2: string | null;
   exerciseName: string;
   instructions: string[];
+  instructionsEs: string[];
   muscleGroups: string[];
 }
 
 export function ExerciseDemo({
   gifUrl,
+  gifUrl2,
   exerciseName,
   instructions,
+  instructionsEs,
   muscleGroups,
 }: ExerciseDemoProps) {
   const [expanded, setExpanded] = useState(false);
   const [showTips, setShowTips] = useState(false);
+  const [showFrame2, setShowFrame2] = useState(false);
+  const locale = useI18n((s) => s.locale);
+
+  const localizedInstructions =
+    locale === "es" && instructionsEs.length > 0 ? instructionsEs : instructions;
+
+  // Animate between frames
+  useEffect(() => {
+    if (!gifUrl || !gifUrl2) return;
+    const interval = setInterval(() => {
+      setShowFrame2((prev) => !prev);
+    }, 1200);
+    return () => clearInterval(interval);
+  }, [gifUrl, gifUrl2]);
+
+  const currentUrl = showFrame2 && gifUrl2 ? gifUrl2 : gifUrl;
 
   return (
     <>
-      {/* Compact preview */}
-      {gifUrl && (
+      {/* Animated preview */}
+      {currentUrl && (
         <button
           onClick={() => setExpanded(true)}
           className="w-full rounded-xl border border-border bg-card overflow-hidden"
         >
           <div className="relative h-40 w-full">
             <Image
-              src={gifUrl}
+              src={currentUrl}
               alt={`${exerciseName} demonstration`}
               fill
-              className="object-contain"
+              className="object-contain transition-opacity duration-300"
               unoptimized
             />
           </div>
@@ -40,7 +61,7 @@ export function ExerciseDemo({
       )}
 
       {/* Form tips toggle */}
-      {instructions.length > 0 && (
+      {localizedInstructions.length > 0 && (
         <div className="mt-2">
           <button
             onClick={() => setShowTips(!showTips)}
@@ -59,11 +80,11 @@ export function ExerciseDemo({
                 d="m8.25 4.5 7.5 7.5-7.5 7.5"
               />
             </svg>
-            How to do this
+            {locale === "es" ? "Cómo hacerlo" : "How to do this"}
           </button>
           {showTips && (
             <ol className="mt-2 space-y-1.5 pl-5 text-xs text-muted-foreground list-decimal">
-              {instructions.map((instruction, i) => (
+              {localizedInstructions.map((instruction, i) => (
                 <li key={i}>{instruction}</li>
               ))}
             </ol>
@@ -84,14 +105,16 @@ export function ExerciseDemo({
       )}
 
       {/* No image fallback */}
-      {!gifUrl && instructions.length === 0 && (
+      {!gifUrl && localizedInstructions.length === 0 && (
         <p className="text-xs text-muted-foreground italic">
-          No demo available for this exercise.
+          {locale === "es"
+            ? "No hay demo disponible para este ejercicio."
+            : "No demo available for this exercise."}
         </p>
       )}
 
       {/* Full-screen overlay */}
-      {expanded && gifUrl && (
+      {expanded && currentUrl && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
           onClick={() => setExpanded(false)}
@@ -105,7 +128,7 @@ export function ExerciseDemo({
           </button>
           <div className="relative w-full h-full max-w-lg max-h-[80vh]">
             <Image
-              src={gifUrl}
+              src={currentUrl}
               alt={`${exerciseName} demonstration`}
               fill
               className="object-contain"
