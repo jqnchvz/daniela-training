@@ -47,6 +47,7 @@ interface HistoryState {
   getSessionsByWeek: () => { thisWeek: number; total: number };
   getLatestCheckin: () => SavedCheckin | null;
   getCheckinForDate: (date: string) => SavedCheckin | null;
+  getLastWeightForExercise: (exerciseId: string) => number | null;
 }
 
 export const useHistoryStore = create<HistoryState>()(
@@ -91,6 +92,18 @@ export const useHistoryStore = create<HistoryState>()(
 
       getCheckinForDate: (date) =>
         get().checkins.find((c) => c.date === date) ?? null,
+
+      getLastWeightForExercise: (exerciseId) => {
+        for (const session of get().sessions) {
+          const sets = session.sets.filter(
+            (s) => s.exerciseId === exerciseId && s.weight > 0,
+          );
+          if (sets.length > 0) {
+            return Math.max(...sets.map((s) => s.weight));
+          }
+        }
+        return null;
+      },
     }),
     { name: "history-store" },
   ),
