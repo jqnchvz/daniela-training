@@ -45,7 +45,7 @@ describe("Home page", () => {
 describe("Session page", () => {
   it("renders", () => {
     render(<SessionPage />);
-    expect(screen.getByText("Workout Session")).toBeInTheDocument();
+    expect(screen.getByText("Workout Sessions")).toBeInTheDocument();
   });
 });
 
