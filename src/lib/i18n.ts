@@ -70,6 +70,9 @@ const translations: Record<string, Record<Locale, string>> = {
   "home.dismiss": { en: "Dismiss", es: "Descartar" },
 
   // Session
+  "session.resumeBanner": { en: "Session in progress", es: "Sesión en curso" },
+  "session.resumeBtn": { en: "Resume →", es: "Continuar →" },
+  "session.discardBtn": { en: "Discard", es: "Descartar" },
   "session.workoutSessions": { en: "Workout Sessions", es: "Sesiones de Entrenamiento" },
   "session.warmup": { en: "Warm-up", es: "Calentamiento" },
   "session.mainWork": { en: "Main work", es: "Trabajo principal" },

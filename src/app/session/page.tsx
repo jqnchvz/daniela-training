@@ -5,6 +5,7 @@ import { useState } from "react";
 import { WORKOUT_PLANS, getExerciseById } from "@/lib/exercises";
 import { getSessionProtocol } from "@/lib/session-protocols";
 import { useI18n, useT } from "@/lib/i18n";
+import { useSessionStore } from "@/store/session-store";
 
 export default function SessionPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -12,8 +13,42 @@ export default function SessionPage() {
   const t = useT();
   const isEs = locale === "es";
 
+  const activePlanId = useSessionStore((s) => s.planId);
+  const activePhase = useSessionStore((s) => s.phase);
+  const resetSession = useSessionStore((s) => s.reset);
+  const hasActiveSession = activePlanId && activePhase !== "pre-check";
+  const activePlan = hasActiveSession
+    ? WORKOUT_PLANS.find((p) => p.id === activePlanId)
+    : null;
+
   return (
     <div className="px-5 py-5">
+      {/* Resume banner */}
+      {activePlan && (
+        <div className="mb-4 rounded-[16px] border border-sage-dim bg-sage-bg p-4">
+          <p className="text-[13px] font-semibold text-sage mb-1">
+            {t("session.resumeBanner")}
+          </p>
+          <p className="text-xs text-muted-foreground mb-3">
+            {isEs ? getSessionProtocol(activePlan.id).nameEs : activePlan.name}
+          </p>
+          <div className="flex gap-2">
+            <Link
+              href={`/session/${activePlan.id}`}
+              className="flex-1 rounded-[12px] bg-sage py-2.5 text-center font-heading text-[13px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
+            >
+              {t("session.resumeBtn")}
+            </Link>
+            <button
+              onClick={resetSession}
+              className="rounded-[12px] border border-border bg-surface2 px-4 py-2.5 text-[13px] font-semibold text-muted-foreground transition-colors hover:bg-surface3"
+            >
+              {t("session.discardBtn")}
+            </button>
+          </div>
+        </div>
+      )}
+
       <h1 className="font-heading text-[13px] font-bold tracking-[2px] uppercase text-muted-foreground mb-4">
         {t("session.workoutSessions")}
       </h1>
