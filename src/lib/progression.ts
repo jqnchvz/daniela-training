@@ -152,7 +152,7 @@ export function getDeloadStatus(
   );
   const weekNumber = Math.floor(daysSince / 7) + 1;
 
-  if (weekNumber >= 6) {
+  if (weekNumber >= 4) {
     return {
       weekNumber,
       shouldDeload: false,
@@ -162,7 +162,7 @@ export function getDeloadStatus(
     };
   }
 
-  if (weekNumber === 5) {
+  if (weekNumber === 3) {
     return {
       weekNumber,
       shouldDeload: true,

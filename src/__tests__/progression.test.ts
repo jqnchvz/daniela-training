@@ -125,19 +125,19 @@ describe("getDeloadStatus", () => {
     vi.useRealTimers();
   });
 
-  it("warns at week 5", () => {
+  it("warns at week 3", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-05-03")); // ~4.5 weeks after start
+    vi.setSystemTime(new Date("2026-04-17")); // ~2.3 weeks after start
     const status = getDeloadStatus("2026-04-01", null);
-    expect(status.weekNumber).toBe(5);
+    expect(status.weekNumber).toBe(3);
     expect(status.shouldDeload).toBe(true);
     expect(status.message).toContain("Deload week coming up");
     vi.useRealTimers();
   });
 
-  it("marks deload week at week 6", () => {
+  it("marks deload week at week 4", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-05-10")); // ~5.5 weeks
+    vi.setSystemTime(new Date("2026-04-24")); // ~3.3 weeks
     const status = getDeloadStatus("2026-04-01", null);
     expect(status.isDeloadWeek).toBe(true);
     expect(status.message).toContain("DELOAD WEEK");
