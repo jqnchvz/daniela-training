@@ -40,6 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# claude worktrees
+.claude/worktrees/
+
 # serwist/pwa
 public/sw.js
 public/sw.js.map
