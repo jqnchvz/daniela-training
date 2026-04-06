@@ -50,9 +50,9 @@ describe("Session page", () => {
 });
 
 describe("Progress page", () => {
-  it("renders", () => {
+  it("renders empty state when no data", () => {
     render(<ProgressPage />);
-    expect(screen.getByText("2-Week Rule Status")).toBeInTheDocument();
+    expect(screen.getByText("No data yet")).toBeInTheDocument();
   });
 });
 
