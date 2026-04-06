@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import Image from "next/image";
 import { useSessionStore } from "@/store/session-store";
 import { useAppStore } from "@/store/app-store";
@@ -33,9 +33,12 @@ export default function ActiveSessionPage({
   const store = useSessionStore();
   const isOnline = useAppStore((s) => s.isOnline);
 
-  if (!store.planId && plan) {
-    store.startSession(planId);
-  }
+  // Initialize session in useEffect to avoid side effects during render
+  useEffect(() => {
+    if (!store.planId && plan) {
+      store.startSession(planId);
+    }
+  }, [store, store.planId, plan, planId]);
 
   if (!plan) {
     return (
@@ -118,14 +121,27 @@ function WarmupPhase() {
 
 function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const store = useSessionStore();
-  const currentPlanExercise = plan.exercises[store.currentExerciseIndex];
+  const currentExIndex = store.currentExerciseIndex;
+  const currentPlanExercise = plan.exercises[currentExIndex];
   const exercise = currentPlanExercise ? getExerciseById(currentPlanExercise.exerciseId) : null;
-  const [setInputs, setSetInputs] = useState<Array<{ weight: string; reps: string }>>([]);
 
-  // Initialize inputs when exercise changes
-  const setsForExercise = store.completedSets.filter(
-    (s) => s.exerciseId === exercise?.id,
-  );
+  // Track set inputs per exercise — reset when exercise index changes
+  const [setInputs, setSetInputs] = useState<Array<{ weight: string; reps: string }>>([]);
+  const [lastExIndex, setLastExIndex] = useState(currentExIndex);
+
+  useEffect(() => {
+    if (currentExIndex !== lastExIndex || setInputs.length === 0) {
+      if (currentPlanExercise) {
+        setSetInputs(
+          Array.from({ length: currentPlanExercise.sets }, () => ({
+            weight: "0",
+            reps: String(currentPlanExercise.reps),
+          })),
+        );
+      }
+      setLastExIndex(currentExIndex);
+    }
+  }, [currentExIndex, lastExIndex, currentPlanExercise, setInputs.length]);
 
   if (!currentPlanExercise || !exercise) {
     return (
@@ -142,28 +158,29 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
     );
   }
 
-  const nextExIndex = store.currentExerciseIndex + 1;
+  const setsForExercise = store.completedSets.filter(
+    (s) => s.exerciseId === exercise.id,
+  );
+
+  const nextExIndex = currentExIndex + 1;
   const nextPlanEx = plan.exercises[nextExIndex];
   const nextExercise = nextPlanEx ? getExerciseById(nextPlanEx.exerciseId) : null;
 
-  // Initialize set inputs if needed
-  if (setInputs.length === 0 && currentPlanExercise) {
-    const initial = Array.from({ length: currentPlanExercise.sets }, () => ({
-      weight: "0",
-      reps: String(currentPlanExercise.reps),
-    }));
-    setSetInputs(initial);
-  }
-
   const handleLogSet = (setIndex: number) => {
+    // Only allow logging the next unlogged set (sequential order)
+    if (setIndex !== setsForExercise.length) return;
+
     const input = setInputs[setIndex];
     if (!input) return;
+
+    const weight = Math.max(0, Number(input.weight) || 0);
+    const reps = Math.max(1, Number(input.reps) || 1);
 
     store.logSet({
       exerciseId: exercise.id,
       setNumber: setIndex + 1,
-      weight: Number(input.weight),
-      reps: Number(input.reps),
+      weight,
+      reps,
       rpe: null,
       completed: true,
     });
@@ -176,12 +193,19 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
   const handleNextExercise = () => {
     store.nextExercise();
-    setSetInputs([]);
+  };
+
+  const handlePrevExercise = () => {
+    if (currentExIndex > 0) {
+      useSessionStore.setState((s) => ({
+        currentExerciseIndex: s.currentExerciseIndex - 1,
+      }));
+    }
   };
 
   const allSetsDone = setsForExercise.length >= currentPlanExercise.sets;
   const progressPercent = Math.round(
-    ((store.currentExerciseIndex + (allSetsDone ? 1 : 0)) / plan.exercises.length) * 100,
+    ((currentExIndex + (allSetsDone ? 1 : 0)) / plan.exercises.length) * 100,
   );
 
   return (
@@ -199,7 +223,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       {/* Progress */}
       <div className="px-5 pt-4">
         <div className="flex justify-between text-xs text-muted-foreground mb-2">
-          <span>Exercise {store.currentExerciseIndex + 1} of {plan.exercises.length}</span>
+          <span>Exercise {currentExIndex + 1} of {plan.exercises.length}</span>
           <span className="text-sage">Main Work</span>
         </div>
         <div className="h-1 rounded-full bg-surface3">
@@ -209,7 +233,6 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
       {/* Exercise card */}
       <div className="mx-5 mt-4 rounded-[20px] border border-border bg-card overflow-hidden">
-        {/* Image area */}
         <div className="relative h-[200px] bg-surface2 flex items-center justify-center border-b border-border">
           {exercise.gifUrl ? (
             <Image src={exercise.gifUrl} alt={exercise.name} fill className="object-contain" unoptimized />
@@ -224,7 +247,6 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
             ))}
           </div>
         </div>
-        {/* Info */}
         <div className="p-[18px]">
           <h2 className="font-heading text-[1.3rem] font-extrabold">{exercise.name}</h2>
           <p className="text-[13px] text-muted-foreground leading-relaxed mt-1 mb-3.5">
@@ -246,6 +268,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         </p>
         {Array.from({ length: currentPlanExercise.sets }, (_, i) => {
           const isDone = i < setsForExercise.length;
+          const isNext = i === setsForExercise.length;
           const input = setInputs[i] || { weight: "0", reps: String(currentPlanExercise.reps) };
           return (
             <div key={i} className="flex items-center gap-2.5 py-2.5 border-b border-border last:border-b-0">
@@ -257,35 +280,37 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
               <input
                 type="number"
                 value={isDone ? setsForExercise[i].weight : input.weight}
-                disabled={isDone}
+                disabled={isDone || !isNext}
                 onChange={(e) => {
                   const updated = [...setInputs];
                   updated[i] = { ...input, weight: e.target.value };
                   setSetInputs(updated);
                 }}
-                className="w-full rounded-lg border border-border bg-surface2 px-2.5 py-2 font-mono text-sm text-center disabled:opacity-50"
+                className="w-full rounded-lg border border-border bg-surface2 px-2.5 py-2 font-mono text-sm text-center disabled:opacity-40"
                 placeholder="kg"
               />
               <span className="text-[11px] text-[#5a5550] shrink-0 w-5 text-center">×</span>
               <input
                 type="number"
                 value={isDone ? setsForExercise[i].reps : input.reps}
-                disabled={isDone}
+                disabled={isDone || !isNext}
                 onChange={(e) => {
                   const updated = [...setInputs];
                   updated[i] = { ...input, reps: e.target.value };
                   setSetInputs(updated);
                 }}
-                className="w-16 rounded-lg border border-border bg-surface2 px-2.5 py-2 font-mono text-sm text-center disabled:opacity-50"
+                className="w-16 rounded-lg border border-border bg-surface2 px-2.5 py-2 font-mono text-sm text-center disabled:opacity-40"
                 placeholder="reps"
               />
               <button
-                disabled={isDone}
+                disabled={isDone || !isNext}
                 onClick={() => handleLogSet(i)}
                 className={`w-9 h-9 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
                   isDone
                     ? "bg-sage border-sage text-[#0f1f10]"
-                    : "border-[#3a3a3a] hover:border-sage"
+                    : isNext
+                      ? "border-sage hover:bg-sage/20 cursor-pointer"
+                      : "border-[#3a3a3a] opacity-40"
                 }`}
               >
                 {isDone ? "✓" : ""}
@@ -311,14 +336,9 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
       {/* Nav buttons */}
       <div className="flex gap-2.5 px-5 mt-4 pb-28">
-        {store.currentExerciseIndex > 0 && (
+        {currentExIndex > 0 && (
           <button
-            onClick={() => {
-              useSessionStore.setState((s) => ({
-                currentExerciseIndex: Math.max(0, s.currentExerciseIndex - 1),
-              }));
-              setSetInputs([]);
-            }}
+            onClick={handlePrevExercise}
             className="flex-[0.5] rounded-[16px] border border-[#3a3a3a] bg-surface2 py-3.5 font-heading text-sm font-semibold transition-colors hover:bg-surface3"
           >
             ‹ Prev
@@ -375,6 +395,11 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
   const totalVolume = store.completedSets.reduce((sum, s) => sum + s.weight * s.reps, 0);
   const exercisesCompleted = new Set(store.completedSets.map((s) => s.exerciseId)).size;
+  const totalSets = store.completedSets.length;
+
+  const duration = store.startedAt
+    ? Math.round((Date.now() - new Date(store.startedAt).getTime()) / 60000)
+    : 0;
 
   const handleComplete = () => {
     store.reset();
@@ -389,9 +414,15 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       <h1 className="font-heading text-[2rem] font-extrabold leading-tight mb-2">
         Session<br />Complete!
       </h1>
-      <p className="text-sm text-muted-foreground mb-8">
-        {plan.name} · {exercisesCompleted} exercises · {totalVolume.toLocaleString()}kg volume
+      <p className="text-sm text-muted-foreground mb-2">
+        {plan.name}
       </p>
+      <div className="flex gap-4 text-xs text-muted-foreground mb-8">
+        <span>⏱ {duration} min</span>
+        <span>📋 {exercisesCompleted} exercises</span>
+        <span>💪 {totalSets} sets</span>
+        {totalVolume > 0 && <span>🏋️ {totalVolume.toLocaleString()} kg</span>}
+      </div>
 
       {/* Wellness inputs */}
       <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left mb-4">
