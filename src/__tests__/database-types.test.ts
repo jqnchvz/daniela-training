@@ -1,66 +1,49 @@
 import { describe, it, expect } from "vitest";
-import type { Database } from "@/types/database";
+import * as schema from "@/lib/db/schema";
 
-// Type-level tests: these verify the database types are well-formed
-// by using TypeScript satisfies checks at compile time.
-
-type Tables = Database["public"]["Tables"];
-
-describe("Database types", () => {
-  it("has all required tables defined", () => {
-    const tableNames: (keyof Tables)[] = [
-      "exercises",
-      "workout_plans",
-      "workout_plan_exercises",
-      "session_logs",
-      "set_logs",
-      "daily_checkins",
-      "body_measurements",
-    ];
-    expect(tableNames).toHaveLength(7);
+describe("Database schema", () => {
+  it("exports all required tables", () => {
+    expect(schema.sessions).toBeDefined();
+    expect(schema.sessionSets).toBeDefined();
+    expect(schema.checkins).toBeDefined();
+    expect(schema.cycleState).toBeDefined();
   });
 
-  it("exercises table has correct shape", () => {
-    const exercise: Tables["exercises"]["Row"] = {
-      id: "test-id",
-      name: "Goblet Squat",
-      category: "compound",
-      muscle_groups: ["quads", "glutes"],
-      equipment: ["dumbbell"],
-      notes: null,
-    };
-    expect(exercise.name).toBe("Goblet Squat");
-    expect(exercise.category).toBe("compound");
+  it("sessions table has expected columns", () => {
+    const cols = Object.keys(schema.sessions);
+    expect(cols).toContain("id");
+    expect(cols).toContain("planId");
+    expect(cols).toContain("date");
+    expect(cols).toContain("startedAt");
+    expect(cols).toContain("completedAt");
+    expect(cols).toContain("energyPre");
+    expect(cols).toContain("sessionMode");
   });
 
-  it("set_logs table has correct shape", () => {
-    const setLog: Tables["set_logs"]["Row"] = {
-      id: "test-id",
-      session_log_id: "session-1",
-      exercise_id: "ex-1",
-      set_number: 1,
-      weight: 12.5,
-      reps: 10,
-      rpe: 7,
-      completed: true,
-    };
-    expect(setLog.weight).toBe(12.5);
-    expect(setLog.completed).toBe(true);
+  it("sessionSets table has expected columns", () => {
+    const cols = Object.keys(schema.sessionSets);
+    expect(cols).toContain("sessionId");
+    expect(cols).toContain("exerciseId");
+    expect(cols).toContain("weight");
+    expect(cols).toContain("reps");
+    expect(cols).toContain("rpe");
   });
 
-  it("daily_checkins table has correct shape", () => {
-    const checkin: Tables["daily_checkins"]["Row"] = {
-      id: "test-id",
-      date: "2024-03-15",
-      energy: 7,
-      sleep_quality: 8,
-      sleep_hours: 7.5,
-      mood: 7,
-      soreness: 3,
-      notes: null,
-      created_at: "2024-03-15T08:00:00Z",
-    };
-    expect(checkin.energy).toBe(7);
-    expect(checkin.sleep_hours).toBe(7.5);
+  it("checkins table has expected columns", () => {
+    const cols = Object.keys(schema.checkins);
+    expect(cols).toContain("date");
+    expect(cols).toContain("energy");
+    expect(cols).toContain("sleepQuality");
+    expect(cols).toContain("sleepHours");
+    expect(cols).toContain("mood");
+    expect(cols).toContain("soreness");
+  });
+
+  it("cycleState table has expected columns", () => {
+    const cols = Object.keys(schema.cycleState);
+    expect(cols).toContain("cycleStartDate");
+    expect(cols).toContain("extensionWeeks");
+    expect(cols).toContain("lastDeloadDate");
+    expect(cols).toContain("completedSessions");
   });
 });
