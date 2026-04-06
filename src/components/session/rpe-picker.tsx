@@ -20,7 +20,7 @@ export function RpePicker({ onSelect, onSkip }: RpePickerProps) {
   const isEs = locale === "es";
 
   return (
-    <div className="fixed inset-0 z-[190] flex flex-col items-center justify-center bg-black/85 backdrop-blur-[10px] px-6">
+    <div className="fixed inset-0 z-[190] flex flex-col items-center justify-center bg-background/95 backdrop-blur-[10px] px-6">
       <p className="text-xs tracking-[2px] uppercase text-muted-foreground font-mono mb-2">
         {isEs ? "ESFUERZO PERCIBIDO" : "PERCEIVED EXERTION"}
       </p>

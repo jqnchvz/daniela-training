@@ -50,7 +50,7 @@ export function RestTimer() {
   const isEs = locale === "es";
 
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/85 backdrop-blur-[10px]">
+    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-background/95 backdrop-blur-[10px]">
       {/* Circular ring */}
       <div className="relative w-[180px] h-[180px] mb-6">
         <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
