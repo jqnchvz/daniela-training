@@ -9,6 +9,7 @@ import { useCycleStore } from "@/store/cycle-store";
 import { getExerciseById, getLiteExercises, WORKOUT_PLANS } from "@/lib/exercises";
 import { EnergySlider } from "@/components/session/energy-slider";
 import { RestTimer } from "@/components/session/rest-timer";
+import { RpePicker } from "@/components/session/rpe-picker";
 import { getSessionProtocol } from "@/lib/session-protocols";
 import { useI18n, useT } from "@/lib/i18n";
 import { detectRedFlags, type CheckinData } from "@/lib/checkin";
@@ -200,6 +201,10 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
   const currentImageUrl = showFrame2 && exercise?.gifUrl2 ? exercise.gifUrl2 : exercise?.gifUrl;
 
+  // RPE picker state — shown after logging a set, before rest timer
+  const [showRpePicker, setShowRpePicker] = useState(false);
+  const [pendingRestTimer, setPendingRestTimer] = useState<{ duration: number; nextInfo: string | null } | null>(null);
+
   // Track set inputs per exercise — reset when exercise index changes
   const [setInputs, setSetInputs] = useState<Array<{ weight: string; reps: string }>>([]);
   const [lastExIndex, setLastExIndex] = useState(currentExIndex);
@@ -263,16 +268,35 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       completed: true,
     });
 
-    // Start rest timer if not last set
+    // Prepare rest timer (will start after RPE selection)
     if (setsForExercise.length + 1 < currentPlanExercise.sets) {
-      // Show next set info, or next exercise if this is the penultimate set
       const remainingSets = currentPlanExercise.sets - (setsForExercise.length + 1);
       const nextInfo = remainingSets > 0
         ? `Set ${setsForExercise.length + 2}/${currentPlanExercise.sets} · ${locale === "es" ? (exercise?.nameEs ?? exercise?.name) : exercise?.name}`
         : nextExercise
           ? `${locale === "es" ? nextExercise.nameEs : nextExercise.name} · ${nextPlanEx.sets}×${nextPlanEx.reps}`
           : null;
-      store.setRestTimer(Date.now() + currentPlanExercise.restSeconds * 1000, nextInfo);
+      setPendingRestTimer({ duration: currentPlanExercise.restSeconds, nextInfo });
+    } else {
+      setPendingRestTimer(null);
+    }
+    setShowRpePicker(true);
+  };
+
+  const handleRpeSelect = (rpe: number) => {
+    store.updateLastSetRpe(rpe);
+    setShowRpePicker(false);
+    if (pendingRestTimer) {
+      store.setRestTimer(Date.now() + pendingRestTimer.duration * 1000, pendingRestTimer.nextInfo);
+      setPendingRestTimer(null);
+    }
+  };
+
+  const handleRpeSkip = () => {
+    setShowRpePicker(false);
+    if (pendingRestTimer) {
+      store.setRestTimer(Date.now() + pendingRestTimer.duration * 1000, pendingRestTimer.nextInfo);
+      setPendingRestTimer(null);
     }
   };
 
@@ -464,6 +488,9 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         </button>
       </div>
 
+      {/* RPE picker overlay */}
+      {showRpePicker && <RpePicker onSelect={handleRpeSelect} onSkip={handleRpeSkip} />}
+
       {/* Rest timer overlay */}
       <RestTimer />
     </>
@@ -525,6 +552,10 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const totalVolume = store.completedSets.reduce((sum, s) => sum + s.weight * s.reps, 0);
   const exercisesCompleted = new Set(store.completedSets.map((s) => s.exerciseId)).size;
   const totalSets = store.completedSets.length;
+  const rpeSets = store.completedSets.filter((s) => s.rpe !== null);
+  const avgRpe = rpeSets.length > 0
+    ? (rpeSets.reduce((sum, s) => sum + s.rpe!, 0) / rpeSets.length).toFixed(1)
+    : null;
 
   const sessionStart = store.workingStartedAt ?? store.startedAt;
   const duration = sessionStart
@@ -578,6 +609,7 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         <span>📋 {exercisesCompleted} exercises</span>
         <span>💪 {totalSets} sets</span>
         {totalVolume > 0 && <span>🏋️ {totalVolume.toLocaleString()} kg</span>}
+        {avgRpe && <span>🎯 RPE {avgRpe}</span>}
       </div>
 
       {/* Wellness inputs */}

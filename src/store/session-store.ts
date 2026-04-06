@@ -39,6 +39,7 @@ interface SessionState {
   nextExercise: () => void;
   toggleWarmup: (index: number) => void;
   toggleCooldown: (index: number) => void;
+  updateLastSetRpe: (rpe: number) => void;
   setRestTimer: (endTime: number | null, nextInfo?: string | null) => void;
   setNotes: (notes: string) => void;
   reset: () => void;
@@ -102,6 +103,15 @@ export const useSessionStore = create<SessionState>()(
           const list = [...state.cooldownChecklist];
           list[index] = !list[index];
           return { cooldownChecklist: list };
+        }),
+
+      updateLastSetRpe: (rpe) =>
+        set((state) => {
+          const sets = [...state.completedSets];
+          if (sets.length > 0) {
+            sets[sets.length - 1] = { ...sets[sets.length - 1], rpe };
+          }
+          return { completedSets: sets };
         }),
 
       setRestTimer: (endTime, nextInfo) => set({ restTimerEnd: endTime, restTimerNextInfo: nextInfo ?? null }),
