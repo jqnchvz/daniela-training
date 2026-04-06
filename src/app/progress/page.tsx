@@ -46,9 +46,9 @@ export default function ProgressPage() {
 
       {/* Red flag banner */}
       {(redFlags.hasEnergyFlag || redFlags.hasMoodFlag) && (
-        <div className="rounded-[16px] bg-dt-red-bg border border-[#5a1a1a] p-3.5 flex gap-2.5 items-start mb-3">
+        <div className="rounded-[16px] bg-dt-red-bg border border-[#3A1820] p-3.5 flex gap-2.5 items-start mb-3">
           <span className="text-lg shrink-0">⚠️</span>
-          <p className="text-[13px] text-[#e08888] leading-relaxed">
+          <p className="text-[13px] text-[#D48A8E] leading-relaxed">
             {redFlags.hasEnergyFlag && (
               <>
                 Your 7-day energy average (<strong>{redFlags.energyAvg7}</strong>) is significantly
@@ -163,7 +163,7 @@ export default function ProgressPage() {
           <MetricBox value="—" label="Hip cm" />
           <MetricBox value="—" label="Thigh cm" />
         </div>
-        <button className="w-full mt-3 rounded-[16px] border border-[#3a3a3a] bg-surface2 py-2.5 text-[13px] font-semibold transition-colors hover:bg-surface3">
+        <button className="w-full mt-3 rounded-[16px] border border-[#3A3530] bg-surface2 py-2.5 text-[13px] font-semibold transition-colors hover:bg-surface3">
           + Log measurements
         </button>
       </div>
@@ -316,20 +316,20 @@ function StrengthChart({ data }: { data: ExerciseDataPoint[] }) {
       <svg className="w-full h-20" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
         <defs>
           <linearGradient id="strengthGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7aad7c" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#7aad7c" stopOpacity="0" />
+            <stop offset="0%" stopColor="#9B8EC4" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#9B8EC4" stopOpacity="0" />
           </linearGradient>
         </defs>
         <path d={areaPath} fill="url(#strengthGrad)" />
-        <polyline points={polyline} stroke="#7aad7c" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline points={polyline} stroke="#9B8EC4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         {points.map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r={i === points.length - 1 ? 5 : 3} fill="#7aad7c" stroke={i === points.length - 1 ? "#0f1f10" : "none"} strokeWidth={i === points.length - 1 ? 2 : 0} />
+          <circle key={i} cx={p.x} cy={p.y} r={i === points.length - 1 ? 5 : 3} fill="#9B8EC4" stroke={i === points.length - 1 ? "#1A1625" : "none"} strokeWidth={i === points.length - 1 ? 2 : 0} />
         ))}
-        <text x={points[points.length - 1].x - 20} y={points[points.length - 1].y - 8} fill="#7aad7c" fontSize="9" fontFamily="JetBrains Mono" fontWeight="500">
+        <text x={points[points.length - 1].x - 20} y={points[points.length - 1].y - 8} fill="#9B8EC4" fontSize="9" fontFamily="JetBrains Mono" fontWeight="500">
           {data[data.length - 1].label}
         </text>
       </svg>
-      <div className="flex justify-between mt-2 text-xs text-[#5a5550]">
+      <div className="flex justify-between mt-2 text-xs text-[#8A847E]">
         <span>Started: <span className="text-muted-foreground">{data[0].maxWeight} kg</span></span>
         {data.length > 1 && (
           <span>
@@ -356,8 +356,8 @@ function VolumeChart({ data }: { data: WeeklyVolumePoint[] }) {
         const y = height - 15 - barHeight;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barWidth} height={barHeight} rx="4" fill="#7aad7c" opacity="0.8" />
-            <text x={x + barWidth / 2} y={height - 3} fill="#5a5550" fontSize="8" fontFamily="JetBrains Mono" textAnchor="middle">
+            <rect x={x} y={y} width={barWidth} height={barHeight} rx="4" fill="#9B8EC4" opacity="0.8" />
+            <text x={x + barWidth / 2} y={height - 3} fill="#8A847E" fontSize="8" fontFamily="JetBrains Mono" textAnchor="middle">
               {d.label}
             </text>
           </g>
@@ -384,10 +384,10 @@ function WellnessChart({ checkins }: { checkins: Array<{ date: string; energy: n
 
   return (
     <svg className="w-full h-20" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
-      <polyline points={energyPoints} stroke="#7aad7c" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <polyline points={energyPoints} stroke="#9B8EC4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       <polyline points={sleepPoints} stroke="#5a9fd4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2" />
-      <line x1="10" y1="10" x2="25" y2="10" stroke="#7aad7c" strokeWidth="2" />
-      <text x="28" y="14" fill="#7aad7c" fontSize="9">Energy</text>
+      <line x1="10" y1="10" x2="25" y2="10" stroke="#9B8EC4" strokeWidth="2" />
+      <text x="28" y="14" fill="#9B8EC4" fontSize="9">Energy</text>
       <line x1="80" y1="10" x2="95" y2="10" stroke="#5a9fd4" strokeWidth="2" strokeDasharray="4 2" />
       <text x="98" y="14" fill="#5a9fd4" fontSize="9">Sleep</text>
     </svg>
@@ -415,7 +415,7 @@ function MetricBox({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex-1 text-center rounded-[10px] bg-surface2 p-3">
       <p className="font-heading text-[1.2rem] font-extrabold">{value}</p>
-      <p className="text-[10px] text-[#5a5550] mt-1">{label}</p>
+      <p className="text-[10px] text-[#8A847E] mt-1">{label}</p>
     </div>
   );
 }

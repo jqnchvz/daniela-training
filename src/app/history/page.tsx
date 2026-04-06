@@ -33,19 +33,19 @@ export default function HistoryPage() {
           <p className="font-heading text-[1.5rem] font-extrabold leading-none">
             {sessions.length}
           </p>
-          <p className="text-[10px] text-[#5a5550] mt-1">Total sessions</p>
+          <p className="text-[10px] text-[#8A847E] mt-1">Total sessions</p>
         </div>
         <div className="flex-1 text-center rounded-[10px] border border-border bg-surface2 p-3">
           <p className="font-heading text-[1.5rem] font-extrabold leading-none text-sage">
             {totalPRs}
           </p>
-          <p className="text-[10px] text-[#5a5550] mt-1">PRs set</p>
+          <p className="text-[10px] text-[#8A847E] mt-1">PRs set</p>
         </div>
         <div className="flex-1 text-center rounded-[10px] border border-border bg-surface2 p-3">
           <p className="font-heading text-[1.5rem] font-extrabold leading-none text-gold">
             {avgEnergy}
           </p>
-          <p className="text-[10px] text-[#5a5550] mt-1">Avg energy</p>
+          <p className="text-[10px] text-[#8A847E] mt-1">Avg energy</p>
         </div>
       </div>
 
@@ -119,7 +119,7 @@ function SessionEntry({
             {session.planName} · {session.durationMinutes} min
           </p>
         </div>
-        <span className="text-xs text-[#5a5550]">
+        <span className="text-xs text-[#8A847E]">
           {isExpanded ? "▲" : "▼"}
         </span>
       </button>
@@ -148,7 +148,7 @@ function SessionEntry({
               </span>
             )}
             {session.sleepScore != null && (
-              <span className="rounded-full bg-dt-blue-bg text-dt-blue border border-[#1a3a5a] px-2.5 py-0.5 text-[11px] font-semibold">
+              <span className="rounded-full bg-dt-blue-bg text-dt-blue border border-[#1A2240] px-2.5 py-0.5 text-[11px] font-semibold">
                 Sleep {session.sleepScore}
               </span>
             )}
