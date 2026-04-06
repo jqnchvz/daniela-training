@@ -4,6 +4,8 @@ import { use, useState, useEffect } from "react";
 import Image from "next/image";
 import { useSessionStore } from "@/store/session-store";
 import { useAppStore } from "@/store/app-store";
+import { useHistoryStore } from "@/store/history-store";
+import { useCycleStore } from "@/store/cycle-store";
 import { getExerciseById, WORKOUT_PLANS } from "@/lib/exercises";
 import { EnergySlider } from "@/components/session/energy-slider";
 import { RestTimer } from "@/components/session/rest-timer";
@@ -389,6 +391,8 @@ function CooldownPhase() {
 
 function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const store = useSessionStore();
+  const addSession = useHistoryStore((s) => s.addSession);
+  const incrementSessions = useCycleStore((s) => s.incrementSessions);
   const [energy, setEnergy] = useState(4);
   const [sleep, setSleep] = useState(3);
   const [soreness, setSoreness] = useState(1);
@@ -402,6 +406,31 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
     : 0;
 
   const handleComplete = () => {
+    // Save session to persistent history
+    addSession({
+      id: crypto.randomUUID(),
+      planId: plan.id,
+      planName: plan.name,
+      date: new Date().toISOString().split("T")[0],
+      startedAt: store.startedAt || new Date().toISOString(),
+      completedAt: new Date().toISOString(),
+      durationMinutes: duration,
+      energyPre: store.energyPre,
+      energyPost: energy,
+      sleepScore: sleep,
+      sorenessScore: soreness,
+      sets: store.completedSets.map((s) => ({
+        exerciseId: s.exerciseId,
+        exerciseName: getExerciseById(s.exerciseId)?.name ?? "Unknown",
+        setNumber: s.setNumber,
+        weight: s.weight,
+        reps: s.reps,
+        rpe: s.rpe,
+      })),
+      notes: store.notes,
+    });
+
+    incrementSessions();
     store.reset();
     window.location.href = "/";
   };
