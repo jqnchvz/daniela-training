@@ -80,6 +80,14 @@ export async function syncCycleToDb(cycle: unknown) {
   await syncToApi("/api/cycle", cycle);
 }
 
+// ── Auto-flush on reconnect ────────────────────────────────────────────────
+
+if (typeof window !== "undefined") {
+  window.addEventListener("online", () => {
+    flushQueue();
+  });
+}
+
 // ── Read helpers (hydrate from DB on new device) ────────────────────────────
 
 export async function fetchSessionsFromDb(): Promise<Record<string, unknown>[] | null> {
