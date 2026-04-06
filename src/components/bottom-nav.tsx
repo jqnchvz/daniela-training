@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useT } from "@/lib/i18n";
 
 const navItems = [
-  { href: "/", label: "Home", icon: "🏠" },
-  { href: "/session", label: "Session", icon: "▶️" },
-  { href: "/progress", label: "Progress", icon: "📈" },
-  { href: "/library", label: "Library", icon: "📚" },
-  { href: "/history", label: "History", icon: "📋" },
+  { href: "/", labelKey: "nav.home", icon: "🏠" },
+  { href: "/session", labelKey: "nav.session", icon: "▶️" },
+  { href: "/progress", labelKey: "nav.progress", icon: "📈" },
+  { href: "/library", labelKey: "nav.library", icon: "📚" },
+  { href: "/history", labelKey: "nav.history", icon: "📋" },
 ] as const;
 
 export function BottomNav() {
   const pathname = usePathname();
+  const t = useT();
 
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-[420px] border-t border-border bg-[rgba(18,18,18,0.92)] backdrop-blur-[20px] pb-[env(safe-area-inset-bottom)]">
@@ -34,7 +36,7 @@ export function BottomNav() {
                   isActive ? "text-sage" : "text-[#5a5550]"
                 }`}
               >
-                {item.label}
+                {t(item.labelKey)}
               </span>
             </Link>
           );

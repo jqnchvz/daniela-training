@@ -9,21 +9,7 @@ import { useCycleStore } from "@/store/cycle-store";
 import { getExerciseById, WORKOUT_PLANS } from "@/lib/exercises";
 import { EnergySlider } from "@/components/session/energy-slider";
 import { RestTimer } from "@/components/session/rest-timer";
-
-const WARMUP_ITEMS = [
-  { icon: "🏃", text: "Treadmill walk — 5 min, 3% incline" },
-  { icon: "🔄", text: "Arm circles + shoulder rolls — 2 min" },
-  { icon: "💪", text: "Band pull-aparts — 2×15" },
-  { icon: "🧱", text: "Wall slides — 2×10 slow" },
-  { icon: "🐱", text: "Cat-cow + thoracic rotation — 3 min" },
-];
-
-const COOLDOWN_ITEMS = [
-  { icon: "🌊", text: "Lat stretch — 60s each side" },
-  { icon: "🔄", text: "Supine spinal twist — 60s each" },
-  { icon: "💪", text: "Bicep/forearm stretch — 45s each" },
-  { icon: "🌬", text: "Diaphragmatic breathing — 3 min" },
-];
+import { getSessionProtocol } from "@/lib/session-protocols";
 
 export default function ActiveSessionPage({
   params,
@@ -59,9 +45,9 @@ export default function ActiveSessionPage({
       )}
 
       {store.phase === "pre-check" && <PreCheckPhase />}
-      {store.phase === "warmup" && <WarmupPhase />}
+      {store.phase === "warmup" && <WarmupPhase planId={planId} />}
       {store.phase === "working" && <WorkingPhase plan={plan} />}
-      {store.phase === "cooldown" && <CooldownPhase />}
+      {store.phase === "cooldown" && <CooldownPhase planId={planId} />}
       {store.phase === "summary" && <SummaryPhase plan={plan} />}
     </div>
   );
@@ -91,29 +77,38 @@ function PreCheckPhase() {
   );
 }
 
-function WarmupPhase() {
+function WarmupPhase({ planId }: { planId: string }) {
   const { setPhase } = useSessionStore();
+  const protocol = getSessionProtocol(planId);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
       <div className="text-6xl mb-4">🔥</div>
-      <h2 className="font-heading text-[1.35rem] font-bold mb-2">Warm-up</h2>
-      <p className="text-sm text-muted-foreground mb-6 max-w-[280px] leading-relaxed">
-        Start with 5 min incline treadmill, then dynamic stretches. Take your time — this is non-negotiable for recovery.
+      <h2 className="font-heading text-[1.35rem] font-bold mb-1">Warm-up</h2>
+      <p className="text-xs text-sage font-semibold mb-4">
+        {protocol.warmupMinutes} min · {protocol.focus}
       </p>
-      <div className="w-full max-w-[320px] rounded-[16px] border border-border bg-card p-4 text-left">
-        <div className="flex flex-col gap-2.5">
-          {WARMUP_ITEMS.map((item, i) => (
-            <div key={i} className="flex items-center gap-2.5 text-sm">
-              <span>{item.icon}</span>
-              <span>{item.text}</span>
+      <p className="text-sm text-muted-foreground mb-6 max-w-[280px] leading-relaxed">
+        Prepare your body for today&apos;s session. Take your time — this is non-negotiable for hypothyroid recovery.
+      </p>
+      <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left">
+        <div className="flex flex-col gap-3">
+          {protocol.warmup.map((item, i) => (
+            <div key={i} className="flex items-center justify-between text-[13px]">
+              <span className="flex items-center gap-2.5">
+                <span>{item.icon}</span>
+                <span>{item.text}</span>
+              </span>
+              <span className="text-[10px] text-[#5a5550] font-mono shrink-0 ml-2">
+                {item.duration}
+              </span>
             </div>
           ))}
         </div>
       </div>
       <button
         onClick={() => setPhase("working")}
-        className="mt-6 w-full max-w-[320px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#0f1f10] transition-all hover:bg-[#8dc88f]"
+        className="mt-6 w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#0f1f10] transition-all hover:bg-[#8dc88f]"
       >
         Done with Warm-up →
       </button>
@@ -360,28 +355,38 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   );
 }
 
-function CooldownPhase() {
+function CooldownPhase({ planId }: { planId: string }) {
   const store = useSessionStore();
+  const protocol = getSessionProtocol(planId);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
       <div className="text-6xl mb-4">🧘</div>
-      <h2 className="font-heading text-[1.35rem] font-bold mb-2">Cool-down</h2>
-      <p className="text-sm text-muted-foreground mb-6 max-w-[280px] leading-relaxed">
-        10 minutes of stretching. This is when recovery begins — don&apos;t skip it.
+      <h2 className="font-heading text-[1.35rem] font-bold mb-1">Cool-down</h2>
+      <p className="text-xs text-dt-blue font-semibold mb-4">
+        {protocol.cooldownMinutes} min · {protocol.focus}
       </p>
-      <div className="w-full max-w-[320px] rounded-[16px] border border-border bg-card p-4 text-left">
-        <div className="flex flex-col gap-2.5">
-          {COOLDOWN_ITEMS.map((item, i) => (
-            <div key={i} className="text-sm">
-              {item.icon} {item.text}
+      <p className="text-sm text-muted-foreground mb-6 max-w-[280px] leading-relaxed">
+        Stretching the muscles you just worked. This is when recovery begins — don&apos;t skip it.
+      </p>
+      <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left">
+        <div className="flex flex-col gap-3">
+          {protocol.cooldown.map((item, i) => (
+            <div key={i} className="flex items-center justify-between text-[13px]">
+              <span className="flex items-center gap-2.5">
+                <span>{item.icon}</span>
+                <span>{item.text}</span>
+              </span>
+              <span className="text-[10px] text-[#5a5550] font-mono shrink-0 ml-2">
+                {item.duration}
+              </span>
             </div>
           ))}
         </div>
       </div>
       <button
         onClick={() => store.setPhase("summary")}
-        className="mt-6 w-full max-w-[320px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#0f1f10]"
+        className="mt-6 w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#0f1f10]"
       >
         Complete Session ✓
       </button>

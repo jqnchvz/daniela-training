@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
-  getGreeting,
   getTodaysWorkout,
   getNextWorkout,
   getDayName,
@@ -12,10 +11,11 @@ import {
 import { getCurrentPhase } from "@/lib/phases";
 import { useCycleStore } from "@/store/cycle-store";
 import { useHistoryStore } from "@/store/history-store";
+import { useT } from "@/lib/i18n";
 
 export default function HomePage() {
-  const [greeting, setGreeting] = useState("Good morning");
   const [mounted, setMounted] = useState(false);
+  const t = useT();
   const cycle = useCycleStore();
   const history = useHistoryStore();
   const weekStats = history.getSessionsByWeek();
@@ -23,8 +23,15 @@ export default function HomePage() {
 
   useEffect(() => {
     setMounted(true);
-    setGreeting(getGreeting());
   }, []);
+
+  const hour = new Date().getHours();
+  const greetingKey =
+    hour < 12
+      ? "home.goodMorning"
+      : hour < 18
+        ? "home.goodAfternoon"
+        : "home.goodEvening";
 
   const todaysWorkout = getTodaysWorkout();
   const nextWorkout = getNextWorkout();
@@ -50,7 +57,7 @@ export default function HomePage() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-[13px] text-muted-foreground">
-            {mounted ? greeting : "Good morning"} ☀️
+            {mounted ? t(greetingKey) : t("home.goodMorning")} ☀️
           </p>
           <h1 className="font-heading text-[1.35rem] font-bold">Daniela</h1>
         </div>
@@ -61,7 +68,7 @@ export default function HomePage() {
       {phaseStatus ? (
         <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-secondary border border-border px-3.5 py-1.5 text-xs font-semibold text-muted-foreground">
           <span className="h-2 w-2 rounded-full bg-sage" />
-          Phase {phaseStatus.phase.phase} · Week {phaseStatus.weekNumber} of{" "}
+          {t("home.phase")} {phaseStatus.phase.phase} · {t("home.week")} {phaseStatus.weekNumber} {t("home.of")}{" "}
           {phaseStatus.totalWeeks}
         </div>
       ) : (
@@ -70,7 +77,7 @@ export default function HomePage() {
           className="mt-3 inline-flex items-center gap-2 rounded-full bg-sage-bg border border-sage-dim px-3.5 py-1.5 text-xs font-semibold text-sage transition-colors hover:bg-sage/20"
         >
           <span className="h-2 w-2 rounded-full bg-sage" />
-          Start your 16-week program →
+          {t("home.startProgram")}
         </button>
       )}
 
@@ -146,16 +153,16 @@ export default function HomePage() {
               href="/session"
               className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#0f1f10] transition-all hover:bg-[#8dc88f] hover:-translate-y-0.5 active:translate-y-0"
             >
-              ▶ Start Session
+              {t("home.startSession")}
             </Link>
           </>
         ) : (
           <>
             <p className="text-[11px] font-semibold tracking-[2px] uppercase text-sage">
-              Rest day
+              {t("home.restDay")}
             </p>
             <h2 className="font-heading text-[1.4rem] font-bold mt-2">
-              Recovery day
+              {t("home.recoveryDay")}
             </h2>
             <p className="text-[13px] text-muted-foreground mt-1.5">
               Next: {getDayName(nextWorkout.dayOfWeek)} — {nextWorkout.name}
@@ -166,33 +173,33 @@ export default function HomePage() {
 
       {/* Wellness row */}
       <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mt-5 mb-2">
-        Last session wellness
+        {t("home.lastWellness")}
       </p>
       <div className="flex gap-2">
-        <WellnessCard label="Energy" value={latestCheckin ? String(latestCheckin.energy) : "--"} color="text-sage" />
-        <WellnessCard label="Sleep" value={latestCheckin ? String(latestCheckin.sleepQuality) : "--"} color="text-dt-blue" />
-        <WellnessCard label="Soreness" value={latestCheckin ? String(latestCheckin.soreness) : "--"} color="text-gold" />
+        <WellnessCard label={t("home.energy")} value={latestCheckin ? String(latestCheckin.energy) : "--"} color="text-sage" />
+        <WellnessCard label={t("home.sleep")} value={latestCheckin ? String(latestCheckin.sleepQuality) : "--"} color="text-dt-blue" />
+        <WellnessCard label={t("home.soreness")} value={latestCheckin ? String(latestCheckin.soreness) : "--"} color="text-gold" />
       </div>
 
       {/* Stats row */}
       <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mt-4 mb-2">
-        This week
+        {t("home.thisWeek")}
       </p>
       <div className="flex gap-2.5">
         <StatBox
           value={`${weekStats.thisWeek}/3`}
-          label="This week"
+          label={t("home.thisWeek")}
           color="text-sage"
         />
-        <StatBox value={String(weekStats.total)} label="Total sessions" color="text-gold" />
-        <StatBox value={String(history.checkins.length)} label="Check-ins" color="text-dt-blue" />
+        <StatBox value={String(weekStats.total)} label={t("home.totalSessions")} color="text-gold" />
+        <StatBox value={String(history.checkins.length)} label={t("home.checkins")} color="text-dt-blue" />
       </div>
 
       {/* Phase progress */}
       {phaseStatus && (
         <div className="mt-3 rounded-[16px] border border-border bg-card p-4">
           <p className="text-xs font-semibold tracking-[1px] uppercase text-muted-foreground font-mono mb-1.5">
-            Phase progress
+            {t("home.phaseProgress")}
           </p>
           <p className="text-[13px] text-muted-foreground mb-2.5">
             {phaseStatus.phase.name} · Week {phaseStatus.weekInPhase} &middot;{" "}
@@ -211,8 +218,7 @@ export default function HomePage() {
       {!phaseStatus && (
         <div className="mt-3 rounded-[16px] border border-border bg-card p-4 text-center">
           <p className="text-sm text-muted-foreground">
-            Start your 16-week training cycle to track phase progress, deload
-            reminders, and progressive overload.
+            {t("home.startProgramDesc")}
           </p>
         </div>
       )}
