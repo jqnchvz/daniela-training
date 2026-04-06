@@ -10,6 +10,7 @@ import { getExerciseById, getLiteExercises, WORKOUT_PLANS } from "@/lib/exercise
 import { EnergySlider } from "@/components/session/energy-slider";
 import { RestTimer } from "@/components/session/rest-timer";
 import { getSessionProtocol } from "@/lib/session-protocols";
+import { useI18n, useT } from "@/lib/i18n";
 import { detectRedFlags, type CheckinData } from "@/lib/checkin";
 import { t } from "@/lib/i18n";
 
@@ -56,6 +57,8 @@ export default function ActiveSessionPage({
 }
 
 function PreCheckPhase() {
+  const t = useT();
+  const locale = useI18n((s) => s.locale);
   const { energyPre, setEnergyPre, setPhase, sessionMode, setSessionMode } = useSessionStore();
   const checkins = useHistoryStore((s) => s.checkins);
 
@@ -69,9 +72,9 @@ function PreCheckPhase() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
       <div className="text-6xl mb-4">⚡</div>
-      <h2 className="font-heading text-[1.35rem] font-bold mb-2">Pre-session Check</h2>
+      <h2 className="font-heading text-[1.35rem] font-bold mb-2">{t("session.preCheck")}</h2>
       <p className="text-sm text-muted-foreground mb-8 max-w-[280px]">
-        Quick energy check before we start.
+        {t("session.quickCheck")}
       </p>
 
       {redFlags.hasSorenessFlag && (
@@ -131,13 +134,15 @@ function PreCheckPhase() {
 }
 
 function WarmupPhase({ planId }: { planId: string }) {
+  const t = useT();
+  const locale = useI18n((s) => s.locale);
   const { setPhase } = useSessionStore();
   const protocol = getSessionProtocol(planId);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
       <div className="text-6xl mb-4">🔥</div>
-      <h2 className="font-heading text-[1.35rem] font-bold mb-1">Warm-up</h2>
+      <h2 className="font-heading text-[1.35rem] font-bold mb-1">{t("session.warmup")}</h2>
       <p className="text-xs text-sage font-semibold mb-4">
         {protocol.warmupMinutes} min · {protocol.focus}
       </p>
@@ -150,7 +155,7 @@ function WarmupPhase({ planId }: { planId: string }) {
             <div key={i} className="flex items-center justify-between text-[13px]">
               <span className="flex items-center gap-2.5">
                 <span>{item.icon}</span>
-                <span>{item.text}</span>
+                <span>{locale === "es" ? item.textEs : item.text}</span>
               </span>
               <span className="text-[10px] text-muted-foreground font-mono shrink-0 ml-2">
                 {item.duration}
@@ -170,6 +175,8 @@ function WarmupPhase({ planId }: { planId: string }) {
 }
 
 function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
+  const t = useT();
+  const locale = useI18n((s) => s.locale);
   const store = useSessionStore();
   const exercises = store.sessionMode === "lite"
     ? getLiteExercises(plan.exercises)
@@ -200,7 +207,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
         <div className="text-6xl mb-4">💪</div>
-        <h2 className="font-heading text-lg font-bold mb-3">All exercises complete!</h2>
+        <h2 className="font-heading text-lg font-bold mb-3">{t("session.allComplete")}</h2>
         <button
           onClick={() => store.setPhase("cooldown")}
           className="rounded-[16px] bg-sage px-8 py-4 font-heading text-[15px] font-bold text-primary-foreground"
@@ -284,7 +291,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       <div className="px-5 pt-4">
         <div className="flex justify-between text-xs text-muted-foreground mb-2">
           <span>Exercise {currentExIndex + 1} of {exercises.length}</span>
-          <span className="text-sage">Main Work</span>
+          <span className="text-sage">{t("session.mainWork")}</span>
         </div>
         <div className="h-1 rounded-full bg-surface3">
           <div className="h-full rounded-full bg-sage transition-all" style={{ width: `${progressPercent}%` }} />
@@ -308,9 +315,9 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
           </div>
         </div>
         <div className="p-[18px]">
-          <h2 className="font-heading text-[1.3rem] font-extrabold">{exercise.name}</h2>
+          <h2 className="font-heading text-[1.3rem] font-extrabold">{locale === "es" ? exercise.nameEs : exercise.name}</h2>
           <p className="text-[13px] text-muted-foreground leading-relaxed mt-1 mb-3.5">
-            {exercise.notes}
+            {locale === "es" ? exercise.notesEs : exercise.notes}
           </p>
           <div className="flex gap-2.5">
             <TargetBox value={String(currentPlanExercise.sets)} label="Sets" highlight />
@@ -385,8 +392,8 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         <div className="mx-5 mt-4 flex items-center gap-3 rounded-[16px] border border-border bg-surface2 p-3.5">
           <span className="text-[22px] w-11 text-center shrink-0">👁</span>
           <div className="flex-1">
-            <p className="text-[10px] text-muted-foreground tracking-[1px] uppercase font-semibold">Next up</p>
-            <p className="font-semibold text-sm mt-0.5">{nextExercise.name}</p>
+            <p className="text-[10px] text-muted-foreground tracking-[1px] uppercase font-semibold">{t("session.nextUp")}</p>
+            <p className="font-semibold text-sm mt-0.5">{locale === "es" ? nextExercise.nameEs : nextExercise.name}</p>
           </div>
           <span className="rounded-full bg-surface2 border border-border px-2 py-0.5 text-[11px] text-muted-foreground">
             {nextPlanEx.sets}×{nextPlanEx.reps}
@@ -408,7 +415,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
           onClick={handleNextExercise}
           className="flex-1 rounded-[16px] bg-sage py-3.5 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
         >
-          {allSetsDone ? "Next Exercise →" : "Skip →"}
+          {allSetsDone ? t("session.nextExercise") : (locale === "es" ? "Saltar →" : "Skip →")}
         </button>
       </div>
 
@@ -419,13 +426,15 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 }
 
 function CooldownPhase({ planId }: { planId: string }) {
+  const t = useT();
+  const locale = useI18n((s) => s.locale);
   const store = useSessionStore();
   const protocol = getSessionProtocol(planId);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
       <div className="text-6xl mb-4">🧘</div>
-      <h2 className="font-heading text-[1.35rem] font-bold mb-1">Cool-down</h2>
+      <h2 className="font-heading text-[1.35rem] font-bold mb-1">{t("session.cooldown")}</h2>
       <p className="text-xs text-dt-blue font-semibold mb-4">
         {protocol.cooldownMinutes} min · {protocol.focus}
       </p>
@@ -438,7 +447,7 @@ function CooldownPhase({ planId }: { planId: string }) {
             <div key={i} className="flex items-center justify-between text-[13px]">
               <span className="flex items-center gap-2.5">
                 <span>{item.icon}</span>
-                <span>{item.text}</span>
+                <span>{locale === "es" ? item.textEs : item.text}</span>
               </span>
               <span className="text-[10px] text-muted-foreground font-mono shrink-0 ml-2">
                 {item.duration}
@@ -458,6 +467,8 @@ function CooldownPhase({ planId }: { planId: string }) {
 }
 
 function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
+  const t = useT();
+  const locale = useI18n((s) => s.locale);
   const store = useSessionStore();
   const addSession = useHistoryStore((s) => s.addSession);
   const incrementSessions = useCycleStore((s) => s.incrementSessions);
@@ -509,7 +520,7 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         ✓
       </div>
       <h1 className="font-heading text-[2rem] font-extrabold leading-tight mb-2">
-        Session<br />Complete!
+        {locale === "es" ? "¡Sesión" : "Session"}<br />{locale === "es" ? "Completada!" : "Complete!"}
       </h1>
       <p className="text-sm text-muted-foreground mb-2">
         {plan.name}
