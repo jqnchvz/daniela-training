@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { syncCycleToDb } from "@/lib/db/sync";
 
 interface CycleState {
   /** ISO date string when the training cycle started, or null if not started */
@@ -26,30 +27,54 @@ export const useCycleStore = create<CycleState>()(
       lastDeloadDate: null,
       completedSessions: 0,
 
-      startCycle: () =>
+      startCycle: () => {
         set({
           cycleStartDate: new Date().toISOString().split("T")[0],
           extensionWeeks: 0,
           lastDeloadDate: null,
           completedSessions: 0,
-        }),
+        });
+        syncCycleAfterUpdate();
+      },
 
-      incrementSessions: () =>
-        set((s) => ({ completedSessions: s.completedSessions + 1 })),
+      incrementSessions: () => {
+        set((s) => ({ completedSessions: s.completedSessions + 1 }));
+        syncCycleAfterUpdate();
+      },
 
-      setLastDeload: (date) => set({ lastDeloadDate: date }),
+      setLastDeload: (date) => {
+        set({ lastDeloadDate: date });
+        syncCycleAfterUpdate();
+      },
 
-      extendPhase: (weeks) =>
-        set((s) => ({ extensionWeeks: s.extensionWeeks + weeks })),
+      extendPhase: (weeks) => {
+        set((s) => ({ extensionWeeks: s.extensionWeeks + weeks }));
+        syncCycleAfterUpdate();
+      },
 
-      resetCycle: () =>
+      resetCycle: () => {
         set({
           cycleStartDate: null,
           extensionWeeks: 0,
           lastDeloadDate: null,
           completedSessions: 0,
-        }),
+        });
+        syncCycleAfterUpdate();
+      },
     }),
     { name: "cycle-store" },
   ),
 );
+
+function syncCycleAfterUpdate() {
+  // Read from store after set() has applied
+  setTimeout(() => {
+    const s = useCycleStore.getState();
+    syncCycleToDb({
+      cycleStartDate: s.cycleStartDate,
+      extensionWeeks: s.extensionWeeks,
+      lastDeloadDate: s.lastDeloadDate,
+      completedSessions: s.completedSessions,
+    });
+  }, 0);
+}

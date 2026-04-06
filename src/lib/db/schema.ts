@@ -1,0 +1,81 @@
+import {
+  pgTable,
+  uuid,
+  text,
+  date,
+  timestamp,
+  integer,
+  real,
+  boolean,
+} from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+
+// ── Sessions ────────────────────────────────────────────────────────────────
+
+export const sessions = pgTable("sessions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  planId: text("plan_id").notNull(),
+  planName: text("plan_name").notNull(),
+  date: date("date").notNull(),
+  startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+  completedAt: timestamp("completed_at", { withTimezone: true }).notNull(),
+  durationMinutes: integer("duration_minutes").notNull(),
+  energyPre: integer("energy_pre"),
+  energyPost: integer("energy_post"),
+  sleepScore: integer("sleep_score"),
+  sorenessScore: integer("soreness_score"),
+  sessionMode: text("session_mode").notNull().default("full"),
+  notes: text("notes").notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const sessionsRelations = relations(sessions, ({ many }) => ({
+  sets: many(sessionSets),
+}));
+
+// ── Session Sets ────────────────────────────────────────────────────────────
+
+export const sessionSets = pgTable("session_sets", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  sessionId: uuid("session_id")
+    .notNull()
+    .references(() => sessions.id, { onDelete: "cascade" }),
+  exerciseId: text("exercise_id").notNull(),
+  exerciseName: text("exercise_name").notNull(),
+  setNumber: integer("set_number").notNull(),
+  weight: real("weight").notNull(),
+  reps: integer("reps").notNull(),
+  rpe: real("rpe"),
+});
+
+export const sessionSetsRelations = relations(sessionSets, ({ one }) => ({
+  session: one(sessions, {
+    fields: [sessionSets.sessionId],
+    references: [sessions.id],
+  }),
+}));
+
+// ── Check-ins ───────────────────────────────────────────────────────────────
+
+export const checkins = pgTable("checkins", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  date: date("date").notNull().unique(),
+  energy: integer("energy").notNull(),
+  sleepQuality: integer("sleep_quality").notNull(),
+  sleepHours: real("sleep_hours"),
+  mood: integer("mood").notNull(),
+  soreness: integer("soreness").notNull(),
+  notes: text("notes").notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ── Cycle State ─────────────────────────────────────────────────────────────
+
+export const cycleState = pgTable("cycle_state", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  cycleStartDate: date("cycle_start_date"),
+  extensionWeeks: integer("extension_weeks").notNull().default(0),
+  lastDeloadDate: date("last_deload_date"),
+  completedSessions: integer("completed_sessions").notNull().default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

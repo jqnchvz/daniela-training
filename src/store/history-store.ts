@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { syncSessionToDb, syncCheckinToDb } from "@/lib/db/sync";
 
 export interface CompletedSession {
   id: string;
@@ -54,15 +55,18 @@ export const useHistoryStore = create<HistoryState>()(
       sessions: [],
       checkins: [],
 
-      addSession: (session) =>
-        set((s) => ({ sessions: [session, ...s.sessions] })),
+      addSession: (session) => {
+        set((s) => ({ sessions: [session, ...s.sessions] }));
+        syncSessionToDb(session);
+      },
 
-      addCheckin: (checkin) =>
+      addCheckin: (checkin) => {
         set((s) => {
-          // Replace if same date exists
           const filtered = s.checkins.filter((c) => c.date !== checkin.date);
           return { checkins: [checkin, ...filtered] };
-        }),
+        });
+        syncCheckinToDb(checkin);
+      },
 
       getSessionsByWeek: () => {
         const now = new Date();
