@@ -178,12 +178,15 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const t = useT();
   const locale = useI18n((s) => s.locale);
   const store = useSessionStore();
+  const getLastWeight = useHistoryStore((s) => s.getLastWeightForExercise);
   const exercises = store.sessionMode === "lite"
     ? getLiteExercises(plan.exercises)
     : plan.exercises;
   const currentExIndex = store.currentExerciseIndex;
   const currentPlanExercise = exercises[currentExIndex];
   const exercise = currentPlanExercise ? getExerciseById(currentPlanExercise.exerciseId) : null;
+
+  const lastWeight = exercise ? getLastWeight(exercise.id) : null;
 
   // Track set inputs per exercise — reset when exercise index changes
   const [setInputs, setSetInputs] = useState<Array<{ weight: string; reps: string }>>([]);
@@ -192,16 +195,17 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   useEffect(() => {
     if (currentExIndex !== lastExIndex || setInputs.length === 0) {
       if (currentPlanExercise) {
+        const prefillWeight = exercise ? getLastWeight(exercise.id) : null;
         setSetInputs(
           Array.from({ length: currentPlanExercise.sets }, () => ({
-            weight: "0",
+            weight: prefillWeight ? String(prefillWeight) : "0",
             reps: String(currentPlanExercise.reps),
           })),
         );
       }
       setLastExIndex(currentExIndex);
     }
-  }, [currentExIndex, lastExIndex, currentPlanExercise, setInputs.length]);
+  }, [currentExIndex, lastExIndex, currentPlanExercise, setInputs.length, exercise, getLastWeight]);
 
   if (!currentPlanExercise || !exercise) {
     return (
@@ -323,7 +327,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
             <TargetBox value={String(currentPlanExercise.sets)} label="Sets" highlight />
             <TargetBox value={String(currentPlanExercise.reps)} label="Reps" highlight />
             <TargetBox value={`${Math.floor(currentPlanExercise.restSeconds / 60)} min`} label="Rest" />
-            <TargetBox value="—" label="Last wt." />
+            <TargetBox value={lastWeight ? `${lastWeight} kg` : "—"} label={t("session.lastWt")} />
           </div>
         </div>
       </div>
@@ -344,18 +348,22 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
               }`}>
                 {i + 1}
               </div>
-              <input
-                type="number"
-                value={isDone ? setsForExercise[i].weight : input.weight}
-                disabled={isDone || !isNext}
-                onChange={(e) => {
-                  const updated = [...setInputs];
-                  updated[i] = { ...input, weight: e.target.value };
-                  setSetInputs(updated);
-                }}
-                className="w-full rounded-lg border border-border bg-surface2 px-2.5 py-2 font-mono text-sm text-center disabled:opacity-40"
-                placeholder="kg"
-              />
+              <div className="relative w-full">
+                <input
+                  type="number"
+                  value={isDone ? setsForExercise[i].weight : input.weight}
+                  disabled={isDone || !isNext}
+                  onChange={(e) => {
+                    const updated = [...setInputs];
+                    updated[i] = { ...input, weight: e.target.value };
+                    setSetInputs(updated);
+                  }}
+                  className="w-full rounded-lg border border-border bg-surface2 pl-2.5 pr-8 py-2 font-mono text-sm text-center disabled:opacity-40"
+                />
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-mono pointer-events-none">
+                  kg
+                </span>
+              </div>
               <span className="text-[11px] text-muted-foreground shrink-0 w-5 text-center">×</span>
               <input
                 type="number"
