@@ -25,6 +25,7 @@ interface SessionState {
   warmupChecklist: boolean[];
   cooldownChecklist: boolean[];
   startedAt: string | null;
+  workingStartedAt: string | null;
   notes: string;
   restTimerEnd: number | null;
   restTimerNextInfo: string | null;
@@ -54,6 +55,7 @@ const initialState = {
   warmupChecklist: [false, false, false],
   cooldownChecklist: [false, false, false],
   startedAt: null,
+  workingStartedAt: null,
   notes: "",
   restTimerEnd: null,
   restTimerNextInfo: null,
@@ -67,7 +69,15 @@ export const useSessionStore = create<SessionState>()(
       startSession: (planId) =>
         set({ ...initialState, planId, startedAt: new Date().toISOString() }),
 
-      setPhase: (phase) => set({ phase }),
+      setPhase: (phase) =>
+        set((state) => ({
+          phase,
+          // Record when warmup starts as the effective session start time
+          workingStartedAt:
+            phase === "warmup" && !state.workingStartedAt
+              ? new Date().toISOString()
+              : state.workingStartedAt,
+        })),
       setSessionMode: (mode) => set({ sessionMode: mode }),
       setEnergyPre: (energy) => set({ energyPre: energy }),
       setEnergyPost: (energy) => set({ energyPost: energy }),
