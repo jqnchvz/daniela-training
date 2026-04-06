@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import HomePage from "@/app/page";
 import SessionPage from "@/app/session/page";
 import ProgressPage from "@/app/progress/page";
 import CheckinPage from "@/app/checkin/page";
+import { useI18n } from "@/lib/i18n";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
@@ -16,6 +17,10 @@ vi.mock("next-themes", () => ({
 }));
 
 afterEach(cleanup);
+beforeEach(() => {
+  // Set English for tests
+  useI18n.setState({ locale: "en" });
+});
 
 describe("Home page", () => {
   it("renders greeting and name", () => {
@@ -26,7 +31,7 @@ describe("Home page", () => {
   it("shows start cycle prompt when no cycle active", () => {
     render(<HomePage />);
     expect(
-      screen.getByText(/Start your 16-week training cycle/),
+      screen.getByText("Start your 16-week program →"),
     ).toBeInTheDocument();
   });
 
