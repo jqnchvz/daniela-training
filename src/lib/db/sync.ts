@@ -51,7 +51,7 @@ async function flushQueue() {
   saveQueue(remaining);
 }
 
-async function syncToApi(url: string, data: Record<string, unknown>) {
+async function syncToApi(url: string, data: unknown) {
   const body = JSON.stringify(data);
   try {
     await flushQueue();
@@ -68,15 +68,15 @@ async function syncToApi(url: string, data: Record<string, unknown>) {
 
 // ── Write helpers (fire after local save) ───────────────────────────────────
 
-export async function syncSessionToDb(session: Record<string, unknown>) {
+export async function syncSessionToDb(session: unknown) {
   await syncToApi("/api/sessions", session);
 }
 
-export async function syncCheckinToDb(checkin: Record<string, unknown>) {
+export async function syncCheckinToDb(checkin: unknown) {
   await syncToApi("/api/checkins", checkin);
 }
 
-export async function syncCycleToDb(cycle: Record<string, unknown>) {
+export async function syncCycleToDb(cycle: unknown) {
   await syncToApi("/api/cycle", cycle);
 }
 
