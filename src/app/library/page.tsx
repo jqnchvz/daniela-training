@@ -8,8 +8,8 @@ const FILTER_TAGS: { label: string; value: ExerciseTag | null; color: string }[]
   { label: "All", value: null, color: "bg-surface2 text-muted-foreground border-border" },
   { label: "Lower", value: "Lower", color: "bg-sage-bg text-sage border-sage-dim" },
   { label: "Push", value: "Push", color: "bg-terra-bg text-terra border-terra-dim" },
-  { label: "Pull", value: "Pull", color: "bg-dt-blue-bg text-dt-blue border-[#1A2240]" },
-  { label: "Core", value: "Core", color: "bg-gold-bg text-gold border-[#3A3018]" },
+  { label: "Pull", value: "Pull", color: "bg-dt-blue-bg text-dt-blue border-dt-blue/30" },
+  { label: "Core", value: "Core", color: "bg-gold-bg text-gold border-gold/30" },
 ];
 
 export default function LibraryPage() {
@@ -34,13 +34,13 @@ export default function LibraryPage() {
 
       {/* Search */}
       <div className="flex items-center gap-2.5 rounded-[10px] border border-border bg-card px-3.5 py-2.5 mb-4">
-        <span className="text-[#8A847E]">🔍</span>
+        <span className="text-muted-foreground">🔍</span>
         <input
           type="text"
           placeholder="Search exercises..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-[#8A847E] focus:outline-none"
+          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
         />
       </div>
 
@@ -69,7 +69,7 @@ export default function LibraryPage() {
               onClick={() =>
                 setExpandedId(expandedId === ex.id ? null : ex.id)
               }
-              className="flex w-full items-center gap-3.5 rounded-[16px] border border-border bg-card p-3.5 text-left transition-colors hover:border-[#3A3530]"
+              className="flex w-full items-center gap-3.5 rounded-[16px] border border-border bg-card p-3.5 text-left transition-colors hover:border-border"
             >
               <div className="w-14 h-14 rounded-[10px] bg-surface2 flex items-center justify-center shrink-0 overflow-hidden">
                 {ex.gifUrl ? (
@@ -97,8 +97,8 @@ export default function LibraryPage() {
                           : tag === "Push"
                             ? "bg-terra-bg text-terra border-terra-dim"
                             : tag === "Pull"
-                              ? "bg-dt-blue-bg text-dt-blue border-[#1A2240]"
-                              : "bg-gold-bg text-gold border-[#3A3018]"
+                              ? "bg-dt-blue-bg text-dt-blue border-dt-blue/30"
+                              : "bg-gold-bg text-gold border-gold/30"
                       }`}
                     >
                       {tag}
@@ -138,7 +138,7 @@ export default function LibraryPage() {
                     ))}
                   </ol>
                 )}
-                <p className="text-xs text-[#8A847E] mt-3 italic">{ex.notes}</p>
+                <p className="text-xs text-muted-foreground mt-3 italic">{ex.notes}</p>
               </div>
             )}
           </div>

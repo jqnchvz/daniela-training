@@ -99,7 +99,7 @@ export default function HomePage() {
                       : "border-border bg-card opacity-40"
               }`}
             >
-              <p className="text-[9px] font-semibold tracking-[1px] uppercase text-[#8A847E]">
+              <p className="text-[9px] font-semibold tracking-[1px] uppercase text-muted-foreground">
                 {day.name}
               </p>
               <p className="text-sm leading-none mt-1">
@@ -121,8 +121,8 @@ export default function HomePage() {
       </div>
 
       {/* Today's workout card */}
-      <div className="mt-4 rounded-[20px] border border-sage-dim bg-gradient-to-br from-sage-bg via-[#251E35] to-[#1A1828] p-[22px] relative overflow-hidden">
-        <div className="absolute -top-[30px] -right-[30px] w-[120px] h-[120px] rounded-full bg-sage opacity-[0.06]" />
+      <div className="mt-4 rounded-[20px] border border-sage-dim bg-gradient-to-br from-sage-bg to-card p-[22px] relative overflow-hidden">
+        <div className="absolute -top-[30px] -right-[30px] w-[120px] h-[120px] rounded-full bg-sage opacity-[0.08]" />
         {todaysWorkout ? (
           <>
             <p className="text-[11px] font-semibold tracking-[2px] uppercase text-sage">
@@ -151,7 +151,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/session"
-              className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-[#1A1625] transition-all hover:bg-[#B0A4D4] hover:-translate-y-0.5 active:translate-y-0"
+              className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80 hover:-translate-y-0.5 active:translate-y-0"
             >
               {t("home.startSession")}
             </Link>
@@ -240,7 +240,7 @@ function WellnessCard({
       <p className={`font-heading text-[1.4rem] font-extrabold ${color}`}>
         {value}
       </p>
-      <p className="text-[10px] text-[#8A847E] mt-0.5">{label}</p>
+      <p className="text-[10px] text-muted-foreground mt-0.5">{label}</p>
     </div>
   );
 }
@@ -261,7 +261,7 @@ function StatBox({
       >
         {value}
       </p>
-      <p className="text-[10px] text-[#8A847E] mt-1">{label}</p>
+      <p className="text-[10px] text-muted-foreground mt-1">{label}</p>
     </div>
   );
 }

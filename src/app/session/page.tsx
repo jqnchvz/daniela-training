@@ -44,7 +44,7 @@ export default function SessionPage() {
                       {protocol.muscleGroups}
                     </p>
                   </div>
-                  <span className="text-xs text-[#8A847E]">
+                  <span className="text-xs text-muted-foreground">
                     {isExpanded ? "▲" : "▼"}
                   </span>
                 </div>
@@ -78,7 +78,7 @@ export default function SessionPage() {
                           <span>
                             {item.icon} {item.text}
                           </span>
-                          <span className="text-[10px] text-[#8A847E] font-mono shrink-0 ml-2">
+                          <span className="text-[10px] text-muted-foreground font-mono shrink-0 ml-2">
                             {item.duration}
                           </span>
                         </div>
@@ -126,7 +126,7 @@ export default function SessionPage() {
                           <span>
                             {item.icon} {item.text}
                           </span>
-                          <span className="text-[10px] text-[#8A847E] font-mono shrink-0 ml-2">
+                          <span className="text-[10px] text-muted-foreground font-mono shrink-0 ml-2">
                             {item.duration}
                           </span>
                         </div>
@@ -138,7 +138,7 @@ export default function SessionPage() {
                   <div className="px-4 pb-4">
                     <Link
                       href={`/session/${plan.id}`}
-                      className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-sage px-4 py-3.5 font-heading text-[15px] font-bold text-[#1A1625] transition-all hover:bg-[#B0A4D4]"
+                      className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-sage px-4 py-3.5 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
                     >
                       ▶ Start {plan.name.split("—")[0].trim()}
                     </Link>
