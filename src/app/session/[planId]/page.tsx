@@ -183,6 +183,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const locale = useI18n((s) => s.locale);
   const store = useSessionStore();
   const getLastWeight = useHistoryStore((s) => s.getLastWeightForExercise);
+  const experienceLevel = useAuthStore((s) => s.experienceLevel);
   const exercises = store.sessionMode === "lite"
     ? getLiteExercises(plan.exercises)
     : plan.exercises;
@@ -214,7 +215,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
     if (currentExIndex !== lastExIndex || setInputs.length === 0) {
       if (currentPlanExercise) {
         const prefillWeight = exercise ? getLastWeight(exercise.id) : null;
-        const defaultWt = exercise ? getDefaultWeight(exercise.id) : 0;
+        const defaultWt = exercise ? getDefaultWeight(exercise.id, experienceLevel) : 0;
         const suggestedWeight = prefillWeight ?? defaultWt;
         setSetInputs(
           Array.from({ length: currentPlanExercise.sets }, () => ({
@@ -386,7 +387,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
             <TargetBox value={String(currentPlanExercise.reps)} label={t("session.reps")} highlight />
             <TargetBox value={`${Math.floor(currentPlanExercise.restSeconds / 60)} min`} label={t("session.rest")} />
             <TargetBox
-              value={lastWeight ? `${lastWeight} kg` : getDefaultWeight(exercise.id) > 0 ? `~${getDefaultWeight(exercise.id)} kg` : "—"}
+              value={lastWeight ? `${lastWeight} kg` : getDefaultWeight(exercise.id, experienceLevel) > 0 ? `~${getDefaultWeight(exercise.id, experienceLevel)} kg` : "—"}
               label={lastWeight ? t("session.lastWt") : t("session.suggested")}
             />
           </div>

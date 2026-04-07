@@ -14,11 +14,14 @@ import { detectRedFlags } from "@/lib/checkin";
 import { useCycleStore } from "@/store/cycle-store";
 import { useHistoryStore } from "@/store/history-store";
 import { useT } from "@/lib/i18n";
-import { useAuthStore } from "@/store/auth-store";
+import { useAuthStore, type User } from "@/store/auth-store";
+import { fetchUsers } from "@/lib/db/sync";
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
   const [earlyDeloadDismissed, setEarlyDeloadDismissed] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const t = useT();
   const cycle = useCycleStore();
   const history = useHistoryStore();
@@ -26,6 +29,7 @@ export default function HomePage() {
   const activeUserEmoji = useAuthStore((s) => s.activeUserEmoji);
   const activeUserId = useAuthStore((s) => s.activeUserId);
   const logout = useAuthStore((s) => s.logout);
+  const login = useAuthStore((s) => s.login);
   const weekStats = history.getSessionsByWeek(activeUserId ?? undefined);
   const latestCheckin = history.getLatestCheckin(activeUserId ?? undefined);
 
@@ -71,9 +75,24 @@ export default function HomePage() {
     <div className="px-5 py-5">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 relative">
           <button
-            onClick={logout}
+            onClick={async () => {
+              if (!showUserMenu) {
+                try {
+                  const data = await fetchUsers();
+                  if (data) {
+                    setAllUsers(data.map((u) => ({
+                      id: u.id as string,
+                      name: u.name as string,
+                      avatarEmoji: u.avatarEmoji as string,
+                      hasPin: u.hasPin as boolean,
+                    })));
+                  }
+                } catch { /* offline */ }
+              }
+              setShowUserMenu(!showUserMenu);
+            }}
             className="w-10 h-10 rounded-full bg-surface2 border border-border flex items-center justify-center text-xl"
             title={t("auth.switchUser")}
           >
@@ -85,9 +104,45 @@ export default function HomePage() {
             </p>
             <h1 className="font-heading text-[1.35rem] font-bold">{activeUserName ?? "Daniela"}</h1>
           </div>
+
+          {/* User switcher dropdown */}
+          {showUserMenu && (
+            <div className="absolute top-12 left-0 z-50 w-56 rounded-[14px] border border-border bg-card shadow-lg overflow-hidden">
+              {allUsers.filter((u) => u.id !== activeUserId).map((user) => (
+                <button
+                  key={user.id}
+                  onClick={() => {
+                    if (user.hasPin) {
+                      logout();
+                    } else {
+                      login(user);
+                    }
+                    setShowUserMenu(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3.5 py-3 text-left hover:bg-surface2 transition-colors border-b border-border last:border-b-0"
+                >
+                  <span className="text-xl">{user.avatarEmoji}</span>
+                  <span className="font-semibold text-sm">{user.name}</span>
+                  {user.hasPin && <span className="text-[10px] text-muted-foreground ml-auto">🔒</span>}
+                </button>
+              ))}
+              <button
+                onClick={() => { logout(); setShowUserMenu(false); }}
+                className="w-full flex items-center gap-3 px-3.5 py-3 text-left hover:bg-surface2 transition-colors text-muted-foreground"
+              >
+                <span className="text-lg">➕</span>
+                <span className="text-sm">{t("auth.addUser")}</span>
+              </button>
+            </div>
+          )}
         </div>
         <ThemeToggle />
       </div>
+
+      {/* Close dropdown on outside tap */}
+      {showUserMenu && (
+        <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
+      )}
 
       {/* Phase badge */}
       {phaseStatus ? (

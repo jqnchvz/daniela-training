@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { BottomNav } from "@/components/bottom-nav";
 import { DbHydrator } from "@/components/db-hydrator";
 import { AuthGate } from "@/components/auth-gate";
+import { OnboardingGate } from "@/components/onboarding-gate";
 import "./globals.css";
 
 const syne = Syne({
@@ -52,11 +53,13 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <AuthGate>
-            <DbHydrator />
-            <main className="flex-1 pb-20 max-w-[420px] mx-auto w-full">
-              {children}
-            </main>
-            <BottomNav />
+            <OnboardingGate>
+              <DbHydrator />
+              <main className="flex-1 pb-20 max-w-[420px] mx-auto w-full">
+                {children}
+              </main>
+              <BottomNav />
+            </OnboardingGate>
           </AuthGate>
         </ThemeProvider>
       </body>

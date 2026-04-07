@@ -10,13 +10,18 @@ export interface User {
   hasPin: boolean;
 }
 
+export type ExperienceLevel = "beginner" | "intermediate" | "advanced";
+
 interface AuthState {
   activeUserId: string | null;
   activeUserName: string | null;
   activeUserEmoji: string | null;
+  onboardingComplete: boolean;
+  experienceLevel: ExperienceLevel | null;
 
   login: (user: User) => void;
   logout: () => void;
+  completeOnboarding: (level: ExperienceLevel) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -25,6 +30,8 @@ export const useAuthStore = create<AuthState>()(
       activeUserId: null,
       activeUserName: null,
       activeUserEmoji: null,
+      onboardingComplete: false,
+      experienceLevel: null,
 
       login: (user) =>
         set({
@@ -38,6 +45,14 @@ export const useAuthStore = create<AuthState>()(
           activeUserId: null,
           activeUserName: null,
           activeUserEmoji: null,
+          onboardingComplete: false,
+          experienceLevel: null,
+        }),
+
+      completeOnboarding: (level) =>
+        set({
+          onboardingComplete: true,
+          experienceLevel: level,
         }),
     }),
     { name: "auth-store" },

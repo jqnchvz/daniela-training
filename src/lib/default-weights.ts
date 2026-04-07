@@ -1,43 +1,47 @@
 /**
- * Default starting weights for exercises when no history exists.
- * Based on common starting points for intermediate female lifters
- * with hypothyroidism (conservative to prioritize form over load).
- *
- * Weights are in kg and represent a safe starting point.
- * Users can adjust from here; the progressive overload system
- * will handle increases over time.
+ * Default starting weights for exercises based on experience level.
+ * Conservative values for hypothyroidism training — prioritize form over load.
+ * Weights are in kg.
  */
 
-/** Starting weight by exercise category and muscle group */
-const DEFAULT_WEIGHTS: Record<string, number> = {
+import type { ExperienceLevel } from "@/store/auth-store";
+
+interface WeightTier {
+  beginner: number;
+  intermediate: number;
+  advanced: number;
+}
+
+const DEFAULT_WEIGHTS: Record<string, WeightTier> = {
   // Compound — Lower body
-  "a0000000-0000-4000-8000-000000000001": 8,   // Goblet Squat — 8kg DB
-  "a0000000-0000-4000-8000-000000000002": 8,   // Romanian Deadlift — 8kg per DB
-  "a0000000-0000-4000-8000-000000000006": 6,   // Lunges — 6kg per DB
-  "a0000000-0000-4000-8000-000000000007": 10,  // Hip Thrust — 10kg
-  "a0000000-0000-4000-8000-000000000009": 20,  // Leg Press — 20kg (machine)
+  "a0000000-0000-4000-8000-000000000001": { beginner: 4,  intermediate: 8,  advanced: 14 },  // Goblet Squat
+  "a0000000-0000-4000-8000-000000000002": { beginner: 4,  intermediate: 8,  advanced: 12 },  // Romanian Deadlift
+  "a0000000-0000-4000-8000-000000000006": { beginner: 3,  intermediate: 6,  advanced: 10 },  // Lunges
+  "a0000000-0000-4000-8000-000000000007": { beginner: 5,  intermediate: 10, advanced: 20 },  // Hip Thrust
+  "a0000000-0000-4000-8000-000000000009": { beginner: 10, intermediate: 20, advanced: 40 },  // Leg Press
 
   // Compound — Upper body
-  "a0000000-0000-4000-8000-000000000003": 6,   // DB Bench Press — 6kg per DB
-  "a0000000-0000-4000-8000-000000000004": 4,   // DB Overhead Press — 4kg per DB
-  "a0000000-0000-4000-8000-000000000005": 8,   // Bent-Over Row — 8kg per DB
-  "a0000000-0000-4000-8000-000000000008": 20,  // Lat Pulldown — 20kg (machine)
+  "a0000000-0000-4000-8000-000000000003": { beginner: 3,  intermediate: 6,  advanced: 10 },  // DB Bench Press
+  "a0000000-0000-4000-8000-000000000004": { beginner: 2,  intermediate: 4,  advanced: 8 },   // DB Overhead Press
+  "a0000000-0000-4000-8000-000000000005": { beginner: 4,  intermediate: 8,  advanced: 12 },  // Bent-Over Row
+  "a0000000-0000-4000-8000-000000000008": { beginner: 10, intermediate: 20, advanced: 30 },  // Lat Pulldown
 
   // Multi-joint / Accessory
-  "a0000000-0000-4000-8000-00000000000a": 10,  // Cable Face Pulls — 10kg
-  "a0000000-0000-4000-8000-00000000000b": 4,   // Bicep Curls — 4kg per DB
-  "a0000000-0000-4000-8000-00000000000c": 10,  // Tricep Pushdowns — 10kg
-  "a0000000-0000-4000-8000-00000000000d": 3,   // Lateral Raises — 3kg per DB
-  "a0000000-0000-4000-8000-00000000000e": 0,   // Calf Raises — bodyweight
-  "a0000000-0000-4000-8000-00000000000f": 0,   // Plank — bodyweight
-  "a0000000-0000-4000-8000-000000000010": 0,   // Dead Bug — bodyweight
-  "a0000000-0000-4000-8000-000000000011": 10,  // Cable Woodchops — 10kg
+  "a0000000-0000-4000-8000-00000000000a": { beginner: 5,  intermediate: 10, advanced: 15 },  // Cable Face Pulls
+  "a0000000-0000-4000-8000-00000000000b": { beginner: 2,  intermediate: 4,  advanced: 8 },   // Bicep Curls
+  "a0000000-0000-4000-8000-00000000000c": { beginner: 5,  intermediate: 10, advanced: 15 },  // Tricep Pushdowns
+  "a0000000-0000-4000-8000-00000000000d": { beginner: 1.5,intermediate: 3,  advanced: 5 },   // Lateral Raises
+  "a0000000-0000-4000-8000-00000000000e": { beginner: 0,  intermediate: 0,  advanced: 10 },  // Calf Raises
+  "a0000000-0000-4000-8000-00000000000f": { beginner: 0,  intermediate: 0,  advanced: 0 },   // Plank (bodyweight)
+  "a0000000-0000-4000-8000-000000000010": { beginner: 0,  intermediate: 0,  advanced: 0 },   // Dead Bug (bodyweight)
+  "a0000000-0000-4000-8000-000000000011": { beginner: 5,  intermediate: 10, advanced: 15 },  // Cable Woodchops
 };
 
 /**
- * Get the default starting weight for an exercise.
- * Returns null for bodyweight exercises (weight = 0 is intentional).
+ * Get the default starting weight for an exercise based on experience level.
  */
-export function getDefaultWeight(exerciseId: string): number {
-  return DEFAULT_WEIGHTS[exerciseId] ?? 0;
+export function getDefaultWeight(exerciseId: string, level?: ExperienceLevel | null): number {
+  const tier = DEFAULT_WEIGHTS[exerciseId];
+  if (!tier) return 0;
+  return tier[level ?? "intermediate"];
 }
