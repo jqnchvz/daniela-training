@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { sessions, sessionSets } from "@/lib/db/schema";
+import { sessionSchema } from "@/lib/validations";
 import { desc, eq } from "drizzle-orm";
 
 export async function GET(request: Request) {
@@ -18,7 +19,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { sets, ...sessionData } = body;
+  const parsed = sessionSchema.safeParse(body);
+  if (!parsed.success) {
+    return Response.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
+  const { sets, ...sessionData } = parsed.data;
 
   const result = await db.transaction(async (tx) => {
     const [session] = await tx
@@ -53,14 +58,14 @@ export async function POST(request: Request) {
 
       if (existingSets.length === 0) {
         await tx.insert(sessionSets).values(
-          sets.map((s: Record<string, unknown>) => ({
+          sets.map((s) => ({
             sessionId,
-            exerciseId: s.exerciseId as string,
-            exerciseName: s.exerciseName as string,
-            setNumber: s.setNumber as number,
-            weight: s.weight as number,
-            reps: s.reps as number,
-            rpe: s.rpe as number | null,
+            exerciseId: s.exerciseId,
+            exerciseName: s.exerciseName,
+            setNumber: s.setNumber,
+            weight: s.weight,
+            reps: s.reps,
+            rpe: s.rpe ?? null,
           })),
         );
       }
