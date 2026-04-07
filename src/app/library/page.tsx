@@ -5,6 +5,7 @@ import Image from "next/image";
 import { EXERCISES, type ExerciseTag } from "@/lib/exercises";
 import { useI18n } from "@/lib/i18n";
 import { useT } from "@/lib/i18n";
+import { useExerciseCache } from "@/lib/use-exercise-cache";
 
 const FILTER_TAGS: { labelKey: string; value: ExerciseTag | null; color: string }[] = [
   { labelKey: "library.all", value: null, color: "bg-surface2 text-muted-foreground border-border" },
@@ -20,6 +21,7 @@ export default function LibraryPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const locale = useI18n((s) => s.locale);
   const t = useT();
+  const exerciseDBCache = useExerciseCache();
 
   const filtered = EXERCISES.filter((ex) => {
     const name = locale === "es" ? ex.nameEs : ex.name;
@@ -74,6 +76,7 @@ export default function LibraryPage() {
             locale={locale}
             isExpanded={expandedId === ex.id}
             onToggle={() => setExpandedId(expandedId === ex.id ? null : ex.id)}
+            cachedGif={exerciseDBCache.getGifUrl(ex.id)}
           />
         ))}
       </div>
@@ -86,11 +89,13 @@ function ExerciseItem({
   locale,
   isExpanded,
   onToggle,
+  cachedGif,
 }: {
   exercise: (typeof EXERCISES)[number];
   locale: string;
   isExpanded: boolean;
   onToggle: () => void;
+  cachedGif: string | null;
 }) {
   const name = locale === "es" ? ex.nameEs : ex.name;
   const notes = locale === "es" ? ex.notesEs : ex.notes;
@@ -99,15 +104,17 @@ function ExerciseItem({
       ? ex.instructionsEs
       : ex.instructions;
 
-  // Animate between two frames
+  // Use cached animated GIF from ExerciseDB, or fall back to static frame toggle
   const [showFrame2, setShowFrame2] = useState(false);
   useEffect(() => {
+    if (cachedGif) return;
     if (!isExpanded || !ex.gifUrl || !ex.gifUrl2) return;
     const interval = setInterval(() => setShowFrame2((p) => !p), 1200);
     return () => clearInterval(interval);
-  }, [isExpanded, ex.gifUrl, ex.gifUrl2]);
+  }, [isExpanded, ex.gifUrl, ex.gifUrl2, cachedGif]);
 
-  const currentUrl = isExpanded && showFrame2 && ex.gifUrl2 ? ex.gifUrl2 : ex.gifUrl;
+  const currentUrl = cachedGif ?? (isExpanded && showFrame2 && ex.gifUrl2 ? ex.gifUrl2 : ex.gifUrl);
+  const thumbUrl = cachedGif ?? ex.gifUrl;
 
   return (
     <div>
@@ -116,9 +123,9 @@ function ExerciseItem({
         className="flex w-full items-center gap-3.5 rounded-[16px] border border-border bg-card p-3.5 text-left transition-colors hover:border-sage/30"
       >
         <div className="w-14 h-14 rounded-[10px] bg-surface2 flex items-center justify-center shrink-0 overflow-hidden">
-          {ex.gifUrl ? (
+          {thumbUrl ? (
             <Image
-              src={ex.gifUrl}
+              src={thumbUrl}
               alt={name}
               width={56}
               height={56}

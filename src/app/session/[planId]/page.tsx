@@ -16,6 +16,7 @@ import { detectRedFlags, type CheckinData } from "@/lib/checkin";
 import { t } from "@/lib/i18n";
 import { useAuthStore } from "@/store/auth-store";
 import { getDefaultWeight } from "@/lib/default-weights";
+import { useExerciseCache } from "@/lib/use-exercise-cache";
 
 export default function ActiveSessionPage({
   params,
@@ -197,16 +198,19 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const exercise = currentPlanExercise ? getExerciseById(currentPlanExercise.exerciseId) : null;
 
   const lastWeight = exercise ? getLastWeight(exercise.id) : null;
+  const exerciseDBCache = useExerciseCache();
 
-  // Animate between exercise image frames
+  // Use cached animated GIF from ExerciseDB if available, otherwise fall back to static frame toggle
+  const cachedGif = exercise ? exerciseDBCache.getGifUrl(exercise.id) : null;
   const [showFrame2, setShowFrame2] = useState(false);
   useEffect(() => {
+    if (cachedGif) return; // No need to toggle frames when we have an animated GIF
     if (!exercise?.gifUrl || !exercise?.gifUrl2) return;
     const interval = setInterval(() => setShowFrame2((prev) => !prev), 1200);
     return () => clearInterval(interval);
-  }, [exercise?.gifUrl, exercise?.gifUrl2]);
+  }, [exercise?.gifUrl, exercise?.gifUrl2, cachedGif]);
 
-  const currentImageUrl = showFrame2 && exercise?.gifUrl2 ? exercise.gifUrl2 : exercise?.gifUrl;
+  const currentImageUrl = cachedGif ?? (showFrame2 && exercise?.gifUrl2 ? exercise.gifUrl2 : exercise?.gifUrl);
 
   // RPE picker state — shown after logging a set, before rest timer
   const [showRpePicker, setShowRpePicker] = useState(false);
