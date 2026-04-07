@@ -26,7 +26,8 @@ const SEARCH_MAP: Record<string, string> = {
   "a0000000-0000-4000-8000-000000000011": "cable wood chop",
 };
 
-const EXERCISEDB_BASE = "https://exercisedb-p-exercisedb-exercises.p.rapidapi.com/exercises";
+const EXERCISEDB_HOST = "exercisedb.p.rapidapi.com";
+const EXERCISEDB_BASE = `https://${EXERCISEDB_HOST}/exercises`;
 
 async function searchExerciseDB(query: string): Promise<Record<string, unknown> | null> {
   const apiKey = process.env.RAPIDAPI_KEY;
@@ -34,19 +35,23 @@ async function searchExerciseDB(query: string): Promise<Record<string, unknown> 
 
   try {
     const res = await fetch(
-      `${EXERCISEDB_BASE}/name/${encodeURIComponent(query)}?offset=0&limit=1`,
+      `${EXERCISEDB_BASE}/name/${encodeURIComponent(query)}?offset=0&limit=3`,
       {
         headers: {
           "x-rapidapi-key": apiKey,
-          "x-rapidapi-host": "exercisedb-p-exercisedb-exercises.p.rapidapi.com",
+          "x-rapidapi-host": EXERCISEDB_HOST,
         },
       },
     );
     if (!res.ok) return null;
     const data = await res.json();
-    // RapidAPI ExerciseDB returns an array directly
     const exercises = Array.isArray(data) ? data : data.data;
-    return exercises?.[0] ?? null;
+    if (!exercises || exercises.length === 0) return null;
+    // Prefer dumbbell variant if available
+    const dbVariant = exercises.find(
+      (e: Record<string, unknown>) => String(e.equipment ?? "").includes("dumbbell"),
+    );
+    return dbVariant ?? exercises[0];
   } catch {
     return null;
   }
@@ -80,7 +85,8 @@ export async function POST(request: Request) {
       exerciseId: exercise.id,
       exercisedbId: String(match.id ?? ""),
       name: exercise.name,
-      gifUrl: String(match.gifUrl ?? ""),
+      gifUrl: match.gifUrl ? String(match.gifUrl) : null,
+      description: match.description ? String(match.description) : null,
       instructions: toArr(match.instructions),
       targetMuscles: toArr(match.target ?? match.targetMuscles),
       bodyParts: toArr(match.bodyPart ?? match.bodyParts),

@@ -114,6 +114,7 @@ export const exerciseCache = pgTable("exercise_cache", {
   exercisedbId: text("exercisedb_id"),
   name: text("name").notNull(),
   gifUrl: text("gif_url"),
+  description: text("description"),
   instructions: text("instructions").array(),
   targetMuscles: text("target_muscles").array(),
   bodyParts: text("body_parts").array(),
