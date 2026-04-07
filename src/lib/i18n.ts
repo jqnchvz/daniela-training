@@ -219,6 +219,146 @@ const translations: Record<string, Record<Locale, string>> = {
   "auth.switchUser": { en: "Switch user", es: "Cambiar usuario" },
   "auth.noPin": { en: "No PIN", es: "Sin PIN" },
 
+  // Rest timer (extended)
+  "rest.nextUp": { en: "Next up", es: "Siguiente" },
+  "rest.thyroidRecovery": { en: "Full rest supports thyroid recovery.", es: "El descanso completo apoya la recuperación tiroidea." },
+
+  // RPE
+  "rpe.title": { en: "PERCEIVED EXERTION", es: "ESFUERZO PERCIBIDO" },
+  "rpe.question": { en: "How hard was that?", es: "¿Qué tan difícil fue?" },
+  "rpe.helpsAdjust": { en: "This helps adjust your training.", es: "Esto ayuda a ajustar tu entrenamiento." },
+  "rpe.skip": { en: "Skip →", es: "Saltar →" },
+
+  // Onboarding
+  "onboarding.greeting": { en: "Hey {name}!", es: "¡Hola {name}!" },
+  "onboarding.introDesc": {
+    en: "Hypothyroidism slows metabolism and recovery. This program adapts: longer rest for the nervous system, ~45 min sessions to keep cortisol in check, mandatory warmup and cooldown, and conservative progression to prevent overtraining.",
+    es: "El hipotiroidismo ralentiza el metabolismo y la recuperación. Este programa se adapta: descansos más largos para el sistema nervioso, sesiones de ~45 min para no disparar el cortisol, calentamiento y enfriamiento obligatorios, y progresión conservadora para evitar el sobreentrenamiento.",
+  },
+  "onboarding.featureRestTitle": { en: "Adapted rest times", es: "Descansos adaptados" },
+  "onboarding.featureRestDesc": { en: "2-3 min between sets for nervous system recovery", es: "2-3 min entre series para recuperación del sistema nervioso" },
+  "onboarding.featureOverloadTitle": { en: "Progressive overload", es: "Sobrecarga progresiva" },
+  "onboarding.featureOverloadDesc": { en: "Conservative 5% increases every 2 weeks", es: "Incrementos conservadores de 5% cada 2 semanas" },
+  "onboarding.featureRpeTitle": { en: "RPE per set", es: "RPE por serie" },
+  "onboarding.featureRpeDesc": { en: "Track perceived effort to adjust intensity", es: "Registra el esfuerzo percibido para ajustar la intensidad" },
+  "onboarding.featureWellnessTitle": { en: "Wellness monitoring", es: "Monitoreo de bienestar" },
+  "onboarding.featureWellnessDesc": { en: "Daily check-ins for energy, sleep, and soreness", es: "Check-ins diarios de energía, sueño y dolor muscular" },
+  "onboarding.next": { en: "Next →", es: "Siguiente →" },
+  "onboarding.levelTitle": { en: "What's your level?", es: "¿Cuál es tu nivel?" },
+  "onboarding.levelDesc": {
+    en: "This adjusts suggested weights for your first workout.",
+    es: "Esto ajusta los pesos sugeridos para tu primer entrenamiento.",
+  },
+  "onboarding.beginner": { en: "Beginner", es: "Principiante" },
+  "onboarding.beginnerDesc": { en: "Less than 6 months of weight training", es: "Menos de 6 meses entrenando con pesas" },
+  "onboarding.intermediate": { en: "Intermediate", es: "Intermedio" },
+  "onboarding.intermediateDesc": { en: "6 months to 2 years of experience", es: "6 meses a 2 años de experiencia" },
+  "onboarding.advanced": { en: "Advanced", es: "Avanzado" },
+  "onboarding.advancedDesc": { en: "2+ years of consistent training", es: "Más de 2 años entrenando consistentemente" },
+  "onboarding.allSet": { en: "All set!", es: "¡Todo listo!" },
+  "onboarding.summaryDesc": {
+    en: "Your 16-week program is configured. You train 3 times per week with rest periods adapted to your condition.",
+    es: "Tu programa de 16 semanas está configurado. Entrenas 3 veces por semana con descansos adaptados a tu condición.",
+  },
+  "onboarding.yourProgram": { en: "YOUR PROGRAM", es: "TU PROGRAMA" },
+  "onboarding.duration": { en: "Duration", es: "Duración" },
+  "onboarding.durationValue": { en: "16 weeks (3 phases)", es: "16 semanas (3 fases)" },
+  "onboarding.frequency": { en: "Frequency", es: "Frecuencia" },
+  "onboarding.frequencyValue": { en: "3 sessions/week", es: "3 sesiones/semana" },
+  "onboarding.level": { en: "Level", es: "Nivel" },
+  "onboarding.startingWeights": { en: "Starting weights", es: "Pesos iniciales" },
+  "onboarding.startingWeightsValue": { en: "Adjusted to your level", es: "Ajustados a tu nivel" },
+  "onboarding.startTraining": { en: "Start training!", es: "¡Empezar a entrenar!" },
+  "onboarding.skip": { en: "Skip →", es: "Saltar →" },
+
+  // Home — phase descriptions
+  "home.phaseStabilization": {
+    en: "Stabilization: lighter load to prepare joints and nervous system.",
+    es: "Estabilización: carga ligera para preparar articulaciones y sistema nervioso.",
+  },
+  "home.phaseHypertrophy": {
+    en: "Hypertrophy: muscle growth with controlled volume to avoid thyroid stress.",
+    es: "Hipertrofia: crecimiento muscular con volumen controlado para no estresar la tiroides.",
+  },
+  "home.phaseStrength": {
+    en: "Strength: heavier loads with longer rest — cortisol stays in check.",
+    es: "Fuerza: cargas más altas con descansos largos — el cortisol se mantiene bajo control.",
+  },
+
+  // Recovery tips
+  "recovery.walkTitle": { en: "Light walk", es: "Caminata ligera" },
+  "recovery.walkDesc": {
+    en: "20-30 min at easy pace. Improves blood flow and speeds recovery without stressing the nervous system.",
+    es: "20-30 min a ritmo suave. Mejora el flujo sanguíneo y acelera la recuperación sin estresar el sistema nervioso.",
+  },
+  "recovery.stretchTitle": { en: "Stretching or yoga", es: "Estiramientos o yoga" },
+  "recovery.stretchDesc": {
+    en: "15-20 min of gentle stretching or restorative yoga. Lowers cortisol and improves joint mobility.",
+    es: "15-20 min de estiramientos suaves o yoga restaurativo. Reduce el cortisol y mejora la movilidad articular.",
+  },
+  "recovery.sleepTitle": { en: "Sleep 7-9 hours", es: "Dormir 7-9 horas" },
+  "recovery.sleepDesc": {
+    en: "Sleep is when the body repairs muscle tissue. With hypothyroidism, sleep quality is even more critical.",
+    es: "El sueño es cuando el cuerpo repara el tejido muscular. Con hipotiroidismo, la calidad del sueño es aún más crítica.",
+  },
+  "recovery.nutritionTitle": { en: "Hydration & nutrition", es: "Hidratación y nutrición" },
+  "recovery.nutritionDesc": {
+    en: "Adequate protein (1.6-2g/kg) and hydration support muscle synthesis and thyroid function.",
+    es: "Proteína suficiente (1.6-2g/kg) y buena hidratación apoyan la síntesis muscular y la función tiroidea.",
+  },
+  "recovery.stressTitle": { en: "Stress management", es: "Manejo del estrés" },
+  "recovery.stressDesc": {
+    en: "Chronic stress elevates cortisol and suppresses thyroid. Deep breathing, meditation, or time in nature.",
+    es: "El estrés crónico eleva el cortisol y suprime la tiroides. Respiración profunda, meditación o tiempo en la naturaleza.",
+  },
+
+  // Session page (picker)
+  "session.startPlan": { en: "▶ Start", es: "▶ Iniciar" },
+
+  // Session [planId] — pre-check
+  "session.lowEnergyWarning": {
+    en: "Pushing through low energy can spike cortisol and further suppress thyroid function.",
+    es: "Forzar con poca energía puede elevar el cortisol y suprimir más la función tiroidea.",
+  },
+
+  // Session [planId] — hypothyroid info
+  "hypo.whyTheseValues": { en: "Why these values?", es: "¿Por qué estos valores?" },
+  "hypo.restLabel": { en: "Rest", es: "Descanso" },
+  "hypo.repsLabel": { en: "Reps", es: "Repeticiones" },
+  "hypo.durationLabel": { en: "Duration", es: "Duración" },
+  "hypo.restCompound": {
+    en: "Longer rest on compound lifts allows full CNS recovery — crucial with hypothyroidism since slower metabolism affects recovery capacity.",
+    es: "Los descansos más largos en ejercicios compuestos permiten una recuperación completa del sistema nervioso central, algo crucial con hipotiroidismo ya que el metabolismo más lento afecta la capacidad de recuperación.",
+  },
+  "hypo.restAccessory": {
+    en: "Accessory exercises need less rest as they work smaller muscle groups with less nervous system demand.",
+    es: "Los ejercicios accesorios requieren menos descanso al trabajar grupos musculares más pequeños con menor carga sobre el sistema nervioso.",
+  },
+  "hypo.repsHighStabilization": {
+    en: "Higher reps build work capacity and muscular endurance — ideal in the stabilization phase for mastering form.",
+    es: "Las repeticiones más altas construyen capacidad de trabajo y resistencia muscular — ideal en la fase de estabilización para perfeccionar la técnica.",
+  },
+  "hypo.repsHypertrophy": {
+    en: "Standard hypertrophy range promotes muscle growth while keeping moderate thyroid stress.",
+    es: "El rango de hipertrofia estándar promueve el crecimiento muscular mientras mantiene un esfuerzo moderado sobre la tiroides.",
+  },
+  "hypo.repsStrength": {
+    en: "Lower reps with heavier weight build maximal strength — longer rest compensates for the higher system demand.",
+    es: "Menos repeticiones con más peso desarrollan fuerza máxima — los descansos más largos compensan la mayor demanda al sistema.",
+  },
+  "hypo.duration": {
+    en: "Sessions are designed for ~45 min of work to stay within the cortisol-safe window for hypothyroid training.",
+    es: "Las sesiones están diseñadas para ~45 min de trabajo para mantenerse dentro de la ventana segura de cortisol en entrenamiento con hipotiroidismo.",
+  },
+
+  // Exercise demo
+  "exerciseDemo.howTo": { en: "How to do this", es: "Cómo hacerlo" },
+  "exerciseDemo.noDemo": { en: "No demo available for this exercise.", es: "No hay demo disponible para este ejercicio." },
+
+  // Auth
+  "auth.selectProfile": { en: "Select your profile", es: "Selecciona tu perfil" },
+  "auth.createProfile": { en: "Create your profile to start training.", es: "Crea tu perfil para empezar a entrenar." },
+
   // Days
   "day.mon": { en: "MON", es: "LUN" },
   "day.tue": { en: "TUE", es: "MAR" },

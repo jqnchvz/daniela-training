@@ -169,10 +169,10 @@ export default function HomePage() {
           </div>
           <p className="text-[11px] text-muted-foreground/70 mt-1 ml-1">
             {phaseStatus.phase.phase === 1
-              ? (isEs ? "Estabilización: carga ligera para preparar articulaciones y sistema nervioso." : "Stabilization: lighter load to prepare joints and nervous system.")
+              ? t("home.phaseStabilization")
               : phaseStatus.phase.phase === 2
-                ? (isEs ? "Hipertrofia: crecimiento muscular con volumen controlado para no estresar la tiroides." : "Hypertrophy: muscle growth with controlled volume to avoid thyroid stress.")
-                : (isEs ? "Fuerza: cargas más altas con descansos largos — el cortisol se mantiene bajo control." : "Strength: heavier loads with longer rest — cortisol stays in check.")}
+                ? t("home.phaseHypertrophy")
+                : t("home.phaseStrength")}
           </p>
         </div>
       ) : (
@@ -289,28 +289,28 @@ export default function HomePage() {
             <div className="space-y-2.5">
               <RecoveryTip
                 icon="🚶"
-                title={isEs ? "Caminata ligera" : "Light walk"}
-                desc={isEs ? "20-30 min a ritmo suave. Mejora el flujo sanguíneo y acelera la recuperación sin estresar el sistema nervioso." : "20-30 min at easy pace. Improves blood flow and speeds recovery without stressing the nervous system."}
+                title={t("recovery.walkTitle")}
+                desc={t("recovery.walkDesc")}
               />
               <RecoveryTip
                 icon="🧘"
-                title={isEs ? "Estiramientos o yoga" : "Stretching or yoga"}
-                desc={isEs ? "15-20 min de estiramientos suaves o yoga restaurativo. Reduce el cortisol y mejora la movilidad articular." : "15-20 min of gentle stretching or restorative yoga. Lowers cortisol and improves joint mobility."}
+                title={t("recovery.stretchTitle")}
+                desc={t("recovery.stretchDesc")}
               />
               <RecoveryTip
                 icon="😴"
-                title={isEs ? "Dormir 7-9 horas" : "Sleep 7-9 hours"}
-                desc={isEs ? "El sueño es cuando el cuerpo repara el tejido muscular. Con hipotiroidismo, la calidad del sueño es aún más crítica." : "Sleep is when the body repairs muscle tissue. With hypothyroidism, sleep quality is even more critical."}
+                title={t("recovery.sleepTitle")}
+                desc={t("recovery.sleepDesc")}
               />
               <RecoveryTip
                 icon="💧"
-                title={isEs ? "Hidratación y nutrición" : "Hydration & nutrition"}
-                desc={isEs ? "Proteína suficiente (1.6-2g/kg) y buena hidratación apoyan la síntesis muscular y la función tiroidea." : "Adequate protein (1.6-2g/kg) and hydration support muscle synthesis and thyroid function."}
+                title={t("recovery.nutritionTitle")}
+                desc={t("recovery.nutritionDesc")}
               />
               <RecoveryTip
                 icon="🧊"
-                title={isEs ? "Manejo del estrés" : "Stress management"}
-                desc={isEs ? "El estrés crónico eleva el cortisol y suprime la tiroides. Respiración profunda, meditación o tiempo en la naturaleza." : "Chronic stress elevates cortisol and suppresses thyroid. Deep breathing, meditation, or time in nature."}
+                title={t("recovery.stressTitle")}
+                desc={t("recovery.stressDesc")}
               />
             </div>
           </>

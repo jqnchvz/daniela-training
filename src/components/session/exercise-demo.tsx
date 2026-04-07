@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, useT } from "@/lib/i18n";
 
 interface ExerciseDemoProps {
   gifUrl: string | null;
@@ -25,6 +25,7 @@ export function ExerciseDemo({
   const [showTips, setShowTips] = useState(false);
   const [showFrame2, setShowFrame2] = useState(false);
   const locale = useI18n((s) => s.locale);
+  const t = useT();
 
   const localizedInstructions =
     locale === "es" && instructionsEs.length > 0 ? instructionsEs : instructions;
@@ -80,7 +81,7 @@ export function ExerciseDemo({
                 d="m8.25 4.5 7.5 7.5-7.5 7.5"
               />
             </svg>
-            {locale === "es" ? "Cómo hacerlo" : "How to do this"}
+            {t("exerciseDemo.howTo")}
           </button>
           {showTips && (
             <ol className="mt-2 space-y-1.5 pl-5 text-xs text-muted-foreground list-decimal">
@@ -107,9 +108,7 @@ export function ExerciseDemo({
       {/* No image fallback */}
       {!gifUrl && localizedInstructions.length === 0 && (
         <p className="text-xs text-muted-foreground italic">
-          {locale === "es"
-            ? "No hay demo disponible para este ejercicio."
-            : "No demo available for this exercise."}
+          {t("exerciseDemo.noDemo")}
         </p>
       )}
 

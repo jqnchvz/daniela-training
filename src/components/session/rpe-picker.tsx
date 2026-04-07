@@ -1,6 +1,6 @@
 "use client";
 
-import { useI18n } from "@/lib/i18n";
+import { useI18n, useT } from "@/lib/i18n";
 
 const RPE_OPTIONS = [
   { value: 6, emoji: "😊", en: "Easy — could do 4+ more", es: "Fácil — podrías hacer 4+ más" },
@@ -18,19 +18,18 @@ interface RpePickerProps {
 export function RpePicker({ onSelect, onSkip }: RpePickerProps) {
   const locale = useI18n((s) => s.locale);
   const isEs = locale === "es";
+  const t = useT();
 
   return (
     <div className="fixed inset-0 z-[190] flex flex-col items-center justify-center bg-background/95 backdrop-blur-[10px] px-6">
       <p className="text-xs tracking-[2px] uppercase text-muted-foreground font-mono mb-2">
-        {isEs ? "ESFUERZO PERCIBIDO" : "PERCEIVED EXERTION"}
+        {t("rpe.title")}
       </p>
       <h2 className="font-heading text-xl font-bold mb-1 text-center">
-        {isEs ? "¿Qué tan difícil fue?" : "How hard was that?"}
+        {t("rpe.question")}
       </h2>
       <p className="text-xs text-muted-foreground mb-5 text-center max-w-[260px]">
-        {isEs
-          ? "Esto ayuda a ajustar tu entrenamiento."
-          : "This helps adjust your training."}
+        {t("rpe.helpsAdjust")}
       </p>
 
       <div className="w-full max-w-[340px] space-y-2">
@@ -55,7 +54,7 @@ export function RpePicker({ onSelect, onSkip }: RpePickerProps) {
         onClick={onSkip}
         className="mt-4 text-sm text-muted-foreground"
       >
-        {isEs ? "Saltar →" : "Skip →"}
+        {t("rpe.skip")}
       </button>
     </div>
   );

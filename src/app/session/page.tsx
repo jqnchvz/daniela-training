@@ -162,7 +162,7 @@ export default function SessionPage() {
                       href={`/session/${plan.id}`}
                       className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-sage px-4 py-3.5 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
                     >
-                      ▶ {isEs ? "Iniciar" : "Start"} {planName.split("—")[0].trim()}
+                      {t("session.startPlan")} {planName.split("—")[0].trim()}
                     </Link>
                   </div>
                 </div>

@@ -188,9 +188,9 @@ export default function ProgressPage() {
         {showMeasForm ? (
           <div className="mt-3 space-y-2">
             <div className="flex gap-2">
-              <MeasInput label={locale === "es" ? "Cintura" : "Waist"} value={waist} onChange={setWaist} />
-              <MeasInput label={locale === "es" ? "Cadera" : "Hip"} value={hip} onChange={setHip} />
-              <MeasInput label={locale === "es" ? "Muslo" : "Thigh"} value={thigh} onChange={setThigh} />
+              <MeasInput label={t("progress.waist")} value={waist} onChange={setWaist} />
+              <MeasInput label={t("progress.hip")} value={hip} onChange={setHip} />
+              <MeasInput label={t("progress.thigh")} value={thigh} onChange={setThigh} />
             </div>
             <div className="flex gap-2">
               <button

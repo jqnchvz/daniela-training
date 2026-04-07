@@ -99,9 +99,7 @@ function PreCheckPhase() {
               {t("session.lowEnergyPrompt")}
             </p>
             <p className="text-[11px] text-muted-foreground/60 mb-3">
-              {locale === "es"
-                ? "Forzar con poca energía puede elevar el cortisol y suprimir más la función tiroidea."
-                : "Pushing through low energy can spike cortisol and further suppress thyroid function."}
+              {t("session.lowEnergyWarning")}
             </p>
             <div className="flex gap-2">
               <button
@@ -693,8 +691,7 @@ function HypothyroidInfo({
   isCompound: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const locale = useI18n((s) => s.locale);
-  const isEs = locale === "es";
+  const t = useT();
 
   const restMin = Math.floor(restSeconds / 60);
   const restSec = restSeconds % 60;
@@ -707,40 +704,22 @@ function HypothyroidInfo({
         className="flex items-center gap-1.5 text-[11px] text-sage font-semibold"
       >
         <span>ℹ️</span>
-        <span>{isEs ? "¿Por qué estos valores?" : "Why these values?"}</span>
+        <span>{t("hypo.whyTheseValues")}</span>
         <span className="text-[9px]">{expanded ? "▲" : "▼"}</span>
       </button>
       {expanded && (
         <div className="mt-2 rounded-[10px] bg-surface2 border border-border p-3 text-[12px] text-muted-foreground leading-relaxed space-y-2">
           <p>
-            <span className="font-semibold text-foreground">{isEs ? "Descanso" : "Rest"} ({restLabel}):</span>{" "}
-            {isEs
-              ? isCompound
-                ? "Los descansos más largos en ejercicios compuestos permiten una recuperación completa del sistema nervioso central, algo crucial con hipotiroidismo ya que el metabolismo más lento afecta la capacidad de recuperación."
-                : "Los ejercicios accesorios requieren menos descanso al trabajar grupos musculares más pequeños con menor carga sobre el sistema nervioso."
-              : isCompound
-                ? "Longer rest on compound lifts allows full CNS recovery — crucial with hypothyroidism since slower metabolism affects recovery capacity."
-                : "Accessory exercises need less rest as they work smaller muscle groups with less nervous system demand."}
+            <span className="font-semibold text-foreground">{t("hypo.restLabel")} ({restLabel}):</span>{" "}
+            {isCompound ? t("hypo.restCompound") : t("hypo.restAccessory")}
           </p>
           <p>
-            <span className="font-semibold text-foreground">{isEs ? "Repeticiones" : "Reps"} ({reps}):</span>{" "}
-            {isEs
-              ? reps >= 12
-                ? "Las repeticiones más altas construyen capacidad de trabajo y resistencia muscular — ideal en la fase de estabilización para perfeccionar la técnica."
-                : reps >= 8
-                  ? "El rango de hipertrofia estándar promueve el crecimiento muscular mientras mantiene un esfuerzo moderado sobre la tiroides."
-                  : "Menos repeticiones con más peso desarrollan fuerza máxima — los descansos más largos compensan la mayor demanda al sistema."
-              : reps >= 12
-                ? "Higher reps build work capacity and muscular endurance — ideal in the stabilization phase for mastering form."
-                : reps >= 8
-                  ? "Standard hypertrophy range promotes muscle growth while keeping moderate thyroid stress."
-                  : "Lower reps with heavier weight build maximal strength — longer rest compensates for the higher system demand."}
+            <span className="font-semibold text-foreground">{t("hypo.repsLabel")} ({reps}):</span>{" "}
+            {reps >= 12 ? t("hypo.repsHighStabilization") : reps >= 8 ? t("hypo.repsHypertrophy") : t("hypo.repsStrength")}
           </p>
           <p>
-            <span className="font-semibold text-foreground">{isEs ? "Duración" : "Duration"} (~45 min):</span>{" "}
-            {isEs
-              ? "Las sesiones están diseñadas para ~45 min de trabajo para mantenerse dentro de la ventana segura de cortisol en entrenamiento con hipotiroidismo."
-              : "Sessions are designed for ~45 min of work to stay within the cortisol-safe window for hypothyroid training."}
+            <span className="font-semibold text-foreground">{t("hypo.durationLabel")} (~45 min):</span>{" "}
+            {t("hypo.duration")}
           </p>
         </div>
       )}

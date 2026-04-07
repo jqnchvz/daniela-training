@@ -72,9 +72,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
         <div className="text-6xl mb-4">👋</div>
         <h1 className="font-heading text-2xl font-extrabold mb-2">{t("auth.welcome")}</h1>
         <p className="text-sm text-muted-foreground mb-8 max-w-[280px]">
-          {locale === "es"
-            ? "Crea tu perfil para empezar a entrenar."
-            : "Create your profile to start training."}
+          {t("auth.createProfile")}
         </p>
         <CreateUserForm
           newName={newName}
@@ -206,7 +204,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       <div className="text-5xl mb-4">🏋️</div>
       <h1 className="font-heading text-xl font-bold mb-1">{t("auth.selectUser")}</h1>
       <p className="text-xs text-muted-foreground mb-8">
-        {locale === "es" ? "Selecciona tu perfil" : "Select your profile"}
+        {t("auth.selectProfile")}
       </p>
 
       <div className="w-full max-w-[320px] space-y-3 mb-6">
