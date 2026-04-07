@@ -28,17 +28,11 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     try {
       const data = await fetchUsers();
       if (data && data.length > 0) {
-        const mapped: User[] = data.map((u) => ({
-          id: u.id as string,
-          name: u.name as string,
-          avatarEmoji: u.avatarEmoji as string,
-          hasPin: u.hasPin as boolean,
-        }));
-        setUsers(mapped);
+        setUsers(data);
 
         // Auto-login if only one user with no PIN
-        if (mapped.length === 1 && !mapped[0].hasPin) {
-          login(mapped[0]);
+        if (data.length === 1 && !data[0].hasPin) {
+          login(data[0]);
         }
       }
     } catch {
