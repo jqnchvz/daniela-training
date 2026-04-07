@@ -112,8 +112,8 @@ const translations: Record<string, Record<Locale, string>> = {
   "session.allComplete": { en: "All exercises complete!", es: "¡Todos los ejercicios completos!" },
   "session.startCooldown": { en: "Start Cool-down →", es: "Iniciar Enfriamiento →" },
   "session.cooldownDesc": {
-    en: "Stretching the muscles you just worked. This is when recovery begins — don't skip it.",
-    es: "Estirando los músculos que acabas de trabajar. Aquí comienza la recuperación — no lo saltes.",
+    en: "Stretching the muscles you just worked. Cooldown normalizes cortisol levels — essential for hypothyroid recovery. Don't skip it.",
+    es: "Estirando los músculos que acabas de trabajar. El enfriamiento normaliza los niveles de cortisol — esencial para la recuperación con hipotiroidismo. No lo saltes.",
   },
   "session.completeSession": { en: "Complete Session ✓", es: "Completar Sesión ✓" },
   "session.sessionComplete": { en: "Session\nComplete!", es: "¡Sesión\nCompletada!" },

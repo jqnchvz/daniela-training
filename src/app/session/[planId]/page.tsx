@@ -94,8 +94,13 @@ function PreCheckPhase() {
 
         {showModeSelector && (
           <div className="mt-5 rounded-[12px] border border-border bg-card p-4 text-left">
-            <p className="text-[13px] text-muted-foreground mb-3">
+            <p className="text-[13px] text-muted-foreground mb-1">
               {t("session.lowEnergyPrompt")}
+            </p>
+            <p className="text-[11px] text-muted-foreground/60 mb-3">
+              {locale === "es"
+                ? "Forzar con poca energía puede elevar el cortisol y suprimir más la función tiroidea."
+                : "Pushing through low energy can spike cortisol and further suppress thyroid function."}
             </p>
             <div className="flex gap-2">
               <button
@@ -719,6 +724,12 @@ function HypothyroidInfo({
                 : reps >= 8
                   ? "Standard hypertrophy range promotes muscle growth while keeping moderate thyroid stress."
                   : "Lower reps with heavier weight build maximal strength — longer rest compensates for the higher system demand."}
+          </p>
+          <p>
+            <span className="font-semibold text-foreground">{isEs ? "Duración" : "Duration"} (~45 min):</span>{" "}
+            {isEs
+              ? "Las sesiones están diseñadas para ~45 min de trabajo para mantenerse dentro de la ventana segura de cortisol en entrenamiento con hipotiroidismo."
+              : "Sessions are designed for ~45 min of work to stay within the cortisol-safe window for hypothyroid training."}
           </p>
         </div>
       )}

@@ -84,10 +84,15 @@ export function RestTimer() {
         </div>
       </div>
 
-      <p className="text-[15px] text-muted-foreground mb-4 text-center">
+      <p className="text-[15px] text-muted-foreground mb-1 text-center">
         {isEs
           ? "¡Gran serie! Descansa y\nprepárate para la siguiente."
           : "Great set! Rest and\nprepare for the next one."}
+      </p>
+      <p className="text-[11px] text-muted-foreground/60 mb-4 text-center">
+        {isEs
+          ? "El descanso completo apoya la recuperación tiroidea."
+          : "Full rest supports thyroid recovery."}
       </p>
 
       {/* Next exercise info */}

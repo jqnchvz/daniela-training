@@ -40,8 +40,8 @@ export function Onboarding() {
           </h1>
           <p className="text-sm text-muted-foreground mb-8 max-w-[300px] leading-relaxed">
             {isEs
-              ? "Este programa está diseñado para entrenamiento con hipotiroidismo: descansos más largos, progresión conservadora y monitoreo de recuperación."
-              : "This program is designed for training with hypothyroidism: longer rest periods, conservative progression, and recovery monitoring."}
+              ? "El hipotiroidismo ralentiza el metabolismo y la recuperación. Este programa se adapta: descansos más largos para el sistema nervioso, sesiones de ~45 min para no disparar el cortisol, calentamiento y enfriamiento obligatorios, y progresión conservadora para evitar el sobreentrenamiento."
+              : "Hypothyroidism slows metabolism and recovery. This program adapts: longer rest for the nervous system, ~45 min sessions to keep cortisol in check, mandatory warmup and cooldown, and conservative progression to prevent overtraining."}
           </p>
           <div className="w-full max-w-[320px] rounded-[16px] border border-border bg-card p-4 text-left space-y-3">
             <Feature icon="⏱" title={isEs ? "Descansos adaptados" : "Adapted rest times"} desc={isEs ? "2-3 min entre series para recuperación del sistema nervioso" : "2-3 min between sets for nervous system recovery"} />

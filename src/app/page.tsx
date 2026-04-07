@@ -156,10 +156,19 @@ export default function HomePage() {
 
       {/* Phase badge */}
       {phaseStatus ? (
-        <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-secondary border border-border px-3.5 py-1.5 text-xs font-semibold text-muted-foreground">
-          <span className="h-2 w-2 rounded-full bg-sage" />
-          {t("home.phase")} {phaseStatus.phase.phase} · {t("home.week")} {phaseStatus.weekNumber} {t("home.of")}{" "}
-          {phaseStatus.totalWeeks}
+        <div className="mt-3">
+          <div className="inline-flex items-center gap-2 rounded-full bg-secondary border border-border px-3.5 py-1.5 text-xs font-semibold text-muted-foreground">
+            <span className="h-2 w-2 rounded-full bg-sage" />
+            {t("home.phase")} {phaseStatus.phase.phase} · {t("home.week")} {phaseStatus.weekNumber} {t("home.of")}{" "}
+            {phaseStatus.totalWeeks}
+          </div>
+          <p className="text-[11px] text-muted-foreground/70 mt-1 ml-1">
+            {phaseStatus.phase.phase === 1
+              ? (isEs ? "Estabilización: carga ligera para preparar articulaciones y sistema nervioso." : "Stabilization: lighter load to prepare joints and nervous system.")
+              : phaseStatus.phase.phase === 2
+                ? (isEs ? "Hipertrofia: crecimiento muscular con volumen controlado para no estresar la tiroides." : "Hypertrophy: muscle growth with controlled volume to avoid thyroid stress.")
+                : (isEs ? "Fuerza: cargas más altas con descansos largos — el cortisol se mantiene bajo control." : "Strength: heavier loads with longer rest — cortisol stays in check.")}
+          </p>
         </div>
       ) : (
         <button
