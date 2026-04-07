@@ -414,6 +414,8 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
               <div className="relative w-full">
                 <input
                   type="number"
+                  step="2.5"
+                  inputMode="decimal"
                   value={isDone ? setsForExercise[i].weight : input.weight}
                   disabled={isDone || !isNext}
                   onChange={(e) => {
