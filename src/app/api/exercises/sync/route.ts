@@ -16,7 +16,7 @@ const SEARCH_MAP: Record<string, string> = {
   "a0000000-0000-4000-8000-000000000007": "hip thrust",
   "a0000000-0000-4000-8000-000000000008": "lat pulldown",
   "a0000000-0000-4000-8000-000000000009": "leg press",
-  "a0000000-0000-4000-8000-00000000000a": "cable rear delt fly",
+  "a0000000-0000-4000-8000-00000000000a": "rear delt row",
   "a0000000-0000-4000-8000-00000000000b": "dumbbell bicep curl",
   "a0000000-0000-4000-8000-00000000000c": "triceps pushdown",
   "a0000000-0000-4000-8000-00000000000d": "dumbbell lateral raise",
