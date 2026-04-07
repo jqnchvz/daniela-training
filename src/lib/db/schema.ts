@@ -77,7 +77,7 @@ export const sessionSetsRelations = relations(sessionSets, ({ one }) => ({
 export const checkins = pgTable("checkins", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
-  date: date("date").notNull().unique(),
+  date: date("date").notNull(),
   energy: integer("energy").notNull(),
   sleepQuality: integer("sleep_quality").notNull(),
   sleepHours: real("sleep_hours"),
