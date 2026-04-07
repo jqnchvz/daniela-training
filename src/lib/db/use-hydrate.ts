@@ -15,12 +15,12 @@ import {
  * DB is the single source of truth — always fetch fresh data.
  */
 export function useHydrateFromDb() {
-  const hydrated = useRef(false);
+  const lastHydratedUser = useRef<string | null | undefined>(undefined);
   const activeUserId = useAuthStore((s) => s.activeUserId);
 
   useEffect(() => {
-    if (hydrated.current) return;
-    hydrated.current = true;
+    if (lastHydratedUser.current === (activeUserId ?? null)) return;
+    lastHydratedUser.current = activeUserId ?? null;
 
     (async () => {
       try {
