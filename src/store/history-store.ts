@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { enqueueWrite } from "@/lib/write-queue";
 
 export interface CompletedSession {
   id: string;
@@ -85,12 +86,8 @@ export const useHistoryStore = create<HistoryState>()(
 
     addSession: (session) => {
       set((s) => ({ sessions: [session, ...s.sessions] }));
-      // Fire-and-forget write to DB
-      fetch("/api/sessions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(session),
-      }).catch(() => {});
+      // Write to DB with retry queue
+      enqueueWrite("/api/sessions", session);
     },
 
     addCheckin: (checkin) => {
@@ -98,11 +95,7 @@ export const useHistoryStore = create<HistoryState>()(
         const filtered = s.checkins.filter((c) => c.date !== checkin.date);
         return { checkins: [checkin, ...filtered] };
       });
-      fetch("/api/checkins", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(checkin),
-      }).catch(() => {});
+      enqueueWrite("/api/checkins", checkin);
     },
 
     addMeasurement: (m) => {

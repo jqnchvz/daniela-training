@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { enqueueWrite } from "@/lib/write-queue";
 
 interface CycleState {
   cycleStartDate: string | null;
@@ -72,15 +73,11 @@ export const useCycleStore = create<CycleState>()(
 function syncCycleAfterUpdate() {
   setTimeout(() => {
     const s = useCycleStore.getState();
-    fetch("/api/cycle", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        cycleStartDate: s.cycleStartDate,
-        extensionWeeks: s.extensionWeeks,
-        lastDeloadDate: s.lastDeloadDate,
-        completedSessions: s.completedSessions,
-      }),
-    }).catch(() => {});
+    enqueueWrite("/api/cycle", {
+      cycleStartDate: s.cycleStartDate,
+      extensionWeeks: s.extensionWeeks,
+      lastDeloadDate: s.lastDeloadDate,
+      completedSessions: s.completedSessions,
+    });
   }, 0);
 }
