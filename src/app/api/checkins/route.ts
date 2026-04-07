@@ -72,7 +72,7 @@ export async function POST(request: Request) {
   const [row] = await db
     .insert(checkins)
     .values({
-      id: data.id,
+      id: data.id ?? crypto.randomUUID(),
       userId: data.userId ?? null,
       date: data.date,
       energy: data.energy,

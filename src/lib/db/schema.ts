@@ -28,7 +28,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 // ── Sessions ────────────────────────────────────────────────────────────────
 
 export const sessions = pgTable("sessions", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().notNull(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   planId: text("plan_id").notNull(),
   planName: text("plan_name").notNull(),
@@ -75,7 +75,7 @@ export const sessionSetsRelations = relations(sessionSets, ({ one }) => ({
 // ── Check-ins ───────────────────────────────────────────────────────────────
 
 export const checkins = pgTable("checkins", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().notNull(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   date: date("date").notNull(),
   energy: integer("energy").notNull(),
@@ -94,7 +94,7 @@ export const checkinsRelations = relations(checkins, ({ one }) => ({
 // ── Cycle State ─────────────────────────────────────────────────────────────
 
 export const cycleState = pgTable("cycle_state", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().notNull(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   cycleStartDate: date("cycle_start_date"),
   extensionWeeks: integer("extension_weeks").notNull().default(0),

@@ -49,8 +49,8 @@ export async function POST(request: Request) {
         planId: sessionData.planId,
         planName: sessionData.planName,
         date: sessionData.date,
-        startedAt: sessionData.startedAt,
-        completedAt: sessionData.completedAt,
+        startedAt: new Date(sessionData.startedAt),
+        completedAt: new Date(sessionData.completedAt),
         durationMinutes: sessionData.durationMinutes,
         energyPre: sessionData.energyPre,
         energyPost: sessionData.energyPost,
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
         sorenessScore: sessionData.sorenessScore,
         sessionMode: sessionData.sessionMode ?? "full",
         notes: sessionData.notes ?? "",
-      })
+      } satisfies typeof sessions.$inferInsert)
       .onConflictDoNothing()
       .returning();
 
