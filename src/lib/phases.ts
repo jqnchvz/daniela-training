@@ -25,7 +25,7 @@ export const PHASE_CONFIGS: PhaseConfig[] = [
     repsMax: 15,
     setsMin: 2,
     setsMax: 3,
-    restSeconds: 150,
+    restSeconds: 120,
     focus: "Form mastery & work capacity",
     description:
       "Focus on learning proper form with lighter weights. Higher reps build work capacity and neural adaptation.",
@@ -38,7 +38,7 @@ export const PHASE_CONFIGS: PhaseConfig[] = [
     repsMax: 12,
     setsMin: 3,
     setsMax: 3,
-    restSeconds: 135,
+    restSeconds: 150,
     focus: "Progressive overload",
     description:
       "Standard hypertrophy range. Increase weight when you can complete all reps with good form.",
@@ -51,7 +51,7 @@ export const PHASE_CONFIGS: PhaseConfig[] = [
     repsMax: 10,
     setsMin: 3,
     setsMax: 4,
-    restSeconds: 165,
+    restSeconds: 180,
     focus: "Volume & strength gains",
     description:
       "Heavier loads, lower reps. Focus on progressive volume and building strength.",

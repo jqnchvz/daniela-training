@@ -203,14 +203,14 @@ describe("getDeloadStatus", () => {
 });
 
 describe("applyDeload", () => {
-  it("halves sets", () => {
-    expect(applyDeload(3)).toBe(2);
-    expect(applyDeload(4)).toBe(2);
+  it("halves sets and applies 60% weight multiplier", () => {
+    expect(applyDeload(3)).toEqual({ sets: 2, weightMultiplier: 0.6 });
+    expect(applyDeload(4)).toEqual({ sets: 2, weightMultiplier: 0.6 });
   });
 
   it("minimum 1 set", () => {
-    expect(applyDeload(2)).toBe(1);
-    expect(applyDeload(1)).toBe(1);
+    expect(applyDeload(2)).toEqual({ sets: 1, weightMultiplier: 0.6 });
+    expect(applyDeload(1)).toEqual({ sets: 1, weightMultiplier: 0.6 });
   });
 });
 
