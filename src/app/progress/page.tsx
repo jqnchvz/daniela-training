@@ -8,6 +8,7 @@ import {
 import { EXERCISES, getExerciseById } from "@/lib/exercises";
 import { detectRedFlags, type CheckinData } from "@/lib/checkin";
 import { useAuthStore } from "@/store/auth-store";
+import { useT, useI18n, t as tFn } from "@/lib/i18n";
 
 export default function ProgressPage() {
   const sessions = useHistoryStore((s) => s.sessions);
@@ -46,12 +47,14 @@ export default function ProgressPage() {
   const weeklyVolumes = getWeeklyVolumeData(sessions);
 
   const hasData = sessions.length > 0 || checkins.length > 0;
+  const t = useT();
+  const locale = useI18n((s) => s.locale);
 
   return (
     <div className="px-5 py-5">
       <div className="flex items-center justify-between mb-4">
         <h1 className="font-heading text-[13px] font-bold tracking-[2px] uppercase text-muted-foreground">
-          Progress
+          {t("progress.title")}
         </h1>
       </div>
 
@@ -62,15 +65,16 @@ export default function ProgressPage() {
           <p className="text-[13px] text-[var(--dt-red)] leading-relaxed">
             {redFlags.hasEnergyFlag && (
               <>
-                Your 7-day energy average (<strong>{redFlags.energyAvg7}</strong>) is significantly
-                lower than your 30-day average ({redFlags.energyAvg30}). Consider checking
-                recovery, sleep, and stress levels.
+                {t("progress.energyRedFlag")
+                  .replace("{avg7}", String(redFlags.energyAvg7))
+                  .replace("{avg30}", String(redFlags.energyAvg30))}
               </>
             )}
             {redFlags.hasMoodFlag && !redFlags.hasEnergyFlag && (
               <>
-                Your mood has been dropping this week (7-day avg: {redFlags.moodAvg7} vs
-                30-day: {redFlags.moodAvg30}). Listen to your body.
+                {t("progress.moodRedFlag")
+                  .replace("{avg7}", String(redFlags.moodAvg7))
+                  .replace("{avg30}", String(redFlags.moodAvg30))}
               </>
             )}
           </p>
@@ -80,9 +84,9 @@ export default function ProgressPage() {
       {!hasData ? (
         <div className="rounded-[16px] border border-border bg-card p-8 text-center">
           <p className="text-4xl mb-3">📈</p>
-          <p className="font-heading text-lg font-bold mb-2">No data yet</p>
+          <p className="font-heading text-lg font-bold mb-2">{t("progress.noData")}</p>
           <p className="text-sm text-muted-foreground">
-            Complete sessions and daily check-ins to see your progress trends here.
+            {t("progress.noDataDesc")}
           </p>
         </div>
       ) : (
@@ -91,7 +95,7 @@ export default function ProgressPage() {
           {ruleStatus.length > 0 && (
             <>
               <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mb-2.5">
-                2-Week Rule Status
+                {t("progress.ruleStatus")}
               </p>
               <div className="rounded-[16px] border border-border bg-card p-3.5 mb-3">
                 {ruleStatus.map((rule, i) => (
@@ -112,7 +116,7 @@ export default function ProgressPage() {
           {sessions.length > 0 && (
             <>
               <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mt-4 mb-2.5">
-                Strength trend
+                {t("progress.strengthTrend")}
               </p>
               <div className="rounded-[16px] border border-border bg-card p-[18px] mb-3">
                 <select
@@ -122,7 +126,7 @@ export default function ProgressPage() {
                 >
                   {EXERCISES.map((ex) => (
                     <option key={ex.id} value={ex.id}>
-                      {ex.name}
+                      {locale === "es" ? (ex.nameEs ?? ex.name) : ex.name}
                     </option>
                   ))}
                 </select>
@@ -131,7 +135,7 @@ export default function ProgressPage() {
                   <StrengthChart data={exerciseHistory} />
                 ) : (
                   <p className="text-xs text-muted-foreground text-center py-4">
-                    Need at least 2 sessions with this exercise to show a trend.
+                    {t("progress.needAtLeast2")}
                   </p>
                 )}
               </div>
@@ -142,7 +146,7 @@ export default function ProgressPage() {
           {weeklyVolumes.length > 0 && (
             <>
               <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mt-4 mb-2.5">
-                Weekly volume
+                {t("progress.weeklyVolume")}
               </p>
               <div className="rounded-[16px] border border-border bg-card p-[18px] mb-3">
                 <VolumeChart data={weeklyVolumes} />
@@ -154,7 +158,7 @@ export default function ProgressPage() {
           {checkins.length >= 3 && (
             <>
               <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mt-4 mb-2.5">
-                Wellness trend
+                {t("progress.wellnessTrend")}
               </p>
               <div className="rounded-[16px] border border-border bg-card p-[18px] mb-3">
                 <WellnessChart checkins={checkins.slice(0, 14).reverse()} />
@@ -166,13 +170,13 @@ export default function ProgressPage() {
 
       {/* Body metrics */}
       <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mt-4 mb-2.5">
-        Body metrics
+        {t("progress.bodyMetrics")}
       </p>
       <div className="rounded-[16px] border border-border bg-card p-3.5">
         <div className="flex gap-2.5">
-          <MetricBox value={latestMeasurement?.waist ? `${latestMeasurement.waist}` : "—"} label="Waist cm" />
-          <MetricBox value={latestMeasurement?.hip ? `${latestMeasurement.hip}` : "—"} label="Hip cm" />
-          <MetricBox value={latestMeasurement?.thigh ? `${latestMeasurement.thigh}` : "—"} label="Thigh cm" />
+          <MetricBox value={latestMeasurement?.waist ? `${latestMeasurement.waist}` : "—"} label={t("progress.waistCm")} />
+          <MetricBox value={latestMeasurement?.hip ? `${latestMeasurement.hip}` : "—"} label={t("progress.hipCm")} />
+          <MetricBox value={latestMeasurement?.thigh ? `${latestMeasurement.thigh}` : "—"} label={t("progress.thighCm")} />
         </div>
 
         {allMeasurements.length >= 2 && (
@@ -193,7 +197,7 @@ export default function ProgressPage() {
                 onClick={() => setShowMeasForm(false)}
                 className="flex-1 rounded-[12px] border border-border bg-surface2 py-2 text-[13px] font-semibold"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 onClick={() => {
@@ -209,7 +213,7 @@ export default function ProgressPage() {
                 }}
                 className="flex-1 rounded-[12px] bg-sage py-2 text-[13px] font-bold text-primary-foreground"
               >
-                Save
+                {t("common.save")}
               </button>
             </div>
           </div>
@@ -218,7 +222,7 @@ export default function ProgressPage() {
             onClick={() => setShowMeasForm(true)}
             className="w-full mt-3 rounded-[16px] border border-border bg-surface2 py-2.5 text-[13px] font-semibold transition-colors hover:bg-surface3"
           >
-            + Log measurements
+            {t("progress.logMeasurements")}
           </button>
         )}
       </div>
@@ -285,6 +289,7 @@ function get2WeekRuleStatus(sessions: CompletedSession[]): RuleStatusItem[] {
   for (const [exId, data] of exerciseMap) {
     const ex = getExerciseById(exId);
     if (!ex) continue;
+    const locale = useI18n.getState().locale;
 
     const currentWeight = data.weights[data.weights.length - 1];
     const sessionCount = data.weights.length;
@@ -298,18 +303,18 @@ function get2WeekRuleStatus(sessions: CompletedSession[]): RuleStatusItem[] {
 
     if (lastTwoSame && allCompleted && sessionCount >= 2) {
       status = "⬆️";
-      detail = `Hit target for ${sessionCount >= 2 ? 2 : sessionCount} sessions · Ready to increase`;
+      detail = tFn("progress.hitTarget").replace("{count}", String(sessionCount >= 2 ? 2 : sessionCount));
     } else if (allCompleted) {
       status = "✅";
-      detail = `Completed · Hold this week`;
+      detail = tFn("progress.completedHold");
     } else {
       status = "⏸️";
-      detail = `Incomplete reps · Hold`;
+      detail = tFn("progress.incompleteHold");
     }
 
     results.push({
       exerciseId: exId,
-      name: ex.name,
+      name: (locale === "es" ? ex.nameEs : ex.name) ?? ex.name,
       status,
       detail,
       weight: `${currentWeight} kg`,

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useHistoryStore, type CompletedSession } from "@/store/history-store";
+import { useT } from "@/lib/i18n";
 
 export default function HistoryPage() {
   const sessions = useHistoryStore((s) => s.sessions);
@@ -15,15 +16,16 @@ export default function HistoryPage() {
           sessions.filter((s) => s.energyPost).length || 0
         ).toFixed(1)
       : "--";
+  const t = useT();
 
   return (
     <div className="px-5 py-5">
       <div className="flex items-center justify-between mb-4">
         <h1 className="font-heading text-[13px] font-bold tracking-[2px] uppercase text-muted-foreground">
-          History
+          {t("history.title")}
         </h1>
         <span className="rounded-full bg-sage-bg text-sage border border-sage-dim px-2.5 py-1 text-[11px] font-semibold">
-          {sessions.length} sessions
+          {sessions.length} {t("history.sessions")}
         </span>
       </div>
 
@@ -33,19 +35,19 @@ export default function HistoryPage() {
           <p className="font-heading text-[1.5rem] font-extrabold leading-none">
             {sessions.length}
           </p>
-          <p className="text-[10px] text-muted-foreground mt-1">Total sessions</p>
+          <p className="text-[10px] text-muted-foreground mt-1">{t("history.totalSessions")}</p>
         </div>
         <div className="flex-1 text-center rounded-[10px] border border-border bg-surface2 p-3">
           <p className="font-heading text-[1.5rem] font-extrabold leading-none text-sage">
             {totalPRs}
           </p>
-          <p className="text-[10px] text-muted-foreground mt-1">PRs set</p>
+          <p className="text-[10px] text-muted-foreground mt-1">{t("history.prsSet")}</p>
         </div>
         <div className="flex-1 text-center rounded-[10px] border border-border bg-surface2 p-3">
           <p className="font-heading text-[1.5rem] font-extrabold leading-none text-gold">
             {avgEnergy}
           </p>
-          <p className="text-[10px] text-muted-foreground mt-1">Avg energy</p>
+          <p className="text-[10px] text-muted-foreground mt-1">{t("history.avgEnergy")}</p>
         </div>
       </div>
 
@@ -54,7 +56,7 @@ export default function HistoryPage() {
         <div className="rounded-[16px] border border-border bg-card p-6 text-center">
           <p className="text-4xl mb-3">📋</p>
           <p className="text-sm text-muted-foreground">
-            No sessions yet. Complete your first workout to see it here.
+            {t("history.noSessions")}
           </p>
         </div>
       ) : (
@@ -84,6 +86,7 @@ function SessionEntry({
   isExpanded: boolean;
   onToggle: () => void;
 }) {
+  const t = useT();
   const badge = session.planName.includes("A")
     ? "A"
     : session.planName.includes("B")
@@ -144,17 +147,17 @@ function SessionEntry({
           <div className="flex gap-2 mt-2.5">
             {session.energyPost != null && (
               <span className="rounded-full bg-sage-bg text-sage border border-sage-dim px-2.5 py-0.5 text-[11px] font-semibold">
-                Energy {session.energyPost}
+                {t("home.energy")} {session.energyPost}
               </span>
             )}
             {session.sleepScore != null && (
               <span className="rounded-full bg-dt-blue-bg text-dt-blue border border-dt-blue/30 px-2.5 py-0.5 text-[11px] font-semibold">
-                Sleep {session.sleepScore}
+                {t("home.sleep")} {session.sleepScore}
               </span>
             )}
             {session.sorenessScore != null && (
               <span className="rounded-full bg-surface2 text-muted-foreground border border-border px-2.5 py-0.5 text-[11px] font-semibold">
-                Soreness {session.sorenessScore}
+                {t("home.soreness")} {session.sorenessScore}
               </span>
             )}
           </div>

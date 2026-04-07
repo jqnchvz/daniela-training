@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { EnergySlider } from "@/components/session/energy-slider";
 import { useHistoryStore } from "@/store/history-store";
 import { useAuthStore } from "@/store/auth-store";
+import { useT } from "@/lib/i18n";
 
 export default function CheckinPage() {
   const addCheckin = useHistoryStore((s) => s.addCheckin);
@@ -21,6 +22,7 @@ export default function CheckinPage() {
   const [notes, setNotes] = useState(existing?.notes ?? "");
   const [saved, setSaved] = useState(!!existing);
   const [editing, setEditing] = useState(false);
+  const t = useT();
 
   // Sync state if existing checkin loads after hydration
   useEffect(() => {
@@ -55,17 +57,17 @@ export default function CheckinPage() {
     return (
       <div className="px-5 py-6 max-w-[420px] mx-auto text-center">
         <div className="text-4xl mb-3">✓</div>
-        <h2 className="font-heading text-xl font-bold">Check-in saved!</h2>
+        <h2 className="font-heading text-xl font-bold">{t("checkin.saved")}</h2>
         <p className="text-sm text-muted-foreground mt-2">
-          Keep it up — consistency is key.
+          {t("checkin.keepItUp")}
         </p>
 
         <div className="mt-6 rounded-[16px] border border-border bg-card p-4 text-left">
           <div className="grid grid-cols-2 gap-3">
-            <ScoreDisplay label="Energy" value={energy} color="text-sage" />
-            <ScoreDisplay label="Sleep" value={sleepQuality} color="text-dt-blue" />
-            <ScoreDisplay label="Mood" value={mood} color="text-gold" />
-            <ScoreDisplay label="Soreness" value={soreness} color="text-terra" />
+            <ScoreDisplay label={t("home.energy")} value={energy} color="text-sage" />
+            <ScoreDisplay label={t("home.sleep")} value={sleepQuality} color="text-dt-blue" />
+            <ScoreDisplay label={t("checkin.mood")} value={mood} color="text-gold" />
+            <ScoreDisplay label={t("home.soreness")} value={soreness} color="text-terra" />
           </div>
           <p className="text-xs text-muted-foreground mt-3">
             Sleep: {sleepHours}h {notes && `· ${notes}`}
@@ -76,7 +78,7 @@ export default function CheckinPage() {
           onClick={() => setEditing(true)}
           className="mt-4 text-sm text-sage underline"
         >
-          Edit today&apos;s check-in
+          {t("checkin.editToday")}
         </button>
       </div>
     );
@@ -84,18 +86,18 @@ export default function CheckinPage() {
 
   return (
     <div className="px-5 py-6 max-w-[420px] mx-auto">
-      <h1 className="font-heading text-[1.35rem] font-bold">Daily Check-in</h1>
+      <h1 className="font-heading text-[1.35rem] font-bold">{t("checkin.title")}</h1>
       <p className="text-sm text-muted-foreground mt-1">
-        How are you feeling today? Takes 30 seconds.
+        {t("checkin.subtitle")}
       </p>
 
       <div className="mt-6 space-y-6">
-        <EnergySlider value={energy} onChange={setEnergy} label="Energy level" />
+        <EnergySlider value={energy} onChange={setEnergy} label={t("checkin.energyLevel")} />
 
-        <SliderRow label="Sleep quality" value={sleepQuality} onChange={setSleepQuality} low="Poor" high="Great" />
+        <SliderRow label={t("checkin.sleepQuality")} value={sleepQuality} onChange={setSleepQuality} low={t("checkin.poor")} high={t("checkin.great")} />
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Sleep hours</label>
+          <label className="text-sm font-medium">{t("checkin.sleepHours")}</label>
           <input
             type="number"
             value={sleepHours}
@@ -107,15 +109,15 @@ export default function CheckinPage() {
           />
         </div>
 
-        <SliderRow label="Mood" value={mood} onChange={setMood} low="Low" high="Great" />
-        <SliderRow label="Muscle soreness" value={soreness} onChange={setSoreness} low="None" high="Very sore" />
+        <SliderRow label={t("checkin.mood")} value={mood} onChange={setMood} low={t("checkin.low")} high={t("checkin.great")} />
+        <SliderRow label={t("checkin.soreness")} value={soreness} onChange={setSoreness} low={t("checkin.none")} high={t("checkin.verySore")} />
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Notes (optional)</label>
+          <label className="text-sm font-medium">{t("checkin.notes")}</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Anything notable today?"
+            placeholder={t("checkin.notesPlaceholder")}
             maxLength={200}
             className="w-full rounded-[10px] border border-border bg-surface2 p-3 text-sm resize-none h-20"
           />
@@ -125,7 +127,7 @@ export default function CheckinPage() {
           onClick={handleSave}
           className="w-full rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
         >
-          Save Check-in ✓
+          {t("checkin.saveCheckin")}
         </button>
       </div>
     </div>

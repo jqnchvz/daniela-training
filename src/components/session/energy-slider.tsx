@@ -1,5 +1,7 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
+
 const ENERGY_EMOJIS = ["", "😴", "😴", "😪", "😐", "🙂", "😊", "💪", "⚡", "🔥", "🚀"];
 
 export function EnergySlider({
@@ -12,6 +14,7 @@ export function EnergySlider({
   label: string;
 }) {
   const current = value ?? 5;
+  const t = useT();
 
   return (
     <div className="space-y-3">
@@ -28,9 +31,9 @@ export function EnergySlider({
             className="w-full h-2 rounded-full appearance-none bg-secondary accent-primary"
           />
           <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            <span>Low</span>
+            <span>{t("checkin.low")}</span>
             <span className="text-lg font-bold text-foreground">{current}</span>
-            <span>High</span>
+            <span>{t("checkin.high")}</span>
           </div>
         </div>
       </div>

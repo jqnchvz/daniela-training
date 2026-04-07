@@ -26,6 +26,7 @@ export default function ActiveSessionPage({
   const plan = WORKOUT_PLANS.find((p) => p.id === planId);
   const store = useSessionStore();
   const isOnline = useAppStore((s) => s.isOnline);
+  const t = useT();
 
   // Initialize session in useEffect to avoid side effects during render
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function ActiveSessionPage({
   if (!plan) {
     return (
       <div className="px-5 py-6">
-        <p className="text-muted-foreground">Workout plan not found.</p>
+        <p className="text-muted-foreground">{t("common.notFound")}</p>
       </div>
     );
   }
@@ -46,7 +47,7 @@ export default function ActiveSessionPage({
     <div className="min-h-screen flex flex-col">
       {!isOnline && (
         <div className="mx-5 mt-3 rounded-[10px] bg-gold-bg border border-gold/30 px-3 py-2 text-xs text-gold">
-          Offline — data will sync when reconnected
+          {t("common.offline")}
         </div>
       )}
 
@@ -89,7 +90,7 @@ function PreCheckPhase() {
       )}
 
       <div className="w-full max-w-[320px]">
-        <EnergySlider value={energyPre} onChange={setEnergyPre} label="How's your energy?" />
+        <EnergySlider value={energyPre} onChange={setEnergyPre} label={t("session.energyQuestion")} />
 
         {showModeSelector && (
           <div className="mt-5 rounded-[12px] border border-border bg-card p-4 text-left">
@@ -129,7 +130,7 @@ function PreCheckPhase() {
           disabled={energyPre === null}
           className="mt-6 w-full rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground disabled:opacity-50 transition-all hover:bg-sage/80"
         >
-          Start Warm-up →
+          {t("session.startWarmup")}
         </button>
       </div>
     </div>
@@ -150,7 +151,7 @@ function WarmupPhase({ planId }: { planId: string }) {
         {protocol.warmupMinutes} min · {protocol.focus}
       </p>
       <p className="text-sm text-muted-foreground mb-6 max-w-[280px] leading-relaxed">
-        Prepare your body for today&apos;s session. Take your time — this is non-negotiable for hypothyroid recovery.
+        {t("session.warmupDesc")}
       </p>
       <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left">
         <div className="flex flex-col gap-3">
@@ -171,7 +172,7 @@ function WarmupPhase({ planId }: { planId: string }) {
         onClick={() => setPhase("working")}
         className="mt-6 w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
       >
-        Done with Warm-up →
+        {t("session.doneWarmup")}
       </button>
     </div>
   );
@@ -235,7 +236,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
           onClick={() => store.setPhase("cooldown")}
           className="rounded-[16px] bg-sage px-8 py-4 font-heading text-[15px] font-bold text-primary-foreground"
         >
-          Start Cool-down →
+          {t("session.startCooldown")}
         </button>
       </div>
     );
@@ -334,7 +335,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       {/* Header */}
       <div className="px-5 pt-5 flex items-center justify-between">
         <button onClick={() => (window.location.href = "/")} className="text-[13px] text-muted-foreground">
-          ← End
+          {t("session.endSession")}
         </button>
         <div className="flex items-center gap-2">
           {store.sessionMode === "lite" && (
@@ -351,7 +352,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       {/* Progress */}
       <div className="px-5 pt-4">
         <div className="flex justify-between text-xs text-muted-foreground mb-2">
-          <span>Exercise {currentExIndex + 1} of {exercises.length}</span>
+          <span>{t("session.exerciseOf").replace("{current}", String(currentExIndex + 1)).replace("{total}", String(exercises.length))}</span>
           <span className="text-sage">{t("session.mainWork")}</span>
         </div>
         <div className="h-1 rounded-full bg-surface3">
@@ -381,12 +382,12 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
             {locale === "es" ? exercise.notesEs : exercise.notes}
           </p>
           <div className="flex gap-2.5">
-            <TargetBox value={String(currentPlanExercise.sets)} label="Sets" highlight />
-            <TargetBox value={String(currentPlanExercise.reps)} label="Reps" highlight />
-            <TargetBox value={`${Math.floor(currentPlanExercise.restSeconds / 60)} min`} label="Rest" />
+            <TargetBox value={String(currentPlanExercise.sets)} label={t("session.sets")} highlight />
+            <TargetBox value={String(currentPlanExercise.reps)} label={t("session.reps")} highlight />
+            <TargetBox value={`${Math.floor(currentPlanExercise.restSeconds / 60)} min`} label={t("session.rest")} />
             <TargetBox
               value={lastWeight ? `${lastWeight} kg` : getDefaultWeight(exercise.id) > 0 ? `~${getDefaultWeight(exercise.id)} kg` : "—"}
-              label={lastWeight ? t("session.lastWt") : (locale === "es" ? "Sugerido" : "Suggested")}
+              label={lastWeight ? t("session.lastWt") : t("session.suggested")}
             />
           </div>
           <HypothyroidInfo restSeconds={currentPlanExercise.restSeconds} reps={currentPlanExercise.reps} isCompound={exercise.category === "compound"} />
@@ -396,7 +397,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       {/* Set logger */}
       <div className="px-5 mt-4">
         <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mb-3">
-          Log your sets
+          {t("session.logSets")}
         </p>
         {Array.from({ length: currentPlanExercise.sets }, (_, i) => {
           const isDone = i < setsForExercise.length;
@@ -477,14 +478,14 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
             onClick={handlePrevExercise}
             className="flex-[0.5] rounded-[16px] border border-border bg-surface2 py-3.5 font-heading text-sm font-semibold transition-colors hover:bg-surface3"
           >
-            ‹ Prev
+            {t("session.prev")}
           </button>
         )}
         <button
           onClick={handleNextExercise}
           className="flex-1 rounded-[16px] bg-sage py-3.5 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
         >
-          {allSetsDone ? t("session.nextExercise") : (locale === "es" ? "Saltar →" : "Skip →")}
+          {allSetsDone ? t("session.nextExercise") : t("session.skip")}
         </button>
       </div>
 
@@ -511,7 +512,7 @@ function CooldownPhase({ planId }: { planId: string }) {
         {protocol.cooldownMinutes} min · {protocol.focus}
       </p>
       <p className="text-sm text-muted-foreground mb-6 max-w-[280px] leading-relaxed">
-        Stretching the muscles you just worked. This is when recovery begins — don&apos;t skip it.
+        {t("session.cooldownDesc")}
       </p>
       <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left">
         <div className="flex flex-col gap-3">
@@ -532,7 +533,7 @@ function CooldownPhase({ planId }: { planId: string }) {
         onClick={() => store.setPhase("summary")}
         className="mt-6 w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground"
       >
-        Complete Session ✓
+        {t("session.completeSession")}
       </button>
     </div>
   );
@@ -598,16 +599,16 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       <div className="w-[100px] h-[100px] rounded-full bg-sage-bg border-2 border-sage flex items-center justify-center text-[40px] mb-6">
         ✓
       </div>
-      <h1 className="font-heading text-[2rem] font-extrabold leading-tight mb-2">
-        {locale === "es" ? "¡Sesión" : "Session"}<br />{locale === "es" ? "Completada!" : "Complete!"}
+      <h1 className="font-heading text-[2rem] font-extrabold leading-tight mb-2 whitespace-pre-line">
+        {t("session.sessionComplete")}
       </h1>
       <p className="text-sm text-muted-foreground mb-2">
         {plan.name}
       </p>
       <div className="flex gap-4 text-xs text-muted-foreground mb-8">
-        <span>⏱ {duration} min</span>
-        <span>📋 {exercisesCompleted} exercises</span>
-        <span>💪 {totalSets} sets</span>
+        <span>⏱ {duration} {t("common.min")}</span>
+        <span>📋 {exercisesCompleted} {t("common.exercises")}</span>
+        <span>💪 {totalSets} {t("common.sets")}</span>
         {totalVolume > 0 && <span>🏋️ {totalVolume.toLocaleString()} kg</span>}
         {avgRpe && <span>🎯 RPE {avgRpe}</span>}
       </div>
@@ -615,18 +616,18 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       {/* Wellness inputs */}
       <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left mb-4">
         <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mb-3">
-          How did it feel?
+          {t("session.howDidItFeel")}
         </p>
-        <ScoreRow label="Energy" value={energy} onChange={setEnergy} />
-        <ScoreRow label="Sleep last night" value={sleep} onChange={setSleep} />
-        <ScoreRow label="Soreness" value={soreness} onChange={setSoreness} />
+        <ScoreRow label={t("home.energy")} value={energy} onChange={setEnergy} />
+        <ScoreRow label={t("session.sleepLastNight")} value={sleep} onChange={setSleep} />
+        <ScoreRow label={t("home.soreness")} value={soreness} onChange={setSoreness} />
       </div>
 
       <button
         onClick={handleComplete}
         className="w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground"
       >
-        Back to Dashboard
+        {t("session.backToDashboard")}
       </button>
     </div>
   );

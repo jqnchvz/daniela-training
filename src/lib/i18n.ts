@@ -30,6 +30,10 @@ const translations: Record<string, Record<Locale, string>> = {
   "common.prev": { en: "Previous", es: "Anterior" },
   "common.min": { en: "min", es: "min" },
   "common.exercises": { en: "exercises", es: "ejercicios" },
+  "common.cancel": { en: "Cancel", es: "Cancelar" },
+  "common.sets": { en: "sets", es: "series" },
+  "common.offline": { en: "Offline — data will sync when reconnected", es: "Sin conexión — los datos se sincronizarán al reconectar" },
+  "common.notFound": { en: "Workout plan not found.", es: "Plan de entrenamiento no encontrado." },
 
   // Nav
   "nav.home": { en: "Home", es: "Inicio" },
@@ -121,6 +125,10 @@ const translations: Record<string, Record<Locale, string>> = {
   "session.rest": { en: "Rest", es: "Descanso" },
   "session.lastWt": { en: "Last wt.", es: "Último peso" },
   "session.endSession": { en: "← End", es: "← Fin" },
+  "session.exerciseOf": { en: "Exercise {current} of {total}", es: "Ejercicio {current} de {total}" },
+  "session.prev": { en: "‹ Prev", es: "‹ Anterior" },
+  "session.skip": { en: "Skip →", es: "Saltar →" },
+  "session.suggested": { en: "Suggested", es: "Sugerido" },
 
   // Rest timer
   "rest.rest": { en: "REST", es: "DESCANSO" },
@@ -143,6 +151,21 @@ const translations: Record<string, Record<Locale, string>> = {
   "progress.readyIncrease": { en: "Ready to increase", es: "Listo para aumentar" },
   "progress.hold": { en: "Hold this week", es: "Mantener esta semana" },
   "progress.incomplete": { en: "Incomplete reps · Hold", es: "Reps incompletas · Mantener" },
+  "progress.waistCm": { en: "Waist cm", es: "Cintura cm" },
+  "progress.hipCm": { en: "Hip cm", es: "Cadera cm" },
+  "progress.thighCm": { en: "Thigh cm", es: "Muslo cm" },
+  "progress.needAtLeast2": { en: "Need at least 2 sessions with this exercise to show a trend.", es: "Se necesitan al menos 2 sesiones con este ejercicio para mostrar una tendencia." },
+  "progress.energyRedFlag": {
+    en: "Your 7-day energy average ({avg7}) is significantly lower than your 30-day average ({avg30}). Consider checking recovery, sleep, and stress levels.",
+    es: "Tu promedio de energía de 7 días ({avg7}) es significativamente menor que tu promedio de 30 días ({avg30}). Considera revisar tu recuperación, sueño y niveles de estrés.",
+  },
+  "progress.moodRedFlag": {
+    en: "Your mood has been dropping this week (7-day avg: {avg7} vs 30-day: {avg30}). Listen to your body.",
+    es: "Tu ánimo ha ido bajando esta semana (promedio 7 días: {avg7} vs 30 días: {avg30}). Escucha a tu cuerpo.",
+  },
+  "progress.hitTarget": { en: "Hit target for {count} sessions · Ready to increase", es: "Objetivo alcanzado por {count} sesiones · Listo para aumentar" },
+  "progress.completedHold": { en: "Completed · Hold this week", es: "Completado · Mantener esta semana" },
+  "progress.incompleteHold": { en: "Incomplete reps · Hold", es: "Reps incompletas · Mantener" },
 
   // Library
   "library.title": { en: "Exercise Library", es: "Biblioteca de Ejercicios" },
@@ -176,6 +199,7 @@ const translations: Record<string, Record<Locale, string>> = {
   "checkin.low": { en: "Low", es: "Bajo" },
   "checkin.none": { en: "None", es: "Ninguno" },
   "checkin.verySore": { en: "Very sore", es: "Muy adolorido" },
+  "checkin.high": { en: "High", es: "Alto" },
 
   // Auth
   "auth.welcome": { en: "Welcome", es: "Bienvenido" },
