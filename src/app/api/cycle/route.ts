@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { cycleState } from "@/lib/db/schema";
+import { cycleSchema } from "@/lib/validations";
 import { eq } from "drizzle-orm";
 
 const SINGLETON_ID = "00000000-0000-4000-8000-000000000001";
@@ -23,26 +24,31 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const body = await request.json();
+  const parsed = cycleSchema.safeParse(body);
+  if (!parsed.success) {
+    return Response.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
+  const data = parsed.data;
 
-  const rowId = body.userId ?? SINGLETON_ID;
+  const rowId = data.userId ?? SINGLETON_ID;
 
   const [row] = await db
     .insert(cycleState)
     .values({
       id: rowId,
-      userId: body.userId ?? null,
-      cycleStartDate: body.cycleStartDate,
-      extensionWeeks: body.extensionWeeks ?? 0,
-      lastDeloadDate: body.lastDeloadDate,
-      completedSessions: body.completedSessions ?? 0,
+      userId: data.userId ?? null,
+      cycleStartDate: data.cycleStartDate,
+      extensionWeeks: data.extensionWeeks ?? 0,
+      lastDeloadDate: data.lastDeloadDate,
+      completedSessions: data.completedSessions ?? 0,
     })
     .onConflictDoUpdate({
       target: cycleState.id,
       set: {
-        cycleStartDate: body.cycleStartDate,
-        extensionWeeks: body.extensionWeeks ?? 0,
-        lastDeloadDate: body.lastDeloadDate,
-        completedSessions: body.completedSessions ?? 0,
+        cycleStartDate: data.cycleStartDate,
+        extensionWeeks: data.extensionWeeks ?? 0,
+        lastDeloadDate: data.lastDeloadDate,
+        completedSessions: data.completedSessions ?? 0,
         updatedAt: new Date(),
       },
     })

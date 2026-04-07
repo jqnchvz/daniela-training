@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { checkins } from "@/lib/db/schema";
+import { checkinSchema } from "@/lib/validations";
 import { desc, eq, and, sql } from "drizzle-orm";
 
 export async function GET(request: Request) {
@@ -17,6 +18,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const body = await request.json();
+  const parsed = checkinSchema.safeParse(body);
+  if (!parsed.success) {
+    return Response.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
+  const data = parsed.data;
 
   // Manual upsert: check if a checkin exists for this user+date, then insert or update
   const existing = await db
@@ -24,8 +30,8 @@ export async function POST(request: Request) {
     .from(checkins)
     .where(
       and(
-        eq(checkins.date, body.date),
-        body.userId ? eq(checkins.userId, body.userId) : sql`${checkins.userId} IS NULL`,
+        eq(checkins.date, data.date),
+        data.userId ? eq(checkins.userId, data.userId) : sql`${checkins.userId} IS NULL`,
       ),
     )
     .limit(1);
@@ -34,12 +40,12 @@ export async function POST(request: Request) {
     const [row] = await db
       .update(checkins)
       .set({
-        energy: body.energy,
-        sleepQuality: body.sleepQuality,
-        sleepHours: body.sleepHours,
-        mood: body.mood,
-        soreness: body.soreness,
-        notes: body.notes ?? "",
+        energy: data.energy,
+        sleepQuality: data.sleepQuality,
+        sleepHours: data.sleepHours,
+        mood: data.mood,
+        soreness: data.soreness,
+        notes: data.notes ?? "",
       })
       .where(eq(checkins.id, existing[0].id))
       .returning();
@@ -50,15 +56,15 @@ export async function POST(request: Request) {
   const [row] = await db
     .insert(checkins)
     .values({
-      id: body.id,
-      userId: body.userId ?? null,
-      date: body.date,
-      energy: body.energy,
-      sleepQuality: body.sleepQuality,
-      sleepHours: body.sleepHours,
-      mood: body.mood,
-      soreness: body.soreness,
-      notes: body.notes ?? "",
+      id: data.id,
+      userId: data.userId ?? null,
+      date: data.date,
+      energy: data.energy,
+      sleepQuality: data.sleepQuality,
+      sleepHours: data.sleepHours,
+      mood: data.mood,
+      soreness: data.soreness,
+      notes: data.notes ?? "",
     })
     .returning();
 

@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
+import { userActionSchema } from "@/lib/validations";
 import { hashPin } from "@/lib/pin-hash";
 import { eq } from "drizzle-orm";
 
@@ -17,15 +18,19 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { action } = body;
+  const parsed = userActionSchema.safeParse(body);
+  if (!parsed.success) {
+    return Response.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
+  const data = parsed.data;
 
-  if (action === "create") {
+  if (data.action === "create") {
     const [user] = await db
       .insert(users)
       .values({
-        name: body.name,
-        avatarEmoji: body.avatarEmoji ?? "💪",
-        pinHash: body.pinHash ? await hashPin(body.pinHash) : null,
+        name: data.name,
+        avatarEmoji: data.avatarEmoji ?? "💪",
+        pinHash: data.pinHash ? await hashPin(data.pinHash) : null,
       })
       .returning();
 
@@ -35,11 +40,11 @@ export async function POST(request: Request) {
     );
   }
 
-  if (action === "verify-pin") {
+  if (data.action === "verify-pin") {
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.id, body.userId))
+      .where(eq(users.id, data.userId))
       .limit(1);
 
     if (!user) {
@@ -51,7 +56,7 @@ export async function POST(request: Request) {
       return Response.json({ verified: true });
     }
 
-    const verified = user.pinHash === await hashPin(body.pin);
+    const verified = user.pinHash === await hashPin(data.pin);
     return Response.json({ verified });
   }
 
