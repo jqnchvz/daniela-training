@@ -3,6 +3,15 @@
  * These are NOT raw DB models — they reflect the JSON sent over the wire.
  */
 
+// ── Paginated envelope ────────────────────────────────────────────────────
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 // ── GET /api/sessions ──────────────────────────────────────────────────────
 
 export interface SessionSetResponse {

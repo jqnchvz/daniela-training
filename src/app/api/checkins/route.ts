@@ -1,19 +1,35 @@
 import { db } from "@/lib/db";
 import { checkins } from "@/lib/db/schema";
 import { checkinSchema } from "@/lib/validations";
-import { desc, eq, and, sql } from "drizzle-orm";
+import { count, desc, eq, and, sql } from "drizzle-orm";
+
+const DEFAULT_LIMIT = 100;
+const MAX_LIMIT = 200;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
 
-  const rows = await db
-    .select()
-    .from(checkins)
-    .where(userId ? eq(checkins.userId, userId) : undefined)
-    .orderBy(desc(checkins.date));
+  const limit = Math.min(
+    Math.max(1, Number(searchParams.get("limit")) || DEFAULT_LIMIT),
+    MAX_LIMIT,
+  );
+  const offset = Math.max(0, Number(searchParams.get("offset")) || 0);
 
-  return Response.json(rows);
+  const whereClause = userId ? eq(checkins.userId, userId) : undefined;
+
+  const [[{ total }], data] = await Promise.all([
+    db.select({ total: count() }).from(checkins).where(whereClause),
+    db
+      .select()
+      .from(checkins)
+      .where(whereClause)
+      .orderBy(desc(checkins.date))
+      .limit(limit)
+      .offset(offset),
+  ]);
+
+  return Response.json({ data, total, limit, offset });
 }
 
 export async function POST(request: Request) {

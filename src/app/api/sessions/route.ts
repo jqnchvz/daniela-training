@@ -1,20 +1,35 @@
 import { db } from "@/lib/db";
 import { sessions, sessionSets } from "@/lib/db/schema";
 import { sessionSchema } from "@/lib/validations";
-import { desc, eq } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
+
+const DEFAULT_LIMIT = 100;
+const MAX_LIMIT = 200;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
 
-  const query = db.query.sessions.findMany({
-    with: { sets: true },
-    orderBy: [desc(sessions.date)],
-    ...(userId ? { where: eq(sessions.userId, userId) } : {}),
-  });
+  const limit = Math.min(
+    Math.max(1, Number(searchParams.get("limit")) || DEFAULT_LIMIT),
+    MAX_LIMIT,
+  );
+  const offset = Math.max(0, Number(searchParams.get("offset")) || 0);
 
-  const rows = await query;
-  return Response.json(rows);
+  const whereClause = userId ? eq(sessions.userId, userId) : undefined;
+
+  const [[{ total }], data] = await Promise.all([
+    db.select({ total: count() }).from(sessions).where(whereClause),
+    db.query.sessions.findMany({
+      with: { sets: true },
+      orderBy: [desc(sessions.date)],
+      ...(whereClause ? { where: whereClause } : {}),
+      limit,
+      offset,
+    }),
+  ]);
+
+  return Response.json({ data, total, limit, offset });
 }
 
 export async function POST(request: Request) {
