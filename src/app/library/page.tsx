@@ -162,16 +162,18 @@ function ExerciseItem({
       {/* Expanded detail */}
       {isExpanded && (
         <div className="mt-1 rounded-[16px] border border-border bg-card p-4">
-          {currentUrl && (
-            <div className="rounded-[10px] overflow-hidden bg-surface2 mb-3">
-              <Image
-                src={currentUrl}
-                alt={name}
-                width={400}
-                height={200}
-                className="object-contain w-full h-auto max-h-[200px] transition-opacity duration-300"
-                unoptimized
-              />
+          {(cachedGif || ex.gifUrl) && (
+            <div className="relative rounded-[10px] overflow-hidden bg-surface2 mb-3 h-[200px]">
+              {cachedGif ? (
+                <Image src={cachedGif} alt={name} fill className="object-contain" unoptimized />
+              ) : (
+                <>
+                  <Image src={ex.gifUrl!} alt={name} fill className={`object-contain transition-opacity duration-500 ${showFrame2 ? "opacity-0" : "opacity-100"}`} unoptimized />
+                  {ex.gifUrl2 && (
+                    <Image src={ex.gifUrl2} alt={name} fill className={`object-contain transition-opacity duration-500 ${showFrame2 ? "opacity-100" : "opacity-0"}`} unoptimized />
+                  )}
+                </>
+              )}
             </div>
           )}
           {instructions.length > 0 && (

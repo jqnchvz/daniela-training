@@ -373,8 +373,15 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       {/* Exercise card */}
       <div className="mx-5 mt-4 rounded-[20px] border border-border bg-card overflow-hidden">
         <div className="relative h-[200px] bg-surface2 flex items-center justify-center border-b border-border">
-          {currentImageUrl ? (
-            <Image key={currentImageUrl} src={currentImageUrl} alt={exercise.name} fill className="object-contain transition-opacity duration-300" unoptimized />
+          {cachedGif ? (
+            <Image src={cachedGif} alt={exercise.name} fill className="object-contain" unoptimized />
+          ) : exercise?.gifUrl ? (
+            <>
+              <Image src={exercise.gifUrl} alt={exercise.name} fill className={`object-contain transition-opacity duration-500 ${showFrame2 ? "opacity-0" : "opacity-100"}`} unoptimized />
+              {exercise.gifUrl2 && (
+                <Image src={exercise.gifUrl2} alt={exercise.name} fill className={`object-contain transition-opacity duration-500 ${showFrame2 ? "opacity-100" : "opacity-0"}`} unoptimized />
+              )}
+            </>
           ) : (
             <span className="text-6xl">💪</span>
           )}
