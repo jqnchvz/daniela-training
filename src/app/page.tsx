@@ -275,11 +275,39 @@ export default function HomePage() {
               {t("home.restDay")}
             </p>
             <h2 className="font-heading text-[1.4rem] font-bold mt-2">
-              {t("home.recoveryDay")}
+              {t("home.recoveryDay")} 🧘
             </h2>
-            <p className="text-[13px] text-muted-foreground mt-1.5">
+            <p className="text-[13px] text-muted-foreground mt-1.5 mb-4">
               {t("home.nextSession")}: {t(`dayFull.${nextWorkout.dayOfWeek}`)} — {isEs ? nextWorkout.labelEs : nextWorkout.label}
             </p>
+
+            <div className="space-y-2.5">
+              <RecoveryTip
+                icon="🚶"
+                title={isEs ? "Caminata ligera" : "Light walk"}
+                desc={isEs ? "20-30 min a ritmo suave. Mejora el flujo sanguíneo y acelera la recuperación sin estresar el sistema nervioso." : "20-30 min at easy pace. Improves blood flow and speeds recovery without stressing the nervous system."}
+              />
+              <RecoveryTip
+                icon="🧘"
+                title={isEs ? "Estiramientos o yoga" : "Stretching or yoga"}
+                desc={isEs ? "15-20 min de estiramientos suaves o yoga restaurativo. Reduce el cortisol y mejora la movilidad articular." : "15-20 min of gentle stretching or restorative yoga. Lowers cortisol and improves joint mobility."}
+              />
+              <RecoveryTip
+                icon="😴"
+                title={isEs ? "Dormir 7-9 horas" : "Sleep 7-9 hours"}
+                desc={isEs ? "El sueño es cuando el cuerpo repara el tejido muscular. Con hipotiroidismo, la calidad del sueño es aún más crítica." : "Sleep is when the body repairs muscle tissue. With hypothyroidism, sleep quality is even more critical."}
+              />
+              <RecoveryTip
+                icon="💧"
+                title={isEs ? "Hidratación y nutrición" : "Hydration & nutrition"}
+                desc={isEs ? "Proteína suficiente (1.6-2g/kg) y buena hidratación apoyan la síntesis muscular y la función tiroidea." : "Adequate protein (1.6-2g/kg) and hydration support muscle synthesis and thyroid function."}
+              />
+              <RecoveryTip
+                icon="🧊"
+                title={isEs ? "Manejo del estrés" : "Stress management"}
+                desc={isEs ? "El estrés crónico eleva el cortisol y suprime la tiroides. Respiración profunda, meditación o tiempo en la naturaleza." : "Chronic stress elevates cortisol and suppresses thyroid. Deep breathing, meditation, or time in nature."}
+              />
+            </div>
           </>
         )}
       </div>
@@ -335,6 +363,18 @@ export default function HomePage() {
           </p>
         </div>
       )}
+    </div>
+  );
+}
+
+function RecoveryTip({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+  return (
+    <div className="flex items-start gap-2.5">
+      <span className="text-lg shrink-0 mt-0.5">{icon}</span>
+      <div>
+        <p className="font-semibold text-[13px]">{title}</p>
+        <p className="text-[11px] text-muted-foreground leading-relaxed">{desc}</p>
+      </div>
     </div>
   );
 }
