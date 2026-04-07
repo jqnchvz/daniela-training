@@ -62,6 +62,9 @@ export async function POST(request: Request) {
         mood: data.mood,
         soreness: data.soreness,
         notes: data.notes ?? "",
+        walkMinutes: data.walkMinutes ?? null,
+        didStretching: data.didStretching ?? null,
+        didYoga: data.didYoga ?? null,
       })
       .where(eq(checkins.id, existing[0].id))
       .returning();
@@ -81,6 +84,9 @@ export async function POST(request: Request) {
       mood: data.mood,
       soreness: data.soreness,
       notes: data.notes ?? "",
+      walkMinutes: data.walkMinutes ?? null,
+      didStretching: data.didStretching ?? null,
+      didYoga: data.didYoga ?? null,
     })
     .returning();
 

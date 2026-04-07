@@ -84,6 +84,9 @@ export const checkins = pgTable("checkins", {
   mood: integer("mood").notNull(),
   soreness: integer("soreness").notNull(),
   notes: text("notes").notNull().default(""),
+  walkMinutes: integer("walk_minutes"),
+  didStretching: boolean("did_stretching"),
+  didYoga: boolean("did_yoga"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

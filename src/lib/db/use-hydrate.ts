@@ -67,6 +67,9 @@ export function useHydrateFromDb() {
               mood: c.mood,
               soreness: c.soreness,
               notes: c.notes ?? "",
+              walkMinutes: c.walkMinutes ?? null,
+              didStretching: c.didStretching ?? null,
+              didYoga: c.didYoga ?? null,
             }))
           : [];
 

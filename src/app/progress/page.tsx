@@ -35,6 +35,9 @@ export default function ProgressPage() {
     mood: c.mood,
     soreness: c.soreness,
     notes: c.notes,
+    walkMinutes: c.walkMinutes ?? null,
+    didStretching: c.didStretching ?? null,
+    didYoga: c.didYoga ?? null,
   }));
   const redFlags = detectRedFlags(checkinData);
 
@@ -151,6 +154,18 @@ export default function ProgressPage() {
               </p>
               <div className="rounded-[16px] border border-border bg-card p-[18px] mb-3">
                 <VolumeChart data={weeklyVolumes} />
+              </div>
+            </>
+          )}
+
+          {/* Weekly LISS cardio */}
+          {checkins.some((c) => (c.walkMinutes ?? 0) > 0) && (
+            <>
+              <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mt-4 mb-2.5">
+                {t("progress.weeklyLiss")}
+              </p>
+              <div className="rounded-[16px] border border-border bg-card p-[18px] mb-3">
+                <LissChart checkins={checkins} />
               </div>
             </>
           )}
@@ -437,6 +452,59 @@ function VolumeChart({ data }: { data: WeeklyVolumePoint[] }) {
         );
       })}
     </svg>
+  );
+}
+
+function LissChart({ checkins }: { checkins: Array<{ date: string; walkMinutes: number | null }> }) {
+  const weekMap = new Map<string, number>();
+
+  for (const c of checkins) {
+    const date = new Date(c.date);
+    const day = date.getDay();
+    const monday = new Date(date);
+    monday.setDate(date.getDate() - (day === 0 ? 6 : day - 1));
+    const key = monday.toISOString().split("T")[0];
+    weekMap.set(key, (weekMap.get(key) ?? 0) + (c.walkMinutes ?? 0));
+  }
+
+  const data = Array.from(weekMap.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-8)
+    .map(([, minutes], i) => ({ label: `W${i + 1}`, minutes }));
+
+  if (data.length === 0) return null;
+
+  const maxMin = Math.max(150, ...data.map((d) => d.minutes));
+  const width = 300;
+  const height = 80;
+  const barWidth = Math.min(30, (width - 20) / data.length - 4);
+  const targetY = height - 15 - (150 / maxMin) * (height - 20);
+
+  return (
+    <>
+      <svg className="w-full h-20" viewBox={`0 0 ${width} ${height}`}>
+        {/* Target line at 150 min */}
+        <line x1="5" y1={targetY} x2={width - 5} y2={targetY} stroke="#8A847E" strokeWidth="1" strokeDasharray="4 3" opacity="0.5" />
+        <text x={width - 5} y={targetY - 3} fill="#8A847E" fontSize="7" fontFamily="JetBrains Mono" textAnchor="end">150</text>
+        {data.map((d, i) => {
+          const barHeight = maxMin > 0 ? (d.minutes / maxMin) * (height - 20) : 0;
+          const x = 10 + i * ((width - 20) / data.length) + ((width - 20) / data.length - barWidth) / 2;
+          const y = height - 15 - barHeight;
+          return (
+            <g key={i}>
+              <rect x={x} y={y} width={barWidth} height={barHeight} rx="4" fill="#7EC8A0" opacity="0.8" />
+              <text x={x + barWidth / 2} y={height - 3} fill="#8A847E" fontSize="8" fontFamily="JetBrains Mono" textAnchor="middle">
+                {d.label}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+      <div className="flex justify-between mt-1 text-[10px] text-muted-foreground">
+        <span>--- {tFn("progress.lissTarget")}</span>
+        <span>{data[data.length - 1].minutes} {tFn("progress.lissMinutes")}</span>
+      </div>
+    </>
   );
 }
 

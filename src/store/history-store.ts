@@ -37,6 +37,9 @@ export interface SavedCheckin {
   mood: number;
   soreness: number;
   notes: string;
+  walkMinutes: number | null;
+  didStretching: boolean | null;
+  didYoga: boolean | null;
 }
 
 export interface BodyMeasurement {

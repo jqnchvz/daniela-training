@@ -20,6 +20,9 @@ export default function CheckinPage() {
   const [mood, setMood] = useState(existing?.mood ?? 5);
   const [soreness, setSoreness] = useState(existing?.soreness ?? 3);
   const [notes, setNotes] = useState(existing?.notes ?? "");
+  const [walkMinutes, setWalkMinutes] = useState(existing?.walkMinutes ?? 0);
+  const [didStretching, setDidStretching] = useState(existing?.didStretching ?? false);
+  const [didYoga, setDidYoga] = useState(existing?.didYoga ?? false);
   const [saved, setSaved] = useState(!!existing);
   const [editing, setEditing] = useState(false);
   const t = useT();
@@ -33,6 +36,9 @@ export default function CheckinPage() {
       setMood(existing.mood);
       setSoreness(existing.soreness);
       setNotes(existing.notes);
+      setWalkMinutes(existing.walkMinutes ?? 0);
+      setDidStretching(existing.didStretching ?? false);
+      setDidYoga(existing.didYoga ?? false);
       setSaved(true);
     }
   }, [existing, editing]);
@@ -48,6 +54,9 @@ export default function CheckinPage() {
       mood,
       soreness,
       notes,
+      walkMinutes: walkMinutes || null,
+      didStretching: didStretching || null,
+      didYoga: didYoga || null,
     });
     setSaved(true);
     setEditing(false);
@@ -121,6 +130,45 @@ export default function CheckinPage() {
             maxLength={200}
             className="w-full rounded-[10px] border border-border bg-surface2 p-3 text-sm resize-none h-20"
           />
+        </div>
+
+        {/* LISS activity fields */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">{t("home.walkMinutes")}</label>
+          <input
+            type="number"
+            inputMode="numeric"
+            value={walkMinutes}
+            onChange={(e) => setWalkMinutes(Math.max(0, Math.min(300, Number(e.target.value) || 0)))}
+            step={5}
+            min={0}
+            max={300}
+            className="w-full rounded-[10px] border border-border bg-surface2 px-3 py-2 text-sm font-mono"
+          />
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setDidStretching(!didStretching)}
+            className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+              didStretching
+                ? "border-sage bg-sage-bg text-sage"
+                : "border-border bg-surface2 text-muted-foreground"
+            }`}
+          >
+            {didStretching ? "✓ " : ""}{t("home.stretching")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setDidYoga(!didYoga)}
+            className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+              didYoga
+                ? "border-sage bg-sage-bg text-sage"
+                : "border-border bg-surface2 text-muted-foreground"
+            }`}
+          >
+            {didYoga ? "✓ " : ""}{t("home.yoga")}
+          </button>
         </div>
 
         <button

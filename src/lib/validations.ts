@@ -43,6 +43,9 @@ export const checkinSchema = z.object({
   mood: z.number().int().min(1).max(10),
   soreness: z.number().int().min(1).max(10),
   notes: z.string().optional(),
+  walkMinutes: z.number().int().min(0).max(300).nullable().optional(),
+  didStretching: z.boolean().nullable().optional(),
+  didYoga: z.boolean().nullable().optional(),
 });
 
 // ── Cycle State ─────────────────────────────────────────────────────────────

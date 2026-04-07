@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -308,6 +308,9 @@ export default function HomePage() {
                 desc={t("recovery.stressDesc")}
               />
             </div>
+
+            {/* LISS activity log */}
+            <LissActivityCard />
           </>
         )}
       </div>
@@ -394,6 +397,102 @@ function WellnessCard({
         {value}
       </p>
       <p className="text-[10px] text-muted-foreground mt-0.5">{label}</p>
+    </div>
+  );
+}
+
+function LissActivityCard() {
+  const t = useT();
+  const history = useHistoryStore();
+  const activeUserId = useAuthStore((s) => s.activeUserId);
+  const today = new Date().toISOString().split("T")[0];
+  const existing = history.getCheckinForDate(today);
+
+  const [walkMinutes, setWalkMinutes] = useState(existing?.walkMinutes ?? 0);
+  const [didStretching, setDidStretching] = useState(existing?.didStretching ?? false);
+  const [didYoga, setDidYoga] = useState(existing?.didYoga ?? false);
+  const [saved, setSaved] = useState(false);
+
+  // Sync from store if checkin loads after hydration
+  useEffect(() => {
+    if (existing) {
+      setWalkMinutes(existing.walkMinutes ?? 0);
+      setDidStretching(existing.didStretching ?? false);
+      setDidYoga(existing.didYoga ?? false);
+    }
+  }, [existing]);
+
+  const handleSave = useCallback(() => {
+    history.addCheckin({
+      id: existing?.id ?? crypto.randomUUID(),
+      userId: activeUserId ?? undefined,
+      date: today,
+      energy: existing?.energy ?? 5,
+      sleepQuality: existing?.sleepQuality ?? 5,
+      sleepHours: existing?.sleepHours ?? 7,
+      mood: existing?.mood ?? 5,
+      soreness: existing?.soreness ?? 3,
+      notes: existing?.notes ?? "",
+      walkMinutes,
+      didStretching,
+      didYoga,
+    });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }, [existing, activeUserId, today, walkMinutes, didStretching, didYoga, history]);
+
+  return (
+    <div className="mt-4 rounded-[16px] border border-border bg-card p-4">
+      <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mb-3">
+        {t("home.todayActivity")}
+      </p>
+
+      {/* Walk minutes */}
+      <div className="mb-3">
+        <label className="text-sm font-medium">{t("home.walkMinutes")}</label>
+        <input
+          type="number"
+          inputMode="numeric"
+          value={walkMinutes}
+          onChange={(e) => setWalkMinutes(Math.max(0, Math.min(300, Number(e.target.value) || 0)))}
+          step={5}
+          min={0}
+          max={300}
+          className="w-full mt-1 rounded-[10px] border border-border bg-surface2 px-3 py-2 text-sm font-mono"
+        />
+      </div>
+
+      {/* Toggle buttons */}
+      <div className="flex gap-2 mb-3">
+        <button
+          onClick={() => setDidStretching(!didStretching)}
+          className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+            didStretching
+              ? "border-sage bg-sage-bg text-sage"
+              : "border-border bg-surface2 text-muted-foreground"
+          }`}
+        >
+          {didStretching ? "✓ " : ""}{t("home.stretching")}
+        </button>
+        <button
+          onClick={() => setDidYoga(!didYoga)}
+          className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+            didYoga
+              ? "border-sage bg-sage-bg text-sage"
+              : "border-border bg-surface2 text-muted-foreground"
+          }`}
+        >
+          {didYoga ? "✓ " : ""}{t("home.yoga")}
+        </button>
+      </div>
+
+      {/* Save button */}
+      <button
+        onClick={handleSave}
+        className="w-full rounded-[12px] bg-sage py-2.5 text-[13px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
+      >
+        {saved ? t("home.activitySaved") : t("home.logActivity")}
+      </button>
     </div>
   );
 }

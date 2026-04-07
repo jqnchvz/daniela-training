@@ -21,6 +21,9 @@ function makeCheckin(
     mood: 7,
     soreness: 3,
     notes: "",
+    walkMinutes: null,
+    didStretching: null,
+    didYoga: null,
     ...overrides,
   };
 }

@@ -380,6 +380,17 @@ const translations: Record<string, Record<Locale, string>> = {
   "dayFull.4": { en: "Thursday", es: "Jueves" },
   "dayFull.5": { en: "Friday", es: "Viernes" },
   "dayFull.6": { en: "Saturday", es: "Sábado" },
+
+  // LISS tracking
+  "home.todayActivity": { en: "Today's activity", es: "Actividad de hoy" },
+  "home.walkMinutes": { en: "Walk (min)", es: "Caminata (min)" },
+  "home.stretching": { en: "Stretching", es: "Estiramientos" },
+  "home.yoga": { en: "Yoga", es: "Yoga" },
+  "home.activitySaved": { en: "Activity logged!", es: "¡Actividad registrada!" },
+  "home.logActivity": { en: "Log activity", es: "Registrar actividad" },
+  "progress.weeklyLiss": { en: "Weekly LISS cardio", es: "Cardio LISS semanal" },
+  "progress.lissTarget": { en: "150 min target", es: "Objetivo 150 min" },
+  "progress.lissMinutes": { en: "min", es: "min" },
 };
 
 export function t(key: string, locale?: Locale): string {

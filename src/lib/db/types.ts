@@ -56,6 +56,9 @@ export interface CheckinResponse {
   mood: number;
   soreness: number;
   notes: string;
+  walkMinutes: number | null;
+  didStretching: boolean | null;
+  didYoga: boolean | null;
   createdAt: string;
 }
 
