@@ -106,3 +106,18 @@ export const cycleState = pgTable("cycle_state", {
 export const cycleStateRelations = relations(cycleState, ({ one }) => ({
   user: one(users, { fields: [cycleState.userId], references: [users.id] }),
 }));
+
+// ── Exercise Cache (from ExerciseDB API) ────────────────────────────────────
+
+export const exerciseCache = pgTable("exercise_cache", {
+  exerciseId: text("exercise_id").primaryKey(),
+  exercisedbId: text("exercisedb_id"),
+  name: text("name").notNull(),
+  gifUrl: text("gif_url"),
+  instructions: text("instructions").array(),
+  targetMuscles: text("target_muscles").array(),
+  bodyParts: text("body_parts").array(),
+  equipments: text("equipments").array(),
+  secondaryMuscles: text("secondary_muscles").array(),
+  syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+});
