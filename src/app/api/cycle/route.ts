@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { cycleState } from "@/lib/db/schema";
 import { cycleSchema } from "@/lib/validations";
-import { eq } from "drizzle-orm";
+import { eq, or, isNull } from "drizzle-orm";
 
 const SINGLETON_ID = "00000000-0000-4000-8000-000000000001";
 
@@ -10,10 +10,11 @@ export async function GET(request: Request) {
   const userId = searchParams.get("userId");
 
   if (userId) {
+    // Match by userId, or fall back to rows with null userId (legacy/singleton)
     const rows = await db
       .select()
       .from(cycleState)
-      .where(eq(cycleState.userId, userId))
+      .where(or(eq(cycleState.userId, userId), isNull(cycleState.userId)))
       .limit(1);
     return Response.json(rows[0] ?? null);
   }
@@ -45,6 +46,7 @@ export async function POST(request: Request) {
     .onConflictDoUpdate({
       target: cycleState.id,
       set: {
+        userId: data.userId ?? null,
         cycleStartDate: data.cycleStartDate,
         extensionWeeks: data.extensionWeeks ?? 0,
         lastDeloadDate: data.lastDeloadDate,

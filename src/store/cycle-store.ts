@@ -73,7 +73,11 @@ export const useCycleStore = create<CycleState>()(
 function syncCycleAfterUpdate() {
   setTimeout(() => {
     const s = useCycleStore.getState();
+    // Lazy-import auth store to include userId in the sync payload
+    const { useAuthStore } = require("@/store/auth-store");
+    const userId = useAuthStore.getState().activeUserId;
     enqueueWrite("/api/cycle", {
+      userId: userId ?? undefined,
       cycleStartDate: s.cycleStartDate,
       extensionWeeks: s.extensionWeeks,
       lastDeloadDate: s.lastDeloadDate,
