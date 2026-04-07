@@ -3,7 +3,14 @@
  * Database is the single source of truth — no localStorage persistence for data.
  */
 
-export async function fetchSessionsFromDb(userId?: string): Promise<Record<string, unknown>[] | null> {
+import type {
+  SessionResponse,
+  CheckinResponse,
+  CycleResponse,
+  UserResponse,
+} from "./types";
+
+export async function fetchSessionsFromDb(userId?: string): Promise<SessionResponse[] | null> {
   try {
     const url = userId ? `/api/sessions?userId=${userId}` : "/api/sessions";
     const res = await fetch(url);
@@ -14,7 +21,7 @@ export async function fetchSessionsFromDb(userId?: string): Promise<Record<strin
   }
 }
 
-export async function fetchCheckinsFromDb(userId?: string): Promise<Record<string, unknown>[] | null> {
+export async function fetchCheckinsFromDb(userId?: string): Promise<CheckinResponse[] | null> {
   try {
     const url = userId ? `/api/checkins?userId=${userId}` : "/api/checkins";
     const res = await fetch(url);
@@ -25,7 +32,7 @@ export async function fetchCheckinsFromDb(userId?: string): Promise<Record<strin
   }
 }
 
-export async function fetchCycleFromDb(userId?: string): Promise<Record<string, unknown> | null> {
+export async function fetchCycleFromDb(userId?: string): Promise<CycleResponse | null> {
   try {
     const url = userId ? `/api/cycle?userId=${userId}` : "/api/cycle";
     const res = await fetch(url);
@@ -36,7 +43,7 @@ export async function fetchCycleFromDb(userId?: string): Promise<Record<string, 
   }
 }
 
-export async function fetchUsers(): Promise<Record<string, unknown>[] | null> {
+export async function fetchUsers(): Promise<UserResponse[] | null> {
   try {
     const res = await fetch("/api/users");
     if (!res.ok) return null;

@@ -92,12 +92,7 @@ export default function HomePage() {
                 try {
                   const data = await fetchUsers();
                   if (data) {
-                    setAllUsers(data.map((u) => ({
-                      id: u.id as string,
-                      name: u.name as string,
-                      avatarEmoji: u.avatarEmoji as string,
-                      hasPin: u.hasPin as boolean,
-                    })));
+                    setAllUsers(data);
                   }
                 } catch { /* offline */ }
               }
