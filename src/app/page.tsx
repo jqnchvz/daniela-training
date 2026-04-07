@@ -7,6 +7,9 @@ import {
   getTodaysWorkout,
   getNextWorkout,
 } from "@/lib/workout-schedule";
+import { WORKOUT_PLANS, getLiteExercises } from "@/lib/exercises";
+import { getSessionProtocol } from "@/lib/session-protocols";
+import { estimateSessionDuration } from "@/lib/session-duration";
 import { getCurrentPhase } from "@/lib/phases";
 import { getDeloadStatus } from "@/lib/progression";
 import { detectRedFlags } from "@/lib/checkin";
@@ -57,6 +60,12 @@ export default function HomePage() {
   const todaysWorkout = getTodaysWorkout();
   const nextWorkout = getNextWorkout();
   const today = new Date().getDay();
+
+  // Dynamic duration based on actual plan data
+  const todayPlan = todaysWorkout ? WORKOUT_PLANS.find((p) => p.dayOfWeek === todaysWorkout.dayOfWeek) : null;
+  const todayProtocol = todayPlan ? getSessionProtocol(todayPlan.id) : null;
+  const fullDuration = todayPlan && todayProtocol ? estimateSessionDuration(todayPlan.exercises, todayProtocol.warmupMinutes, todayProtocol.cooldownMinutes) : 0;
+  const liteDuration = todayPlan && todayProtocol ? estimateSessionDuration(getLiteExercises(todayPlan.exercises), todayProtocol.warmupMinutes, todayProtocol.cooldownMinutes) : 0;
 
   const phaseStatus = cycle.cycleStartDate
     ? getCurrentPhase(cycle.cycleStartDate, cycle.extensionWeeks)
@@ -228,7 +237,7 @@ export default function HomePage() {
               {isEs ? todaysWorkout.labelEs : todaysWorkout.label}
             </h2>
             <p className="text-[13px] text-muted-foreground mt-1.5">
-              {todaysWorkout.exercises} {t("common.exercises")} &middot; {todaysWorkout.duration}
+              {todaysWorkout.exercises} {t("common.exercises")} &middot; ~{fullDuration} min
             </p>
             {phaseStatus && (
               <p className="text-[11px] text-sage mt-1">
@@ -238,7 +247,7 @@ export default function HomePage() {
             )}
             <div className="flex gap-4 mt-4 mb-5">
               <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                ⏱ {todaysWorkout.duration}
+                ⏱ ~{fullDuration} min
               </span>
               <span className="text-xs text-muted-foreground flex items-center gap-1.5">
                 📋 {todaysWorkout.exercises} {t("common.exercises")}
