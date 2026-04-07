@@ -86,13 +86,13 @@ export default function SessionPage() {
                 </div>
                 <div className="flex gap-3 mt-2">
                   <span className="text-[11px] text-muted-foreground">
-                    ⏱ ~{fullMinutes} min {liteMinutes < fullMinutes && <span className="text-sage">· {isEs ? "ligera" : "lite"} ~{liteMinutes} min</span>}
+                    ⏱ ~{fullMinutes} min {liteMinutes < fullMinutes && <span className="text-sage">· {t("session.liteSession")} ~{liteMinutes} min</span>}
                   </span>
                   <span className="text-[11px] text-muted-foreground">
                     📋 {plan.exercises.length} {t("common.exercises")}
                   </span>
                   <span className="text-[11px] text-muted-foreground">
-                    🔥 {protocol.warmupMinutes} min {isEs ? "calentamiento" : "warmup"}
+                    🔥 {protocol.warmupMinutes} min {t("session.warmup").toLowerCase()}
                   </span>
                 </div>
               </button>

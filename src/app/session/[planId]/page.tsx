@@ -456,7 +456,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
                   setSetInputs(updated);
                 }}
                 className="w-16 rounded-lg border border-border bg-surface2 px-2.5 py-2 font-mono text-sm text-center disabled:opacity-40"
-                placeholder="reps"
+                placeholder={t("session.reps")}
               />
               <button
                 disabled={isDone || !isNext}

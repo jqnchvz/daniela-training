@@ -188,9 +188,9 @@ export default function ProgressPage() {
         {showMeasForm ? (
           <div className="mt-3 space-y-2">
             <div className="flex gap-2">
-              <MeasInput label="Waist" value={waist} onChange={setWaist} />
-              <MeasInput label="Hip" value={hip} onChange={setHip} />
-              <MeasInput label="Thigh" value={thigh} onChange={setThigh} />
+              <MeasInput label={locale === "es" ? "Cintura" : "Waist"} value={waist} onChange={setWaist} />
+              <MeasInput label={locale === "es" ? "Cadera" : "Hip"} value={hip} onChange={setHip} />
+              <MeasInput label={locale === "es" ? "Muslo" : "Thigh"} value={thigh} onChange={setThigh} />
             </div>
             <div className="flex gap-2">
               <button
@@ -390,11 +390,11 @@ function StrengthChart({ data }: { data: ExerciseDataPoint[] }) {
         </text>
       </svg>
       <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-        <span>Started: <span className="text-muted-foreground">{data[0].maxWeight} kg</span></span>
+        <span>{tFn("progress.started")}: <span className="text-muted-foreground">{data[0].maxWeight} kg</span></span>
         {data.length > 1 && (
           <span>
             {data[data.length - 1].maxWeight >= data[0].maxWeight ? "+" : ""}
-            {data[data.length - 1].maxWeight - data[0].maxWeight} kg over {data.length} sessions
+            {data[data.length - 1].maxWeight - data[0].maxWeight} kg · {data.length} {tFn("history.sessions")}
           </span>
         )}
       </div>
@@ -447,9 +447,9 @@ function WellnessChart({ checkins }: { checkins: Array<{ date: string; energy: n
       <polyline points={energyPoints} stroke="#9B8EC4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       <polyline points={sleepPoints} stroke="#5a9fd4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2" />
       <line x1="10" y1="10" x2="25" y2="10" stroke="#9B8EC4" strokeWidth="2" />
-      <text x="28" y="14" fill="#9B8EC4" fontSize="9">Energy</text>
+      <text x="28" y="14" fill="#9B8EC4" fontSize="9">{tFn("home.energy")}</text>
       <line x1="80" y1="10" x2="95" y2="10" stroke="#5a9fd4" strokeWidth="2" strokeDasharray="4 2" />
-      <text x="98" y="14" fill="#5a9fd4" fontSize="9">Sleep</text>
+      <text x="98" y="14" fill="#5a9fd4" fontSize="9">{tFn("checkin.sleepQuality")}</text>
     </svg>
   );
 }
@@ -503,9 +503,9 @@ function MeasurementsChart({ data }: { data: Array<{ date: string; waist: number
       {hipPts && <polyline points={hipPts} stroke="#E4A0A0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />}
       {thighPts && <polyline points={thighPts} stroke="#5a9fd4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />}
       {/* Legend */}
-      {waistPts && <><line x1="10" y1="8" x2="22" y2="8" stroke="#9B8EC4" strokeWidth="2" /><text x="25" y="11" fill="#9B8EC4" fontSize="8">Waist</text></>}
-      {hipPts && <><line x1="65" y1="8" x2="77" y2="8" stroke="#E4A0A0" strokeWidth="2" /><text x="80" y="11" fill="#E4A0A0" fontSize="8">Hip</text></>}
-      {thighPts && <><line x1="110" y1="8" x2="122" y2="8" stroke="#5a9fd4" strokeWidth="2" /><text x="125" y="11" fill="#5a9fd4" fontSize="8">Thigh</text></>}
+      {waistPts && <><line x1="10" y1="8" x2="22" y2="8" stroke="#9B8EC4" strokeWidth="2" /><text x="25" y="11" fill="#9B8EC4" fontSize="8">{tFn("progress.waist")}</text></>}
+      {hipPts && <><line x1="65" y1="8" x2="77" y2="8" stroke="#E4A0A0" strokeWidth="2" /><text x="80" y="11" fill="#E4A0A0" fontSize="8">{tFn("progress.hip")}</text></>}
+      {thighPts && <><line x1="110" y1="8" x2="122" y2="8" stroke="#5a9fd4" strokeWidth="2" /><text x="125" y="11" fill="#5a9fd4" fontSize="8">{tFn("progress.thigh")}</text></>}
     </svg>
   );
 }

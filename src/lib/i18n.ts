@@ -154,6 +154,10 @@ const translations: Record<string, Record<Locale, string>> = {
   "progress.waistCm": { en: "Waist cm", es: "Cintura cm" },
   "progress.hipCm": { en: "Hip cm", es: "Cadera cm" },
   "progress.thighCm": { en: "Thigh cm", es: "Muslo cm" },
+  "progress.waist": { en: "Waist", es: "Cintura" },
+  "progress.hip": { en: "Hip", es: "Cadera" },
+  "progress.thigh": { en: "Thigh", es: "Muslo" },
+  "progress.started": { en: "Started", es: "Inicio" },
   "progress.needAtLeast2": { en: "Need at least 2 sessions with this exercise to show a trend.", es: "Se necesitan al menos 2 sesiones con este ejercicio para mostrar una tendencia." },
   "progress.energyRedFlag": {
     en: "Your 7-day energy average ({avg7}) is significantly lower than your 30-day average ({avg30}). Consider checking recovery, sleep, and stress levels.",
