@@ -113,6 +113,11 @@ export default function HomePage() {
               {mounted ? t(greetingKey) : t("home.goodMorning")} ☀️
             </p>
             <h1 className="font-heading text-[1.35rem] font-bold">{activeUserName ?? "Daniela"}</h1>
+            {mounted && (
+              <p className="text-[11px] text-muted-foreground/60">
+                {new Date().toLocaleDateString(isEs ? "es" : "en", { weekday: "long", day: "numeric", month: "long" })}
+              </p>
+            )}
           </div>
 
           {/* User switcher dropdown */}
