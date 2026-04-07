@@ -6,14 +6,13 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import {
   getTodaysWorkout,
   getNextWorkout,
-  getDayName,
 } from "@/lib/workout-schedule";
 import { getCurrentPhase } from "@/lib/phases";
 import { getDeloadStatus } from "@/lib/progression";
 import { detectRedFlags } from "@/lib/checkin";
 import { useCycleStore } from "@/store/cycle-store";
 import { useHistoryStore } from "@/store/history-store";
-import { useT } from "@/lib/i18n";
+import { useT, useI18n } from "@/lib/i18n";
 import { useAuthStore, type User } from "@/store/auth-store";
 import { fetchUsers } from "@/lib/db/sync";
 
@@ -23,6 +22,8 @@ export default function HomePage() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const t = useT();
+  const locale = useI18n((s) => s.locale);
+  const isEs = locale === "es";
   const cycle = useCycleStore();
   const history = useHistoryStore();
   const activeUserName = useAuthStore((s) => s.activeUserName);
@@ -221,18 +222,17 @@ export default function HomePage() {
         {todaysWorkout ? (
           <>
             <p className="text-[11px] font-semibold tracking-[2px] uppercase text-sage">
-              Today · {todaysWorkout.name}
+              {t("home.today")} · {isEs ? todaysWorkout.nameEs : todaysWorkout.name}
             </p>
             <h2 className="font-heading text-[1.6rem] font-extrabold leading-tight mt-2">
-              {todaysWorkout.label}
+              {isEs ? todaysWorkout.labelEs : todaysWorkout.label}
             </h2>
             <p className="text-[13px] text-muted-foreground mt-1.5">
-              {todaysWorkout.exercises} exercises &middot; {todaysWorkout.duration}
+              {todaysWorkout.exercises} {t("common.exercises")} &middot; {todaysWorkout.duration}
             </p>
             {phaseStatus && (
               <p className="text-[11px] text-sage mt-1">
-                Phase {phaseStatus.phase.phase}: aim for{" "}
-                {phaseStatus.phase.setsMax}×{phaseStatus.phase.repsMin}-
+                {t("home.phase")} {phaseStatus.phase.phase}: {phaseStatus.phase.setsMax}×{phaseStatus.phase.repsMin}-
                 {phaseStatus.phase.repsMax}
               </p>
             )}
@@ -241,7 +241,7 @@ export default function HomePage() {
                 ⏱ {todaysWorkout.duration}
               </span>
               <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                📋 {todaysWorkout.exercises} exercises
+                📋 {todaysWorkout.exercises} {t("common.exercises")}
               </span>
             </div>
             <Link
@@ -260,7 +260,7 @@ export default function HomePage() {
               {t("home.recoveryDay")}
             </h2>
             <p className="text-[13px] text-muted-foreground mt-1.5">
-              Next: {getDayName(nextWorkout.dayOfWeek)} — {nextWorkout.name}
+              {t("home.nextSession")}: {t(`dayFull.${nextWorkout.dayOfWeek}`)} — {isEs ? nextWorkout.labelEs : nextWorkout.label}
             </p>
           </>
         )}

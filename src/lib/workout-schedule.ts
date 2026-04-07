@@ -1,6 +1,8 @@
 export type WorkoutDay = {
   name: string;
+  nameEs: string;
   label: string;
+  labelEs: string;
   dayOfWeek: number; // 0=Sun, 1=Mon, ...
   exercises: number;
   duration: string;
@@ -9,21 +11,27 @@ export type WorkoutDay = {
 export const WORKOUT_SCHEDULE: WorkoutDay[] = [
   {
     name: "Day A",
+    nameEs: "Día A",
     label: "Push Focus",
+    labelEs: "Enfoque Empuje",
     dayOfWeek: 1,
     exercises: 6,
     duration: "~50 min",
   },
   {
     name: "Day B",
+    nameEs: "Día B",
     label: "Pull Focus",
+    labelEs: "Enfoque Tirón",
     dayOfWeek: 3,
     exercises: 6,
     duration: "~50 min",
   },
   {
     name: "Day C",
+    nameEs: "Día C",
     label: "Legs / Full Body",
+    labelEs: "Piernas / Cuerpo Completo",
     dayOfWeek: 5,
     exercises: 6,
     duration: "~50 min",
@@ -50,25 +58,4 @@ export function getNextWorkout(): WorkoutDay & { daysUntil: number } {
   }
 
   return { ...next, daysUntil: minDays };
-}
-
-export function getGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
-}
-
-const DAY_NAMES = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
-export function getDayName(dayOfWeek: number): string {
-  return DAY_NAMES[dayOfWeek];
 }

@@ -2,8 +2,6 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import {
   getTodaysWorkout,
   getNextWorkout,
-  getGreeting,
-  getDayName,
   WORKOUT_SCHEDULE,
 } from "@/lib/workout-schedule";
 
@@ -24,6 +22,8 @@ describe("Workout Schedule", () => {
     expect(workout).not.toBeNull();
     expect(workout!.name).toBe("Day A");
     expect(workout!.label).toBe("Push Focus");
+    expect(workout!.nameEs).toBe("Día A");
+    expect(workout!.labelEs).toBe("Enfoque Empuje");
     vi.useRealTimers();
   });
 
@@ -71,27 +71,5 @@ describe("Workout Schedule", () => {
     expect(next.name).toBe("Day A"); // Monday
     expect(next.daysUntil).toBe(2);
     vi.useRealTimers();
-  });
-
-  it("returns correct greeting based on time", () => {
-    vi.useFakeTimers();
-
-    vi.setSystemTime(new Date("2026-04-06T07:00:00"));
-    expect(getGreeting()).toBe("Good morning");
-
-    vi.setSystemTime(new Date("2026-04-06T14:00:00"));
-    expect(getGreeting()).toBe("Good afternoon");
-
-    vi.setSystemTime(new Date("2026-04-06T20:00:00"));
-    expect(getGreeting()).toBe("Good evening");
-
-    vi.useRealTimers();
-  });
-
-  it("returns correct day names", () => {
-    expect(getDayName(0)).toBe("Sunday");
-    expect(getDayName(1)).toBe("Monday");
-    expect(getDayName(3)).toBe("Wednesday");
-    expect(getDayName(5)).toBe("Friday");
   });
 });
