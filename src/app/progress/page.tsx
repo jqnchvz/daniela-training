@@ -24,6 +24,7 @@ export default function ProgressPage() {
   const [waist, setWaist] = useState(latestMeasurement?.waist?.toString() ?? "");
   const [hip, setHip] = useState(latestMeasurement?.hip?.toString() ?? "");
   const [thigh, setThigh] = useState(latestMeasurement?.thigh?.toString() ?? "");
+  const [weightKg, setWeightKg] = useState(latestMeasurement?.weightKg?.toString() ?? "");
 
   // Convert checkins to the format detectRedFlags expects
   const checkinData: CheckinData[] = checkins.map((c) => ({
@@ -177,11 +178,21 @@ export default function ProgressPage() {
           <MetricBox value={latestMeasurement?.waist ? `${latestMeasurement.waist}` : "—"} label={t("progress.waistCm")} />
           <MetricBox value={latestMeasurement?.hip ? `${latestMeasurement.hip}` : "—"} label={t("progress.hipCm")} />
           <MetricBox value={latestMeasurement?.thigh ? `${latestMeasurement.thigh}` : "—"} label={t("progress.thighCm")} />
+          <MetricBox value={latestMeasurement?.weightKg ? `${latestMeasurement.weightKg}` : "—"} label={t("progress.weightKg")} />
         </div>
 
         {allMeasurements.length >= 2 && (
           <div className="mt-3">
             <MeasurementsChart data={allMeasurements} />
+          </div>
+        )}
+
+        {allMeasurements.filter((m) => m.weightKg != null).length >= 2 && (
+          <div className="mt-3">
+            <p className="text-[10px] font-semibold tracking-[1px] uppercase text-muted-foreground font-mono mb-1.5">
+              {t("progress.weightTrend")}
+            </p>
+            <WeightChart data={allMeasurements} />
           </div>
         )}
 
@@ -191,6 +202,7 @@ export default function ProgressPage() {
               <MeasInput label={t("progress.waist")} value={waist} onChange={setWaist} />
               <MeasInput label={t("progress.hip")} value={hip} onChange={setHip} />
               <MeasInput label={t("progress.thigh")} value={thigh} onChange={setThigh} />
+              <MeasInput label={t("progress.weight")} value={weightKg} onChange={setWeightKg} unit="kg" />
             </div>
             <div className="flex gap-2">
               <button
@@ -208,6 +220,7 @@ export default function ProgressPage() {
                     waist: waist ? Number(waist) : null,
                     hip: hip ? Number(hip) : null,
                     thigh: thigh ? Number(thigh) : null,
+                    weightKg: weightKg ? Number(weightKg) : null,
                   });
                   setShowMeasForm(false);
                 }}
@@ -510,10 +523,57 @@ function MeasurementsChart({ data }: { data: Array<{ date: string; waist: number
   );
 }
 
-function MeasInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function WeightChart({ data }: { data: Array<{ date: string; weightKg: number | null }> }) {
+  const points = data
+    .map((d, i) => (d.weightKg != null ? { i, date: d.date, value: d.weightKg } : null))
+    .filter(Boolean) as { i: number; date: string; value: number }[];
+
+  if (points.length < 2) return null;
+
+  const width = 300;
+  const height = 60;
+  const padding = 5;
+
+  const min = Math.min(...points.map((p) => p.value)) - 1;
+  const max = Math.max(...points.map((p) => p.value)) + 1;
+  const range = max - min || 1;
+
+  const coords = points.map((p, idx) => {
+    const x = points.length === 1 ? width / 2 : (idx / (points.length - 1)) * (width - padding * 2) + padding;
+    const y = height - padding - ((p.value - min) / range) * (height - padding * 2 - 10);
+    return { x, y, value: p.value };
+  });
+
+  // Rolling average (window of 4)
+  const rollingAvg: { x: number; y: number }[] = [];
+  for (let idx = 0; idx < coords.length; idx++) {
+    const windowStart = Math.max(0, idx - 3);
+    const windowSlice = coords.slice(windowStart, idx + 1);
+    const avg = windowSlice.reduce((s, c) => s + c.value, 0) / windowSlice.length;
+    const y = height - padding - ((avg - min) / range) * (height - padding * 2 - 10);
+    rollingAvg.push({ x: coords[idx].x, y });
+  }
+
+  const avgPolyline = rollingAvg.map((p) => `${p.x},${p.y}`).join(" ");
+
+  return (
+    <svg className="w-full h-[60px]" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+      <polyline points={avgPolyline} stroke="#7EC8A0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      {coords.map((c, idx) => (
+        <circle key={idx} cx={c.x} cy={c.y} r={3} fill="#7EC8A0" opacity="0.5" />
+      ))}
+      <circle cx="10" cy="8" r="2.5" fill="#7EC8A0" opacity="0.5" />
+      <text x="16" y="11" fill="#7EC8A0" fontSize="8">{tFn("progress.weight")}</text>
+      <line x1="60" y1="8" x2="75" y2="8" stroke="#7EC8A0" strokeWidth="2" />
+      <text x="78" y="11" fill="#7EC8A0" fontSize="8">{tFn("progress.rollingAvg")}</text>
+    </svg>
+  );
+}
+
+function MeasInput({ label, value, onChange, unit = "cm" }: { label: string; value: string; onChange: (v: string) => void; unit?: string }) {
   return (
     <div className="flex-1">
-      <label className="text-[10px] text-muted-foreground mb-1 block">{label} (cm)</label>
+      <label className="text-[10px] text-muted-foreground mb-1 block">{label} ({unit})</label>
       <input
         type="number"
         inputMode="decimal"

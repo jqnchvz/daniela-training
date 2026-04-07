@@ -46,6 +46,7 @@ export interface BodyMeasurement {
   waist: number | null;
   hip: number | null;
   thigh: number | null;
+  weightKg: number | null;
 }
 
 interface HistoryState {

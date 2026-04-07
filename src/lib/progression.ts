@@ -172,7 +172,7 @@ export function getDeloadStatus(
       isDeloadWeek: true,
       earlyDeloadSuggested: false,
       message:
-        "DELOAD WEEK: Same exercises, half the sets. Your body needs this to get stronger.",
+        "DELOAD WEEK: Same exercises, half the sets, 60% weight. Your body needs this to get stronger.",
     };
   }
 
@@ -183,7 +183,7 @@ export function getDeloadStatus(
       isDeloadWeek: false,
       earlyDeloadSuggested: false,
       message:
-        "Deload week coming up! Next week, same exercises but half the sets. Recovery is where progress happens.",
+        "Deload week coming up! Next week, same exercises but half the sets and 60% weight. Recovery is where progress happens.",
     };
   }
 
@@ -199,10 +199,18 @@ export function getDeloadStatus(
 }
 
 /**
- * Apply deload to a workout plan's sets (halve them).
+ * Apply deload to a workout plan's sets and weight.
  */
-export function applyDeload(targetSets: number): number {
-  return Math.max(1, Math.ceil(targetSets / 2));
+export interface DeloadAdjustment {
+  sets: number;
+  weightMultiplier: number;
+}
+
+export function applyDeload(targetSets: number): DeloadAdjustment {
+  return {
+    sets: Math.max(1, Math.ceil(targetSets / 2)),
+    weightMultiplier: 0.6,
+  };
 }
 
 /**

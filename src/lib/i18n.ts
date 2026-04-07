@@ -157,6 +157,10 @@ const translations: Record<string, Record<Locale, string>> = {
   "progress.waist": { en: "Waist", es: "Cintura" },
   "progress.hip": { en: "Hip", es: "Cadera" },
   "progress.thigh": { en: "Thigh", es: "Muslo" },
+  "progress.weightKg": { en: "Weight kg", es: "Peso kg" },
+  "progress.weight": { en: "Weight", es: "Peso" },
+  "progress.weightTrend": { en: "Weight trend", es: "Tendencia de peso" },
+  "progress.rollingAvg": { en: "4-week avg", es: "Promedio 4 sem" },
   "progress.started": { en: "Started", es: "Inicio" },
   "progress.needAtLeast2": { en: "Need at least 2 sessions with this exercise to show a trend.", es: "Se necesitan al menos 2 sesiones con este ejercicio para mostrar una tendencia." },
   "progress.energyRedFlag": {
@@ -236,7 +240,7 @@ const translations: Record<string, Record<Locale, string>> = {
     es: "El hipotiroidismo ralentiza el metabolismo y la recuperación. Este programa se adapta: descansos más largos para el sistema nervioso, sesiones de ~45 min para no disparar el cortisol, calentamiento y enfriamiento obligatorios, y progresión conservadora para evitar el sobreentrenamiento.",
   },
   "onboarding.featureRestTitle": { en: "Adapted rest times", es: "Descansos adaptados" },
-  "onboarding.featureRestDesc": { en: "2-3 min between sets for nervous system recovery", es: "2-3 min entre series para recuperación del sistema nervioso" },
+  "onboarding.featureRestDesc": { en: "2-3 min between sets, increasing with intensity", es: "2-3 min entre series, aumentando con la intensidad" },
   "onboarding.featureOverloadTitle": { en: "Progressive overload", es: "Sobrecarga progresiva" },
   "onboarding.featureOverloadDesc": { en: "Conservative 5% increases every 2 weeks", es: "Incrementos conservadores de 5% cada 2 semanas" },
   "onboarding.featureRpeTitle": { en: "RPE per set", es: "RPE por serie" },
@@ -327,8 +331,8 @@ const translations: Record<string, Record<Locale, string>> = {
   "hypo.repsLabel": { en: "Reps", es: "Repeticiones" },
   "hypo.durationLabel": { en: "Duration", es: "Duración" },
   "hypo.restCompound": {
-    en: "Longer rest on compound lifts allows full CNS recovery — crucial with hypothyroidism since slower metabolism affects recovery capacity.",
-    es: "Los descansos más largos en ejercicios compuestos permiten una recuperación completa del sistema nervioso central, algo crucial con hipotiroidismo ya que el metabolismo más lento afecta la capacidad de recuperación.",
+    en: "Longer rest on compound lifts allows full CNS recovery — rest increases across phases as load rises. Crucial with hypothyroidism since slower metabolism affects recovery capacity.",
+    es: "Los descansos más largos en ejercicios compuestos permiten una recuperación completa del sistema nervioso central — el descanso aumenta entre fases a medida que sube la carga. Algo crucial con hipotiroidismo ya que el metabolismo más lento afecta la capacidad de recuperación.",
   },
   "hypo.restAccessory": {
     en: "Accessory exercises need less rest as they work smaller muscle groups with less nervous system demand.",
