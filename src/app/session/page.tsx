@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { WORKOUT_PLANS, getExerciseById } from "@/lib/exercises";
-import { getSessionProtocol } from "@/lib/session-protocols";
+import { WORKOUT_PLANS, getExerciseById, type WorkoutPlan } from "@/lib/exercises";
+import { getSessionProtocol, type SessionProtocol } from "@/lib/session-protocols";
 import { useI18n, useT } from "@/lib/i18n";
 import { useSessionStore } from "@/store/session-store";
 
@@ -57,10 +57,7 @@ export default function SessionPage() {
         {WORKOUT_PLANS.map((plan) => {
           const protocol = getSessionProtocol(plan.id);
           const isExpanded = expandedId === plan.id;
-          const totalMinutes =
-            protocol.warmupMinutes +
-            plan.exercises.length * 5 +
-            protocol.cooldownMinutes;
+          const totalMinutes = estimateSessionDuration(plan, protocol);
 
           const planName = isEs ? protocol.nameEs : plan.name;
 
@@ -173,4 +170,48 @@ export default function SessionPage() {
       </div>
     </div>
   );
+}
+
+/**
+ * Estimate total session duration in minutes based on actual sets, rest times,
+ * inter-exercise rest, RPE input time, warmup and cooldown.
+ */
+function estimateSessionDuration(plan: WorkoutPlan, protocol: SessionProtocol): number {
+  const SET_DURATION = 40; // seconds per set (performing the exercise)
+  const RPE_TIME = 10;     // seconds for RPE input after each set
+  const INTER_REST_COMPOUND = 180; // seconds between compound exercises
+  const INTER_REST_MIXED = 150;    // compound→accessory or vice versa
+  const INTER_REST_ACCESSORY = 120; // between accessory exercises
+
+  let totalSeconds = 0;
+
+  for (let i = 0; i < plan.exercises.length; i++) {
+    const ex = plan.exercises[i];
+    const exerciseInfo = getExerciseById(ex.exerciseId);
+    const isCompound = exerciseInfo?.category === "compound";
+
+    // Time performing sets + RPE
+    totalSeconds += ex.sets * (SET_DURATION + RPE_TIME);
+
+    // Intra-exercise rest (between sets of same exercise)
+    totalSeconds += (ex.sets - 1) * ex.restSeconds;
+
+    // Inter-exercise rest (between different exercises, except after last)
+    if (i < plan.exercises.length - 1) {
+      const nextEx = plan.exercises[i + 1];
+      const nextInfo = getExerciseById(nextEx.exerciseId);
+      const nextIsCompound = nextInfo?.category === "compound";
+
+      if (isCompound && nextIsCompound) {
+        totalSeconds += INTER_REST_COMPOUND;
+      } else if (isCompound || nextIsCompound) {
+        totalSeconds += INTER_REST_MIXED;
+      } else {
+        totalSeconds += INTER_REST_ACCESSORY;
+      }
+    }
+  }
+
+  const workingMinutes = Math.ceil(totalSeconds / 60);
+  return protocol.warmupMinutes + workingMinutes + protocol.cooldownMinutes;
 }

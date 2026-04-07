@@ -16,7 +16,7 @@ export const WORKOUT_SCHEDULE: WorkoutDay[] = [
     labelEs: "Enfoque Empuje",
     dayOfWeek: 1,
     exercises: 6,
-    duration: "~50 min",
+    duration: "~65 min",
   },
   {
     name: "Day B",
@@ -25,7 +25,7 @@ export const WORKOUT_SCHEDULE: WorkoutDay[] = [
     labelEs: "Enfoque Tirón",
     dayOfWeek: 3,
     exercises: 6,
-    duration: "~50 min",
+    duration: "~65 min",
   },
   {
     name: "Day C",
@@ -34,7 +34,7 @@ export const WORKOUT_SCHEDULE: WorkoutDay[] = [
     labelEs: "Piernas / Cuerpo Completo",
     dayOfWeek: 5,
     exercises: 6,
-    duration: "~50 min",
+    duration: "~65 min",
   },
 ];
 
