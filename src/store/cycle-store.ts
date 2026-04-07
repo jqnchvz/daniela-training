@@ -1,17 +1,13 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { syncCycleToDb } from "@/lib/db/sync";
 
 interface CycleState {
-  /** ISO date string when the training cycle started, or null if not started */
   cycleStartDate: string | null;
-  /** Additional extension weeks added to the cycle */
   extensionWeeks: number;
-  /** ISO date string of the last deload week */
   lastDeloadDate: string | null;
-  /** Number of completed sessions */
   completedSessions: number;
+  loaded: boolean;
 
+  hydrate: (data: Partial<Pick<CycleState, "cycleStartDate" | "extensionWeeks" | "lastDeloadDate" | "completedSessions">>) => void;
   startCycle: () => void;
   incrementSessions: () => void;
   setLastDeload: (date: string) => void;
@@ -20,61 +16,71 @@ interface CycleState {
 }
 
 export const useCycleStore = create<CycleState>()(
-  persist(
-    (set) => ({
-      cycleStartDate: null,
-      extensionWeeks: 0,
-      lastDeloadDate: null,
-      completedSessions: 0,
+  (set, get) => ({
+    cycleStartDate: null,
+    extensionWeeks: 0,
+    lastDeloadDate: null,
+    completedSessions: 0,
+    loaded: false,
 
-      startCycle: () => {
-        set({
-          cycleStartDate: new Date().toISOString().split("T")[0],
-          extensionWeeks: 0,
-          lastDeloadDate: null,
-          completedSessions: 0,
-        });
-        syncCycleAfterUpdate();
-      },
+    hydrate: (data) =>
+      set({
+        cycleStartDate: data.cycleStartDate ?? null,
+        extensionWeeks: data.extensionWeeks ?? 0,
+        lastDeloadDate: data.lastDeloadDate ?? null,
+        completedSessions: data.completedSessions ?? 0,
+        loaded: true,
+      }),
 
-      incrementSessions: () => {
-        set((s) => ({ completedSessions: s.completedSessions + 1 }));
-        syncCycleAfterUpdate();
-      },
+    startCycle: () => {
+      set({
+        cycleStartDate: new Date().toISOString().split("T")[0],
+        extensionWeeks: 0,
+        lastDeloadDate: null,
+        completedSessions: 0,
+      });
+      syncCycleAfterUpdate();
+    },
 
-      setLastDeload: (date) => {
-        set({ lastDeloadDate: date });
-        syncCycleAfterUpdate();
-      },
+    incrementSessions: () => {
+      set((s) => ({ completedSessions: s.completedSessions + 1 }));
+      syncCycleAfterUpdate();
+    },
 
-      extendPhase: (weeks) => {
-        set((s) => ({ extensionWeeks: s.extensionWeeks + weeks }));
-        syncCycleAfterUpdate();
-      },
+    setLastDeload: (date) => {
+      set({ lastDeloadDate: date });
+      syncCycleAfterUpdate();
+    },
 
-      resetCycle: () => {
-        set({
-          cycleStartDate: null,
-          extensionWeeks: 0,
-          lastDeloadDate: null,
-          completedSessions: 0,
-        });
-        syncCycleAfterUpdate();
-      },
-    }),
-    { name: "cycle-store" },
-  ),
+    extendPhase: (weeks) => {
+      set((s) => ({ extensionWeeks: s.extensionWeeks + weeks }));
+      syncCycleAfterUpdate();
+    },
+
+    resetCycle: () => {
+      set({
+        cycleStartDate: null,
+        extensionWeeks: 0,
+        lastDeloadDate: null,
+        completedSessions: 0,
+      });
+      syncCycleAfterUpdate();
+    },
+  }),
 );
 
 function syncCycleAfterUpdate() {
-  // Read from store after set() has applied
   setTimeout(() => {
     const s = useCycleStore.getState();
-    syncCycleToDb({
-      cycleStartDate: s.cycleStartDate,
-      extensionWeeks: s.extensionWeeks,
-      lastDeloadDate: s.lastDeloadDate,
-      completedSessions: s.completedSessions,
-    });
+    fetch("/api/cycle", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cycleStartDate: s.cycleStartDate,
+        extensionWeeks: s.extensionWeeks,
+        lastDeloadDate: s.lastDeloadDate,
+        completedSessions: s.completedSessions,
+      }),
+    }).catch(() => {});
   }, 0);
 }

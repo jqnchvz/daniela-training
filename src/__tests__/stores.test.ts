@@ -119,53 +119,12 @@ describe("Session Store", () => {
 
 describe("App Store", () => {
   beforeEach(() => {
-    useAppStore.setState({ isOnline: true, offlineQueue: [] });
+    useAppStore.setState({ isOnline: true });
   });
 
   it("tracks online status", () => {
     expect(useAppStore.getState().isOnline).toBe(true);
     useAppStore.getState().setOnline(false);
     expect(useAppStore.getState().isOnline).toBe(false);
-  });
-
-  it("adds to offline queue", () => {
-    useAppStore.getState().addToOfflineQueue({
-      table: "set_logs",
-      type: "insert",
-      data: { weight: 10, reps: 10 },
-    });
-
-    const queue = useAppStore.getState().offlineQueue;
-    expect(queue).toHaveLength(1);
-    expect(queue[0].table).toBe("set_logs");
-    expect(queue[0].id).toBeTruthy();
-  });
-
-  it("removes from offline queue", () => {
-    useAppStore.getState().addToOfflineQueue({
-      table: "set_logs",
-      type: "insert",
-      data: { weight: 10 },
-    });
-
-    const id = useAppStore.getState().offlineQueue[0].id;
-    useAppStore.getState().removeFromQueue(id);
-    expect(useAppStore.getState().offlineQueue).toHaveLength(0);
-  });
-
-  it("clears entire offline queue", () => {
-    useAppStore.getState().addToOfflineQueue({
-      table: "a",
-      type: "insert",
-      data: {},
-    });
-    useAppStore.getState().addToOfflineQueue({
-      table: "b",
-      type: "insert",
-      data: {},
-    });
-
-    useAppStore.getState().clearOfflineQueue();
-    expect(useAppStore.getState().offlineQueue).toHaveLength(0);
   });
 });

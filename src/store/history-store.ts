@@ -1,6 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { syncSessionToDb, syncCheckinToDb } from "@/lib/db/sync";
 
 export interface CompletedSession {
   id: string;
@@ -53,6 +51,10 @@ interface HistoryState {
   sessions: CompletedSession[];
   checkins: SavedCheckin[];
   measurements: BodyMeasurement[];
+  loaded: boolean;
+
+  /** Replace all data (called by hydrator after DB fetch) */
+  hydrate: (data: { sessions?: CompletedSession[]; checkins?: SavedCheckin[] }) => void;
 
   addSession: (session: CompletedSession) => void;
   addCheckin: (checkin: SavedCheckin) => void;
@@ -68,99 +70,113 @@ interface HistoryState {
 }
 
 export const useHistoryStore = create<HistoryState>()(
-  persist(
-    (set, get) => ({
-      sessions: [],
-      checkins: [],
-      measurements: [],
+  (set, get) => ({
+    sessions: [],
+    checkins: [],
+    measurements: [],
+    loaded: false,
 
-      addSession: (session) => {
-        set((s) => ({ sessions: [session, ...s.sessions] }));
-        syncSessionToDb(session);
-      },
+    hydrate: (data) =>
+      set({
+        sessions: data.sessions ?? get().sessions,
+        checkins: data.checkins ?? get().checkins,
+        loaded: true,
+      }),
 
-      addCheckin: (checkin) => {
-        set((s) => {
-          const filtered = s.checkins.filter((c) => c.date !== checkin.date);
-          return { checkins: [checkin, ...filtered] };
-        });
-        syncCheckinToDb(checkin);
-      },
+    addSession: (session) => {
+      set((s) => ({ sessions: [session, ...s.sessions] }));
+      // Fire-and-forget write to DB
+      fetch("/api/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(session),
+      }).catch(() => {});
+    },
 
-      addMeasurement: (m) => {
-        set((s) => ({ measurements: [m, ...s.measurements] }));
-      },
+    addCheckin: (checkin) => {
+      set((s) => {
+        const filtered = s.checkins.filter((c) => c.date !== checkin.date);
+        return { checkins: [checkin, ...filtered] };
+      });
+      fetch("/api/checkins", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(checkin),
+      }).catch(() => {});
+    },
 
-      getLatestMeasurement: (userId) => {
-        const measurements = userId
-          ? get().measurements.filter((m) => !m.userId || m.userId === userId)
-          : get().measurements;
-        return measurements[0] ?? null;
-      },
+    addMeasurement: (m) => {
+      set((s) => ({ measurements: [m, ...s.measurements] }));
+    },
 
-      getMeasurementsForUser: (userId) => {
-        const all = userId
-          ? get().measurements.filter((m) => !m.userId || m.userId === userId)
-          : get().measurements;
-        return [...all].reverse(); // chronological order for charts
-      },
+    getLatestMeasurement: (userId) => {
+      const measurements = userId
+        ? get().measurements.filter((m) => !m.userId || m.userId === userId)
+        : get().measurements;
+      return measurements[0] ?? null;
+    },
 
-      getSessionsForUser: (userId) => {
-        if (!userId) return get().sessions;
-        return get().sessions.filter((s) => !s.userId || s.userId === userId);
-      },
+    getMeasurementsForUser: (userId) => {
+      const all = userId
+        ? get().measurements.filter((m) => !m.userId || m.userId === userId)
+        : get().measurements;
+      return [...all].reverse();
+    },
 
-      getCheckinsForUser: (userId) => {
-        if (!userId) return get().checkins;
-        return get().checkins.filter((c) => !c.userId || c.userId === userId);
-      },
+    getSessionsForUser: (userId) => {
+      if (!userId) return get().sessions;
+      return get().sessions.filter((s) => !s.userId || s.userId === userId);
+    },
 
-      getSessionsByWeek: (userId) => {
-        const now = new Date();
-        const startOfWeek = new Date(now);
-        const day = startOfWeek.getDay();
-        startOfWeek.setDate(startOfWeek.getDate() - (day === 0 ? 6 : day - 1));
-        startOfWeek.setHours(0, 0, 0, 0);
+    getCheckinsForUser: (userId) => {
+      if (!userId) return get().checkins;
+      return get().checkins.filter((c) => !c.userId || c.userId === userId);
+    },
 
-        const sessions = userId
-          ? get().sessions.filter((s) => !s.userId || s.userId === userId)
-          : get().sessions;
+    getSessionsByWeek: (userId) => {
+      const now = new Date();
+      const startOfWeek = new Date(now);
+      const day = startOfWeek.getDay();
+      startOfWeek.setDate(startOfWeek.getDate() - (day === 0 ? 6 : day - 1));
+      startOfWeek.setHours(0, 0, 0, 0);
 
-        const thisWeek = sessions.filter(
-          (s) => new Date(s.date) >= startOfWeek,
-        ).length;
+      const sessions = userId
+        ? get().sessions.filter((s) => !s.userId || s.userId === userId)
+        : get().sessions;
 
-        return { thisWeek, total: sessions.length };
-      },
+      const thisWeek = sessions.filter(
+        (s) => new Date(s.date) >= startOfWeek,
+      ).length;
 
-      getLatestCheckin: (userId) => {
-        const checkins = userId
-          ? get().checkins.filter((c) => !c.userId || c.userId === userId)
-          : get().checkins;
-        const sorted = [...checkins].sort(
-          (a, b) => b.date.localeCompare(a.date),
+      return { thisWeek, total: sessions.length };
+    },
+
+    getLatestCheckin: (userId) => {
+      const checkins = userId
+        ? get().checkins.filter((c) => !c.userId || c.userId === userId)
+        : get().checkins;
+      const sorted = [...checkins].sort(
+        (a, b) => b.date.localeCompare(a.date),
+      );
+      return sorted[0] ?? null;
+    },
+
+    getCheckinForDate: (date) =>
+      get().checkins.find((c) => c.date === date) ?? null,
+
+    getLastWeightForExercise: (exerciseId, userId) => {
+      const sessions = userId
+        ? get().sessions.filter((s) => !s.userId || s.userId === userId)
+        : get().sessions;
+      for (const session of sessions) {
+        const sets = session.sets.filter(
+          (s) => s.exerciseId === exerciseId && s.weight > 0,
         );
-        return sorted[0] ?? null;
-      },
-
-      getCheckinForDate: (date) =>
-        get().checkins.find((c) => c.date === date) ?? null,
-
-      getLastWeightForExercise: (exerciseId, userId) => {
-        const sessions = userId
-          ? get().sessions.filter((s) => !s.userId || s.userId === userId)
-          : get().sessions;
-        for (const session of sessions) {
-          const sets = session.sets.filter(
-            (s) => s.exerciseId === exerciseId && s.weight > 0,
-          );
-          if (sets.length > 0) {
-            return Math.max(...sets.map((s) => s.weight));
-          }
+        if (sets.length > 0) {
+          return Math.max(...sets.map((s) => s.weight));
         }
-        return null;
-      },
-    }),
-    { name: "history-store" },
-  ),
+      }
+      return null;
+    },
+  }),
 );
