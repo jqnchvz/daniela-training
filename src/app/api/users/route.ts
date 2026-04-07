@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
+import { hashPin } from "@/lib/pin-hash";
 import { eq } from "drizzle-orm";
 
 export async function GET() {
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
       .values({
         name: body.name,
         avatarEmoji: body.avatarEmoji ?? "💪",
-        pinHash: body.pinHash ?? null,
+        pinHash: body.pinHash ? await hashPin(body.pinHash) : null,
       })
       .returning();
 
@@ -45,13 +46,12 @@ export async function POST(request: Request) {
       return Response.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Simple PIN comparison (not hashed for simplicity in this personal app)
     if (!user.pinHash) {
       // No PIN set — auto-verified
       return Response.json({ verified: true });
     }
 
-    const verified = user.pinHash === body.pin;
+    const verified = user.pinHash === await hashPin(body.pin);
     return Response.json({ verified });
   }
 
