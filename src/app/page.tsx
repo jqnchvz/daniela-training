@@ -116,6 +116,7 @@ export default function HomePage() {
               }
               setShowUserMenu(!showUserMenu);
             }}
+            aria-label={t("auth.switchUser")}
             className="w-12 h-12 rounded-full bg-surface2 border border-border flex items-center justify-center text-xl"
             title={t("auth.switchUser")}
           >

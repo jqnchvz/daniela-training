@@ -19,7 +19,11 @@ export function BottomNav() {
   const activePlanId = useSessionStore((s) => s.planId);
 
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-[420px] border-t border-border bg-background/92 backdrop-blur-[20px] pb-[env(safe-area-inset-bottom)]">
+    <nav
+      role="navigation"
+      aria-label="Main navigation"
+      className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-[420px] border-t border-border bg-background/92 backdrop-blur-[20px] pb-[env(safe-area-inset-bottom)]"
+    >
       <div className="flex items-center py-3">
         {navItems.map((item) => {
           // If there's an active session, link directly to it
@@ -36,6 +40,8 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={href}
+              aria-label={t(item.labelKey)}
+              aria-current={isActive ? "page" : undefined}
               className="flex flex-1 flex-col items-center gap-1 py-2 min-h-[48px] justify-center"
             >
               <span className="text-xl leading-none">{item.icon}</span>

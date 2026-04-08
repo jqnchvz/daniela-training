@@ -32,6 +32,7 @@ function LanguageToggle() {
   return (
     <button
       onClick={() => setLocale(locale === "en" ? "es" : "en")}
+      aria-label={locale === "en" ? "Switch to Spanish" : "Switch to English"}
       className="flex h-[48px] px-3.5 items-center justify-center rounded-full bg-surface2 border border-border text-[11px] font-bold uppercase tracking-wider transition-colors hover:bg-surface3"
     >
       {locale === "en" ? "ES" : "EN"}
