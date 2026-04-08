@@ -153,7 +153,16 @@ export default function HomePage() {
             </div>
           )}
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/settings"
+            className="flex h-[48px] w-[48px] items-center justify-center rounded-full bg-surface2 border border-border text-base transition-colors hover:bg-surface3"
+            aria-label="Settings"
+          >
+            ⚙️
+          </Link>
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Close dropdown on outside tap */}
