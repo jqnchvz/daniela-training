@@ -195,9 +195,9 @@ export default function HomePage() {
             {t("home.startProgramDesc2")}
           </p>
           <div className="flex gap-2 text-[11px] text-sage font-semibold mb-3">
-            <span className="rounded-full bg-sage-bg border border-sage-dim px-2.5 py-1">1. {t("home.phaseStabilization")}</span>
-            <span className="rounded-full bg-sage-bg border border-sage-dim px-2.5 py-1">2. {t("home.phaseHypertrophy")}</span>
-            <span className="rounded-full bg-sage-bg border border-sage-dim px-2.5 py-1">3. {t("home.phaseStrength")}</span>
+            <span className="rounded-full bg-sage-bg border border-sage-dim px-2.5 py-1">{t("home.phase1Short")}</span>
+            <span className="rounded-full bg-sage-bg border border-sage-dim px-2.5 py-1">{t("home.phase2Short")}</span>
+            <span className="rounded-full bg-sage-bg border border-sage-dim px-2.5 py-1">{t("home.phase3Short")}</span>
           </div>
           {experienceLevel && (
             <p className="text-[11px] text-muted-foreground mb-3">

@@ -81,6 +81,9 @@ const translations: Record<string, Record<Locale, string>> = {
   },
   "home.letsGo": { en: "Let's go!", es: "¡Vamos!" },
   "home.notYet": { en: "Not yet", es: "Aún no" },
+  "home.phase1Short": { en: "1. Stabilization", es: "1. Estabilización" },
+  "home.phase2Short": { en: "2. Hypertrophy", es: "2. Hipertrofia" },
+  "home.phase3Short": { en: "3. Strength", es: "3. Fuerza" },
   "home.startProgramDesc": {
     en: "Start your 16-week training cycle to track phase progress, deload reminders, and progressive overload.",
     es: "Inicia tu ciclo de entrenamiento de 16 semanas para seguir el progreso de fases, descargas y sobrecarga progresiva.",
