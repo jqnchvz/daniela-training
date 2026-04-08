@@ -13,6 +13,7 @@ import { estimateSessionDuration } from "@/lib/session-duration";
 import { getCurrentPhase } from "@/lib/phases";
 import { getDeloadStatus } from "@/lib/progression";
 import { detectRedFlags } from "@/lib/checkin";
+import { getSouthernSeason } from "@/lib/seasons";
 import { useCycleStore } from "@/store/cycle-store";
 import { useHistoryStore } from "@/store/history-store";
 import { useCyclePhaseStore } from "@/store/cycle-phase-store";
@@ -52,6 +53,7 @@ export default function HomePage() {
   const enableCyclePhase = useCyclePhaseStore((s) => s.enable);
   const [showCycleExplainer, setShowCycleExplainer] = useState(false);
   const [showStartConfirm, setShowStartConfirm] = useState(false);
+  const [winterDismissed, setWinterDismissed] = useState(false);
   const [statusExpanded, setStatusExpanded] = useState(false);
   const experienceLevel = useAuthStore((s) => s.experienceLevel);
 
@@ -359,6 +361,26 @@ export default function HomePage() {
           </div>
           <span className="text-muted-foreground text-sm">→</span>
         </Link>
+      )}
+
+      {/* Winter awareness banner (southern hemisphere) */}
+      {mounted && getSouthernSeason().isWinter && !winterDismissed && (
+        <div className="mt-3 rounded-[12px] bg-dt-blue-bg border border-dt-blue/30 p-4">
+          <div className="flex items-start gap-2.5">
+            <span className="text-xl shrink-0">❄️</span>
+            <div className="flex-1">
+              <p className="font-semibold text-[13px] text-dt-blue mb-1">{t("season.winterTitle")}</p>
+              <p className="text-[12px] text-muted-foreground leading-relaxed">{t("season.winterDesc")}</p>
+              <p className="text-[11px] text-dt-blue/80 mt-2 leading-relaxed">{t("season.winterWarmup")}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setWinterDismissed(true)}
+            className="mt-3 w-full rounded-[10px] border border-dt-blue/30 bg-surface2 py-2.5 min-h-[44px] text-[12px] font-semibold text-dt-blue"
+          >
+            {t("season.winterDismiss")}
+          </button>
+        </div>
       )}
 
       {/* Active deload week banner */}
