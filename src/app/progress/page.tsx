@@ -177,6 +177,18 @@ export default function ProgressPage() {
             </>
           )}
 
+          {/* Session RPE trend */}
+          {sessions.some((s) => s.sessionRpe != null) && (
+            <>
+              <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mt-4 mb-2.5">
+                {t("session.rpeTrend")}
+              </p>
+              <div className="rounded-[16px] border border-border bg-card p-[18px] mb-3">
+                <SessionRpeChart sessions={sessions} />
+              </div>
+            </>
+          )}
+
           {/* Heart rate trend */}
           {sessions.some((s) => s.averageHr != null || s.maxHr != null) && (
             <>
@@ -703,6 +715,58 @@ function WeightChart({ data }: { data: Array<{ date: string; weightKg: number | 
       <line x1="60" y1="8" x2="75" y2="8" stroke="#7EC8A0" strokeWidth="2" />
       <text x="78" y="11" fill="#7EC8A0" fontSize="8">{tFn("progress.rollingAvg")}</text>
     </svg>
+  );
+}
+
+function SessionRpeChart({ sessions }: { sessions: CompletedSession[] }) {
+  const data = [...sessions]
+    .reverse()
+    .filter((s) => s.sessionRpe != null)
+    .slice(-12)
+    .map((s) => ({ date: s.date, rpe: s.sessionRpe! }));
+
+  if (data.length < 2) return null;
+
+  const width = 300;
+  const height = 80;
+  const padding = 5;
+
+  const points = data.map((d, i) => {
+    const x = data.length === 1 ? width / 2 : (i / (data.length - 1)) * (width - padding * 2) + padding;
+    const y = height - padding - ((d.rpe - 1) / 9) * (height - padding * 2 - 10);
+    return { x, y, rpe: d.rpe };
+  });
+
+  const polyline = points.map((p) => `${p.x},${p.y}`).join(" ");
+  const last = points[points.length - 1];
+
+  // Flag if trending upward over last 3 sessions
+  const last3 = data.slice(-3);
+  const trending = last3.length === 3 && last3[2].rpe > last3[1].rpe && last3[1].rpe > last3[0].rpe;
+
+  return (
+    <>
+      <svg
+        className="w-full h-20"
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={tFn("session.rpeTrend")}
+      >
+        <polyline points={polyline} stroke={trending ? "#E4A0A0" : "#9B8EC4"} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        {points.map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r={i === points.length - 1 ? 5 : 3} fill={trending ? "#E4A0A0" : "#9B8EC4"} />
+        ))}
+        <text x={last.x - 16} y={last.y - 8} fill={trending ? "#E4A0A0" : "#9B8EC4"} fontSize="9" fontFamily="JetBrains Mono" fontWeight="500">
+          RPE {last.rpe}
+        </text>
+      </svg>
+      {trending && (
+        <p className="text-[11px] text-[var(--dt-red)] mt-1">
+          ⚠️ {tFn("progress.energyRedFlag").split(".")[0]}... Session RPE rising — consider a deload.
+        </p>
+      )}
+    </>
   );
 }
 

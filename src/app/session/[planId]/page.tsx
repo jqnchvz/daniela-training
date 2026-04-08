@@ -696,6 +696,7 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const [soreness, setSoreness] = useState(1);
   const [averageHr, setAverageHr] = useState<string>("");
   const [maxHr, setMaxHr] = useState<string>("");
+  const [sessionRpe, setSessionRpe] = useState<number | null>(null);
 
   const totalVolume = store.completedSets.reduce((sum, s) => sum + s.weight * s.reps, 0);
   const exercisesCompleted = new Set(store.completedSets.map((s) => s.exerciseId)).size;
@@ -737,6 +738,7 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       notes: store.notes,
       averageHr: averageHr ? Number(averageHr) : null,
       maxHr: maxHr ? Number(maxHr) : null,
+      sessionRpe,
     });
 
     incrementSessions();
@@ -771,6 +773,30 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         <ScoreRow label={t("home.energy")} value={energy} onChange={setEnergy} />
         <ScoreRow label={t("session.sleepLastNight")} value={sleep} onChange={setSleep} />
         <ScoreRow label={t("home.soreness")} value={soreness} onChange={setSoreness} />
+      </div>
+
+      {/* Session RPE */}
+      <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left mb-4">
+        <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mb-1">
+          {t("session.rpeTitle")}
+        </p>
+        <p className="text-[13px] font-medium mb-3">{t("session.rpeQuestion")}</p>
+        <div className="flex gap-1.5">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((v) => (
+            <button
+              key={v}
+              onClick={() => setSessionRpe(v === sessionRpe ? null : v)}
+              className={`flex-1 rounded-[10px] border py-2.5 font-heading text-[14px] font-bold min-h-[44px] transition-colors ${
+                sessionRpe === v
+                  ? "bg-sage-bg text-sage border-sage-dim"
+                  : "bg-surface2 text-muted-foreground border-border hover:border-border"
+              }`}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-2">{t("session.rpeHint")}</p>
       </div>
 
       {/* Heart rate (optional) */}

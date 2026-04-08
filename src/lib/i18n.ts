@@ -446,6 +446,15 @@ const translations: Record<string, Record<Locale, string>> = {
   "auth.selectProfile": { en: "Select your profile", es: "Selecciona tu perfil" },
   "auth.createProfile": { en: "Create your profile to start training.", es: "Crea tu perfil para empezar a entrenar." },
 
+  // Session RPE
+  "session.rpeTitle": { en: "Session effort", es: "Esfuerzo de la sesión" },
+  "session.rpeQuestion": { en: "How hard was this session overall?", es: "¿Qué tan difícil fue la sesión en general?" },
+  "session.rpeHint": {
+    en: "Overall session RPE (1–10) is a better load-monitoring signal than per-set averages.",
+    es: "El RPE global de sesión (1–10) es mejor indicador de carga que el promedio por serie.",
+  },
+  "session.rpeTrend": { en: "Session RPE trend", es: "Tendencia de RPE de sesión" },
+
   // Heart rate tracking
   "hr.title": { en: "Heart Rate (optional)", es: "Frecuencia cardíaca (opcional)" },
   "hr.average": { en: "Avg HR", es: "FC promedio" },
