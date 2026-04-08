@@ -173,6 +173,11 @@ const translations: Record<string, Record<Locale, string>> = {
   "session.exerciseOf": { en: "Exercise {current} of {total}", es: "Ejercicio {current} de {total}" },
   "session.prev": { en: "‹ Prev", es: "‹ Anterior" },
   "session.skip": { en: "Skip →", es: "Saltar →" },
+  "session.skipConfirmTitle": { en: "Skip exercise?", es: "¿Saltar ejercicio?" },
+  "session.skipPartialTitle": { en: "Move on?", es: "¿Continuar?" },
+  "session.skipConfirmDesc": { en: "No sets will be logged for this exercise.", es: "No se registrarán series para este ejercicio." },
+  "session.setsCompleted": { en: "sets completed", es: "series completadas" },
+  "session.skipConfirmBtn": { en: "Skip", es: "Saltar" },
   "session.suggested": { en: "Suggested", es: "Sugerido" },
 
   // Rest timer
