@@ -197,6 +197,29 @@
   color: #8A847E;
 }
 
+/* ─── Border radius scale ───
+   Use these CSS variables for consistent border radius across the app.
+   --radius-sm  (10px) — small elements: badges, toggles, chips
+   --radius-md  (12px) — cards, inputs, buttons  [also: --radius token ≈ 1rem]
+   --radius-lg  (16px) — large cards, modals
+   --radius-xl  (20px) — hero cards, main workout card
+*/
+:root {
+  --radius-design-sm: 10px;
+  --radius-design-md: 12px;
+  --radius-design-lg: 16px;
+  --radius-design-xl: 20px;
+}
+
+/* ─── Z-index scale ───
+   10  - Sticky elements
+   40  - Dropdown overlays
+   50  - Bottom nav
+   100 - Modals/dialogs
+   200 - Critical overlays (exit confirm, skip confirm)
+   999 - Skip to content
+*/
+
 /* ─── Accessibility: focus ring ─── */
 *:focus-visible {
   outline: 2px solid var(--sage);
