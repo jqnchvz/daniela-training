@@ -5,6 +5,7 @@ import { EnergySlider } from "@/components/session/energy-slider";
 import { useHistoryStore } from "@/store/history-store";
 import { useAuthStore } from "@/store/auth-store";
 import { useT } from "@/lib/i18n";
+import { useCyclePhaseStore } from "@/store/cycle-phase-store";
 
 export default function CheckinPage() {
   const addCheckin = useHistoryStore((s) => s.addCheckin);
@@ -27,6 +28,12 @@ export default function CheckinPage() {
   const [saved, setSaved] = useState(!!existing);
   const [editing, setEditing] = useState(false);
   const t = useT();
+  const cycleEnabled = useCyclePhaseStore((s) => s.enabled);
+  const logPeriodStart = useCyclePhaseStore((s) => s.logPeriodStart);
+  const periodStartDates = useCyclePhaseStore((s) => s.periodStartDates);
+  const [periodStartedToday, setPeriodStartedToday] = useState(
+    periodStartDates.includes(today),
+  );
 
   // Sync state if existing checkin loads after hydration
   useEffect(() => {
@@ -61,6 +68,9 @@ export default function CheckinPage() {
       didYoga: didYoga || null,
       tookMedication,
     });
+    if (cycleEnabled && periodStartedToday) {
+      logPeriodStart(today);
+    }
     setSaved(true);
     setEditing(false);
   };
@@ -111,6 +121,26 @@ export default function CheckinPage() {
       </p>
 
       <div className="mt-6 space-y-6">
+        {/* Period start toggle — only when cycle tracking is enabled */}
+        {cycleEnabled && (
+          <div className="flex items-center justify-between rounded-[12px] border border-border bg-surface2 p-3.5">
+            <div>
+              <p className="font-semibold text-sm">{t("cycle.periodStartToday")}</p>
+              <p className="text-[11px] text-muted-foreground">{t("cycle.periodStartDesc")}</p>
+            </div>
+            <button
+              onClick={() => setPeriodStartedToday(!periodStartedToday)}
+              className={`w-12 h-7 rounded-full transition-colors ${
+                periodStartedToday ? "bg-dt-red" : "bg-surface3"
+              } relative`}
+            >
+              <span className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform ${
+                periodStartedToday ? "translate-x-5" : "translate-x-0.5"
+              }`} />
+            </button>
+          </div>
+        )}
+
         {/* Medication toggle — first thing in the morning */}
         <div className="flex items-center justify-between rounded-[12px] border border-border bg-surface2 p-3.5">
           <div>
