@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   useHistoryStore,
   type CompletedSession,
+  type LabResult,
 } from "@/store/history-store";
 import { EXERCISES, getExerciseById } from "@/lib/exercises";
 import { detectRedFlags, type CheckinData } from "@/lib/checkin";
@@ -14,13 +15,23 @@ export default function ProgressPage() {
   const sessions = useHistoryStore((s) => s.sessions);
   const checkins = useHistoryStore((s) => s.checkins);
   const addMeasurement = useHistoryStore((s) => s.addMeasurement);
+  const addLabResult = useHistoryStore((s) => s.addLabResult);
   const getLatestMeasurement = useHistoryStore((s) => s.getLatestMeasurement);
   const getMeasurements = useHistoryStore((s) => s.getMeasurementsForUser);
+  const getLabResults = useHistoryStore((s) => s.getLabResultsForUser);
   const activeUserId = useAuthStore((s) => s.activeUserId);
   const latestMeasurement = getLatestMeasurement(activeUserId ?? undefined);
   const allMeasurements = getMeasurements(activeUserId ?? undefined);
+  const allLabResults = getLabResults(activeUserId ?? undefined);
   const [selectedExercise, setSelectedExercise] = useState(EXERCISES[0]?.id ?? "");
   const [showMeasForm, setShowMeasForm] = useState(false);
+  const [showLabForm, setShowLabForm] = useState(false);
+  const [labDate, setLabDate] = useState(new Date().toISOString().split("T")[0]);
+  const [labTsh, setLabTsh] = useState("");
+  const [labFreeT4, setLabFreeT4] = useState("");
+  const [labFreeT3, setLabFreeT3] = useState("");
+  const [labNotes, setLabNotes] = useState("");
+  const [labSaved, setLabSaved] = useState(false);
   const [waist, setWaist] = useState(latestMeasurement?.waist?.toString() ?? "");
   const [hip, setHip] = useState(latestMeasurement?.hip?.toString() ?? "");
   const [thigh, setThigh] = useState(latestMeasurement?.thigh?.toString() ?? "");
@@ -297,6 +308,101 @@ export default function ProgressPage() {
             className="w-full mt-3 rounded-[16px] border border-border bg-surface2 py-2.5 text-[13px] font-semibold transition-colors hover:bg-surface3"
           >
             {t("progress.logMeasurements")}
+          </button>
+        )}
+      </div>
+      {/* Lab results */}
+      <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mt-4 mb-2.5">
+        {t("labs.title")}
+      </p>
+      <div className="rounded-[16px] border border-border bg-card p-3.5">
+        <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
+          {t("labs.hint")}
+        </p>
+
+        {/* Lab history */}
+        {allLabResults.length > 0 ? (
+          <div className="mb-3">
+            <LabResultsChart labResults={allLabResults} sessions={sessions} />
+            <div className="mt-3 space-y-2">
+              {[...allLabResults].reverse().slice(0, 3).map((r) => (
+                <div key={r.id} className="flex items-center justify-between text-[12px] border-b border-border pb-2 last:border-b-0 last:pb-0">
+                  <span className="text-muted-foreground font-mono">{r.date}</span>
+                  <div className="flex gap-3">
+                    {r.tsh != null && <span>TSH: <span className="font-semibold">{r.tsh}</span></span>}
+                    {r.freeT4 != null && <span>T4: <span className="font-semibold">{r.freeT4}</span></span>}
+                    {r.freeT3 != null && <span>T3: <span className="font-semibold">{r.freeT3}</span></span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="text-[12px] text-muted-foreground mb-3">{t("labs.noResults")}</p>
+        )}
+
+        {showLabForm ? (
+          <div className="space-y-2">
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-muted-foreground">{t("labs.date")}</label>
+              <input
+                type="date"
+                value={labDate}
+                onChange={(e) => setLabDate(e.target.value)}
+                className="w-full rounded-lg border border-border bg-surface2 px-2 py-2 font-mono text-sm"
+              />
+            </div>
+            <p className="text-[10px] text-muted-foreground">{t("labs.tshNormal")}</p>
+            <div className="flex gap-2">
+              <LabInput label={`${t("labs.tsh")} (${t("labs.tshUnit")})`} value={labTsh} onChange={setLabTsh} />
+              <LabInput label={`${t("labs.freeT4")} (${t("labs.t4Unit")})`} value={labFreeT4} onChange={setLabFreeT4} />
+              <LabInput label={`${t("labs.freeT3")} (${t("labs.t3Unit")})`} value={labFreeT3} onChange={setLabFreeT3} />
+            </div>
+            <div>
+              <label className="text-[10px] text-muted-foreground mb-1 block">{t("labs.notes")}</label>
+              <textarea
+                value={labNotes}
+                onChange={(e) => setLabNotes(e.target.value)}
+                placeholder={t("labs.notesPlaceholder")}
+                rows={2}
+                className="w-full rounded-lg border border-border bg-surface2 px-2 py-2 text-sm resize-none focus:outline-none focus:border-sage"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowLabForm(false)}
+                className="flex-1 rounded-[12px] border border-border bg-surface2 py-2.5 min-h-[44px] text-[13px] font-semibold"
+              >
+                {t("common.cancel")}
+              </button>
+              <button
+                onClick={() => {
+                  addLabResult({
+                    id: crypto.randomUUID(),
+                    userId: activeUserId ?? undefined,
+                    date: labDate,
+                    tsh: labTsh ? Number(labTsh) : null,
+                    freeT4: labFreeT4 ? Number(labFreeT4) : null,
+                    freeT3: labFreeT3 ? Number(labFreeT3) : null,
+                    notes: labNotes,
+                  });
+                  setShowLabForm(false);
+                  setLabTsh(""); setLabFreeT4(""); setLabFreeT3(""); setLabNotes("");
+                  setLabSaved(true);
+                  setTimeout(() => setLabSaved(false), 2000);
+                }}
+                className="flex-1 rounded-[12px] bg-sage py-2.5 min-h-[44px] text-[13px] font-bold text-primary-foreground"
+              >
+                {labSaved ? t("labs.saved") : t("labs.save")}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowLabForm(true)}
+            className="w-full rounded-[16px] border border-border bg-surface2 py-2.5 min-h-[44px] text-[13px] font-semibold transition-colors hover:bg-surface3"
+          >
+            {labSaved ? t("labs.saved") : t("labs.logNew")}
           </button>
         )}
       </div>
@@ -824,6 +930,93 @@ function HrTrendChart({ sessions }: { sessions: CompletedSession[] }) {
       {maxPts && <polyline points={maxPts} stroke="#E4A0A0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2" />}
       {avgPts && <><line x1="10" y1="8" x2="22" y2="8" stroke="#9B8EC4" strokeWidth="2" /><text x="25" y="11" fill="#9B8EC4" fontSize="8">{tFn("hr.average")}</text></>}
       {maxPts && <><line x1="75" y1="8" x2="87" y2="8" stroke="#E4A0A0" strokeWidth="2" strokeDasharray="4 2" /><text x="90" y="11" fill="#E4A0A0" fontSize="8">{tFn("hr.max")}</text></>}
+    </svg>
+  );
+}
+
+function LabInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="flex-1">
+      <label className="text-[9px] text-muted-foreground mb-1 block leading-tight">{label}</label>
+      <input
+        type="number"
+        inputMode="decimal"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        step="0.01"
+        className="w-full rounded-lg border border-border bg-surface2 px-2 py-2 font-mono text-sm text-center min-h-[44px]"
+        placeholder="—"
+      />
+    </div>
+  );
+}
+
+function LabResultsChart({ labResults, sessions }: { labResults: LabResult[]; sessions: CompletedSession[] }) {
+  if (labResults.length < 2) return null;
+
+  const width = 300;
+  const height = 80;
+  const padding = 5;
+
+  // TSH line
+  const tshData = labResults.filter((r) => r.tsh != null);
+  if (tshData.length < 2) return null;
+
+  const tshMin = Math.max(0, Math.min(...tshData.map((r) => r.tsh!)) - 0.5);
+  const tshMax = Math.max(...tshData.map((r) => r.tsh!)) + 0.5;
+  const tshRange = tshMax - tshMin || 1;
+
+  const tshPoints = tshData.map((r, i) => {
+    const x = (i / (tshData.length - 1)) * (width - padding * 2) + padding;
+    const y = height - padding - ((r.tsh! - tshMin) / tshRange) * (height - padding * 2 - 12);
+    return { x, y, tsh: r.tsh! };
+  });
+
+  const tshPolyline = tshPoints.map((p) => `${p.x},${p.y}`).join(" ");
+
+  // Normal range band (0.4-4.0)
+  const normalLow = height - padding - ((0.4 - tshMin) / tshRange) * (height - padding * 2 - 12);
+  const normalHigh = height - padding - ((4.0 - tshMin) / tshRange) * (height - padding * 2 - 12);
+
+  // Overlay session markers as small dots on the x-axis
+  const allDates = labResults.map((r) => r.date).sort();
+  const firstDate = new Date(allDates[0]).getTime();
+  const lastDate = new Date(allDates[allDates.length - 1]).getTime();
+  const dateRange = lastDate - firstDate || 1;
+
+  const sessionDots = sessions
+    .filter((s) => s.date >= allDates[0] && s.date <= allDates[allDates.length - 1])
+    .slice(0, 20)
+    .map((s) => {
+      const t = (new Date(s.date).getTime() - firstDate) / dateRange;
+      return (t * (width - padding * 2) + padding);
+    });
+
+  return (
+    <svg
+      className="w-full h-20"
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
+      role="img"
+      aria-label={tFn("labs.title")}
+    >
+      {/* Normal TSH range band */}
+      {normalLow > normalHigh && (
+        <rect x={padding} y={normalHigh} width={width - padding * 2} height={normalLow - normalHigh} fill="#7EC8A0" opacity="0.1" />
+      )}
+      {/* Session dots at bottom */}
+      {sessionDots.map((x, i) => (
+        <circle key={i} cx={x} cy={height - 4} r={2} fill="#9B8EC4" opacity="0.4" />
+      ))}
+      {/* TSH line */}
+      <polyline points={tshPolyline} stroke="#E4A0A0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      {tshPoints.map((p, i) => (
+        <circle key={i} cx={p.x} cy={p.y} r={3} fill="#E4A0A0" />
+      ))}
+      <line x1="10" y1="8" x2="22" y2="8" stroke="#E4A0A0" strokeWidth="2" />
+      <text x="25" y="11" fill="#E4A0A0" fontSize="8">{tFn("labs.tsh")}</text>
+      <rect x="90" y="4" width="10" height="6" fill="#7EC8A0" opacity="0.3" />
+      <text x="104" y="11" fill="#7EC8A0" fontSize="8">{tFn("labs.tshNormal")}</text>
     </svg>
   );
 }

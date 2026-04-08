@@ -57,10 +57,21 @@ export interface BodyMeasurement {
   weightKg: number | null;
 }
 
+export interface LabResult {
+  id: string;
+  userId?: string;
+  date: string;
+  tsh: number | null;
+  freeT4: number | null;
+  freeT3: number | null;
+  notes: string;
+}
+
 interface HistoryState {
   sessions: CompletedSession[];
   checkins: SavedCheckin[];
   measurements: BodyMeasurement[];
+  labResults: LabResult[];
   loaded: boolean;
 
   /** Replace all data (called by hydrator after DB fetch) */
@@ -69,8 +80,10 @@ interface HistoryState {
   addSession: (session: CompletedSession) => void;
   addCheckin: (checkin: SavedCheckin) => void;
   addMeasurement: (m: BodyMeasurement) => void;
+  addLabResult: (r: LabResult) => void;
   getLatestMeasurement: (userId?: string) => BodyMeasurement | null;
   getMeasurementsForUser: (userId?: string) => BodyMeasurement[];
+  getLabResultsForUser: (userId?: string) => LabResult[];
   getSessionsByWeek: (userId?: string) => { thisWeek: number; total: number };
   getLatestCheckin: (userId?: string) => SavedCheckin | null;
   getCheckinForDate: (date: string, userId?: string) => SavedCheckin | null;
@@ -84,6 +97,7 @@ export const useHistoryStore = create<HistoryState>()(
     sessions: [],
     checkins: [],
     measurements: [],
+    labResults: [],
     loaded: false,
 
     hydrate: (data) =>
@@ -111,6 +125,10 @@ export const useHistoryStore = create<HistoryState>()(
       set((s) => ({ measurements: [m, ...s.measurements] }));
     },
 
+    addLabResult: (r) => {
+      set((s) => ({ labResults: [r, ...s.labResults] }));
+    },
+
     getLatestMeasurement: (userId) => {
       const measurements = userId
         ? get().measurements.filter((m) => !m.userId || m.userId === userId)
@@ -123,6 +141,13 @@ export const useHistoryStore = create<HistoryState>()(
         ? get().measurements.filter((m) => !m.userId || m.userId === userId)
         : get().measurements;
       return [...all].reverse();
+    },
+
+    getLabResultsForUser: (userId) => {
+      const all = userId
+        ? get().labResults.filter((r) => !r.userId || r.userId === userId)
+        : get().labResults;
+      return [...all].sort((a, b) => a.date.localeCompare(b.date));
     },
 
     getSessionsForUser: (userId) => {
