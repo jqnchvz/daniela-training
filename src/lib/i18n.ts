@@ -446,6 +446,18 @@ const translations: Record<string, Record<Locale, string>> = {
   "auth.selectProfile": { en: "Select your profile", es: "Selecciona tu perfil" },
   "auth.createProfile": { en: "Create your profile to start training.", es: "Crea tu perfil para empezar a entrenar." },
 
+  // Seasonal awareness (southern hemisphere)
+  "season.winterTitle": { en: "Winter training adjustment", es: "Ajuste de entrenamiento invernal" },
+  "season.winterDesc": {
+    en: "Winter months are harder for hypothyroid training. Cold weather increases metabolic demand and reduced sunlight lowers vitamin D — both worsen symptoms. Expect 10–15% slower progress and be extra patient with recovery.",
+    es: "Los meses de invierno son más difíciles para el entrenamiento con hipotiroidismo. El frío aumenta la demanda metabólica y la menor luz solar reduce la vitamina D — ambos empeoran los síntomas. Espera un progreso 10–15% más lento y sé más paciente con la recuperación.",
+  },
+  "season.winterWarmup": {
+    en: "Winter tip: add 2–3 extra minutes to your warm-up to prepare joints and muscles in the cold.",
+    es: "Consejo invernal: agrega 2–3 minutos extra al calentamiento para preparar articulaciones y músculos en el frío.",
+  },
+  "season.winterDismiss": { en: "Got it", es: "Entendido" },
+
   // Session RPE
   "session.rpeTitle": { en: "Session effort", es: "Esfuerzo de la sesión" },
   "session.rpeQuestion": { en: "How hard was this session overall?", es: "¿Qué tan difícil fue la sesión en general?" },
