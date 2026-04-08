@@ -10,6 +10,7 @@ import {
   fetchSessionsFromDb,
   fetchCheckinsFromDb,
   fetchCycleFromDb,
+  fetchCyclePhaseFromDb,
 } from "./sync";
 
 /**
@@ -30,10 +31,11 @@ export function useHydrateFromDb() {
 
     (async () => {
       try {
-        const [dbSessions, dbCheckins, dbCycle] = await Promise.all([
+        const [dbSessions, dbCheckins, dbCycle, dbCyclePhase] = await Promise.all([
           fetchSessionsFromDb(activeUserId ?? undefined),
           fetchCheckinsFromDb(activeUserId ?? undefined),
           fetchCycleFromDb(activeUserId ?? undefined),
+          fetchCyclePhaseFromDb(activeUserId ?? undefined),
         ]);
 
         const sessions = dbSessions
@@ -95,6 +97,13 @@ export function useHydrateFromDb() {
           });
         } else {
           useCycleStore.getState().hydrate({});
+        }
+
+        if (dbCyclePhase) {
+          useCyclePhaseStore.getState().hydrate({
+            enabled: dbCyclePhase.enabled,
+            periodStartDates: dbCyclePhase.periodStartDates ?? [],
+          });
         }
       } catch {
         // DB unavailable — stores remain empty, mark as loaded

@@ -111,6 +111,20 @@ export const cycleStateRelations = relations(cycleState, ({ one }) => ({
   user: one(users, { fields: [cycleState.userId], references: [users.id] }),
 }));
 
+// ── Menstrual Cycle Phase ───────────────────────────────────────────────────
+
+export const menstrualCyclePhase = pgTable("menstrual_cycle_phase", {
+  id: uuid("id").primaryKey().notNull(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  enabled: boolean("enabled").notNull().default(false),
+  periodStartDates: text("period_start_dates").array().notNull().default([]),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const menstrualCyclePhaseRelations = relations(menstrualCyclePhase, ({ one }) => ({
+  user: one(users, { fields: [menstrualCyclePhase.userId], references: [users.id] }),
+}));
+
 // ── Exercise Cache (from ExerciseDB API) ────────────────────────────────────
 
 export const exerciseCache = pgTable("exercise_cache", {

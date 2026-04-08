@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { Locale } from "@/lib/i18n";
+import { enqueueWrite } from "@/lib/write-queue";
 
 export type CyclePhase = "menstrual" | "follicular" | "ovulation" | "luteal";
 
@@ -9,6 +10,7 @@ interface CyclePhaseState {
   defaultCycleLength: number;
   activeUserId: string | null;
 
+  hydrate: (data: { enabled: boolean; periodStartDates: string[] }) => void;
   enable: () => void;
   disable: () => void;
   logPeriodStart: (date: string) => void;
@@ -77,13 +79,21 @@ export const useCyclePhaseStore = create<CyclePhaseState>()(
       defaultCycleLength: 28,
       activeUserId: null,
 
+      hydrate: (data: { enabled: boolean; periodStartDates: string[] }) => {
+        set({ enabled: data.enabled, periodStartDates: data.periodStartDates });
+        // Also update localStorage so it stays consistent
+        saveUserData(get().activeUserId, { ...get(), ...data });
+      },
+
       enable: () => {
         set({ enabled: true });
         saveUserData(get().activeUserId, get());
+        syncCyclePhaseAfterUpdate();
       },
       disable: () => {
         set({ enabled: false, periodStartDates: [] });
         saveUserData(get().activeUserId, get());
+        syncCyclePhaseAfterUpdate();
       },
       logPeriodStart: (date: string) => {
         const existing = get().periodStartDates;
@@ -93,12 +103,14 @@ export const useCyclePhaseStore = create<CyclePhaseState>()(
         );
         set({ periodStartDates: updated });
         saveUserData(get().activeUserId, { ...get(), periodStartDates: updated });
+        syncCyclePhaseAfterUpdate();
       },
 
       removePeriodStart: (date: string) => {
         const updated = get().periodStartDates.filter((d) => d !== date);
         set({ periodStartDates: updated });
         saveUserData(get().activeUserId, { ...get(), periodStartDates: updated });
+        syncCyclePhaseAfterUpdate();
       },
 
       switchUser: (userId: string | null) => {
@@ -150,6 +162,20 @@ export const useCyclePhaseStore = create<CyclePhaseState>()(
       },
     }),
 );
+
+function syncCyclePhaseAfterUpdate() {
+  // Capture userId NOW, before setTimeout fires
+  const { useAuthStore } = require("@/store/auth-store");
+  const userId = useAuthStore.getState().activeUserId;
+  setTimeout(() => {
+    const s = useCyclePhaseStore.getState();
+    enqueueWrite("/api/cycle-phase", {
+      userId: userId ?? undefined,
+      enabled: s.enabled,
+      periodStartDates: s.periodStartDates,
+    }, userId ?? undefined);
+  }, 0);
+}
 
 const phaseLabels: Record<CyclePhase, Record<Locale, string>> = {
   menstrual: { en: "Menstrual", es: "Menstrual" },

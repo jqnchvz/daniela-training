@@ -59,6 +59,14 @@ export const cycleSchema = z.object({
   completedSessions: z.number().int().min(0).optional(),
 });
 
+// ── Menstrual Cycle Phase ────────────────────────────────────────────────────
+
+export const cyclePhaseSchema = z.object({
+  userId: z.string().uuid().nullable().optional(),
+  enabled: z.boolean(),
+  periodStartDates: z.array(z.string()).optional(),
+});
+
 // ── Users ───────────────────────────────────────────────────────────────────
 
 export const createUserSchema = z.object({
