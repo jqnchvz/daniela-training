@@ -180,7 +180,7 @@ export default function HomePage() {
       ) : (
         <button
           onClick={cycle.startCycle}
-          className="mt-3 inline-flex items-center gap-2 rounded-full bg-sage-bg border border-sage-dim px-3.5 py-1.5 text-xs font-semibold text-sage transition-colors hover:bg-sage/20"
+          className="mt-3 inline-flex items-center gap-2 rounded-full bg-sage-bg border border-sage-dim px-3.5 py-2.5 min-h-[44px] text-xs font-semibold text-sage transition-colors hover:bg-sage/20"
         >
           <span className="h-2 w-2 rounded-full bg-sage" />
           {t("home.startProgram")}
@@ -220,7 +220,7 @@ export default function HomePage() {
           {!showCycleExplainer ? (
             <button
               onClick={() => setShowCycleExplainer(true)}
-              className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-surface2 border border-border px-3 py-1.5 text-[11px] text-muted-foreground"
+              className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-surface2 border border-border px-3 py-2.5 min-h-[44px] text-[11px] text-muted-foreground"
             >
               {t("cycle.startTracking")}
             </button>
@@ -543,7 +543,7 @@ function LissActivityCard() {
       <div className="flex gap-2 mb-3">
         <button
           onClick={() => setDidStretching(!didStretching)}
-          className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+          className={`flex-1 rounded-[10px] border py-2.5 min-h-[44px] text-[13px] font-semibold transition-colors ${
             didStretching
               ? "border-sage bg-sage-bg text-sage"
               : "border-border bg-surface2 text-muted-foreground"
@@ -553,7 +553,7 @@ function LissActivityCard() {
         </button>
         <button
           onClick={() => setDidYoga(!didYoga)}
-          className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+          className={`flex-1 rounded-[10px] border py-2.5 min-h-[44px] text-[13px] font-semibold transition-colors ${
             didYoga
               ? "border-sage bg-sage-bg text-sage"
               : "border-border bg-surface2 text-muted-foreground"
@@ -566,7 +566,7 @@ function LissActivityCard() {
       {/* Save button */}
       <button
         onClick={handleSave}
-        className="w-full rounded-[12px] bg-sage py-2.5 text-[13px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
+        className="w-full rounded-[12px] bg-sage py-2.5 min-h-[44px] text-[13px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
       >
         {saved ? t("home.activitySaved") : t("home.logActivity")}
       </button>
