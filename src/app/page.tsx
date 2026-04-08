@@ -443,26 +443,31 @@ export default function HomePage() {
                 icon="🚶"
                 title={t("recovery.walkTitle")}
                 desc={t("recovery.walkDesc")}
+                expandedDesc={t("recovery.walkExpanded")}
               />
               <RecoveryTip
                 icon="🧘"
                 title={t("recovery.stretchTitle")}
                 desc={t("recovery.stretchDesc")}
+                expandedDesc={t("recovery.stretchExpanded")}
               />
               <RecoveryTip
                 icon="😴"
                 title={t("recovery.sleepTitle")}
                 desc={t("recovery.sleepDesc")}
+                expandedDesc={t("recovery.sleepExpanded")}
               />
               <RecoveryTip
                 icon="💧"
                 title={t("recovery.nutritionTitle")}
                 desc={t("recovery.nutritionDesc")}
+                expandedDesc={t("recovery.nutritionExpanded")}
               />
               <RecoveryTip
                 icon="🧊"
                 title={t("recovery.stressTitle")}
                 desc={t("recovery.stressDesc")}
+                expandedDesc={t("recovery.stressExpanded")}
               />
             </div>
 
@@ -552,15 +557,25 @@ export default function HomePage() {
   );
 }
 
-function RecoveryTip({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+function RecoveryTip({ icon, title, desc, expandedDesc }: { icon: string; title: string; desc: string; expandedDesc?: string }) {
+  const [expanded, setExpanded] = useState(false);
   return (
-    <div className="flex items-start gap-2.5">
+    <button
+      onClick={() => expandedDesc && setExpanded(!expanded)}
+      className="flex items-start gap-2.5 text-left w-full rounded-[10px] py-1.5 px-1 -mx-1 transition-colors hover:bg-surface2/50"
+    >
       <span className="text-lg shrink-0 mt-0.5">{icon}</span>
-      <div>
-        <p className="font-semibold text-[13px]">{title}</p>
+      <div className="flex-1">
+        <div className="flex items-center justify-between">
+          <p className="font-semibold text-[13px]">{title}</p>
+          {expandedDesc && <span className="text-[10px] text-muted-foreground">{expanded ? "▲" : "▼"}</span>}
+        </div>
         <p className="text-[11px] text-muted-foreground leading-relaxed">{desc}</p>
+        {expanded && expandedDesc && (
+          <p className="text-[11px] text-muted-foreground/70 leading-relaxed mt-1.5 border-t border-border pt-1.5">{expandedDesc}</p>
+        )}
       </div>
-    </div>
+    </button>
   );
 }
 
