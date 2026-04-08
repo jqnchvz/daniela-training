@@ -444,9 +444,34 @@ export default function HomePage() {
         {t("home.lastWellness")}
       </p>
       <div className="flex gap-2">
-        <WellnessCard label={t("home.energy")} value={latestCheckin ? String(latestCheckin.energy) : "--"} color="text-sage" />
-        <WellnessCard label={t("home.sleep")} value={latestCheckin ? String(latestCheckin.sleepQuality) : "--"} color="text-dt-blue" />
-        <WellnessCard label={t("home.soreness")} value={latestCheckin ? String(latestCheckin.soreness) : "--"} color="text-gold" />
+        <WellnessCard
+          label={t("home.energy")}
+          value={latestCheckin ? latestCheckin.energy : null}
+          color="text-sage"
+          checkins={history.checkins}
+          field="energy"
+          date={latestCheckin?.date}
+          locale={locale}
+        />
+        <WellnessCard
+          label={t("home.sleep")}
+          value={latestCheckin ? latestCheckin.sleepQuality : null}
+          color="text-dt-blue"
+          checkins={history.checkins}
+          field="sleepQuality"
+          date={latestCheckin?.date}
+          locale={locale}
+        />
+        <WellnessCard
+          label={t("home.soreness")}
+          value={latestCheckin ? latestCheckin.soreness : null}
+          color="text-gold"
+          checkins={history.checkins}
+          field="soreness"
+          invertTrend
+          date={latestCheckin?.date}
+          locale={locale}
+        />
       </div>
 
       {/* Stats row */}
@@ -510,17 +535,63 @@ function WellnessCard({
   label,
   value,
   color,
+  checkins,
+  field,
+  invertTrend,
+  date,
+  locale,
 }: {
   label: string;
-  value: string;
+  value: number | null;
   color: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  checkins: any[];
+  field: string;
+  invertTrend?: boolean;
+  date?: string;
+  locale: string;
 }) {
+  // Compute 7-day average for trend
+  const sevenDayAvg = (() => {
+    const recent = checkins.slice(-7);
+    if (recent.length < 2) return null;
+    const vals = recent.map((c) => Number(c[field]) || 0);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  })();
+
+  const trend = (() => {
+    if (value === null || sevenDayAvg === null) return null;
+    const diff = value - sevenDayAvg;
+    const effectiveDiff = invertTrend ? -diff : diff;
+    if (effectiveDiff > 0.5) return "up";
+    if (effectiveDiff < -0.5) return "down";
+    return "stable";
+  })();
+
+  const trendIcon = trend === "up" ? "↑" : trend === "down" ? "↓" : "→";
+  const trendColor = trend === "up" ? "text-sage" : trend === "down" ? "text-dt-red" : "text-gold";
+
+  // Timestamp
+  const timestamp = (() => {
+    if (!date) return null;
+    const today = new Date().toISOString().split("T")[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+    if (date === today) return locale === "es" ? "hoy" : "today";
+    if (date === yesterday) return locale === "es" ? "ayer" : "yesterday";
+    return new Date(date + "T12:00:00").toLocaleDateString(locale === "es" ? "es" : "en", { month: "short", day: "numeric" });
+  })();
+
   return (
     <div className="flex-1 rounded-[10px] border border-border bg-surface2 p-3 text-center">
-      <p className={`font-heading text-[1.4rem] font-extrabold ${color}`}>
-        {value}
-      </p>
+      <div className="flex items-baseline justify-center gap-1">
+        <p className={`font-heading text-[1.4rem] font-extrabold ${color}`}>
+          {value !== null ? value : "--"}
+        </p>
+        <span className="text-[10px] text-muted-foreground">/10</span>
+        {trend && <span className={`text-[11px] font-bold ${trendColor}`}>{trendIcon}</span>}
+      </div>
       <p className="text-[10px] text-muted-foreground mt-0.5">{label}</p>
+      {timestamp && <p className="text-[9px] text-muted-foreground/50 mt-0.5">{timestamp}</p>}
     </div>
   );
 }
