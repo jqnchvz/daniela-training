@@ -50,11 +50,17 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-[999] focus:p-4 focus:bg-background focus:text-foreground"
+        >
+          Skip to content
+        </a>
         <ThemeProvider>
           <AuthGate>
             <OnboardingGate>
               <DbHydrator />
-              <main className="flex-1 pb-20 max-w-[420px] mx-auto w-full">
+              <main id="main-content" className="flex-1 pb-20 max-w-[420px] mx-auto w-full">
                 {children}
               </main>
               <BottomNav />
