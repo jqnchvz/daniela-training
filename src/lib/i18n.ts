@@ -446,6 +446,27 @@ const translations: Record<string, Record<Locale, string>> = {
   "auth.selectProfile": { en: "Select your profile", es: "Selecciona tu perfil" },
   "auth.createProfile": { en: "Create your profile to start training.", es: "Crea tu perfil para empezar a entrenar." },
 
+  // Lab results
+  "labs.title": { en: "Lab Results", es: "Resultados de laboratorio" },
+  "labs.logNew": { en: "+ Log lab results", es: "+ Registrar resultados" },
+  "labs.date": { en: "Date", es: "Fecha" },
+  "labs.tsh": { en: "TSH", es: "TSH" },
+  "labs.freeT4": { en: "Free T4", es: "T4 libre" },
+  "labs.freeT3": { en: "Free T3", es: "T3 libre" },
+  "labs.notes": { en: "Notes", es: "Notas" },
+  "labs.notesPlaceholder": { en: "e.g. dose adjustment, symptoms...", es: "ej. ajuste de dosis, síntomas..." },
+  "labs.save": { en: "Save results", es: "Guardar resultados" },
+  "labs.saved": { en: "Saved!", es: "¡Guardado!" },
+  "labs.noResults": { en: "No lab results logged yet.", es: "Sin resultados de laboratorio aún." },
+  "labs.tshUnit": { en: "mIU/L", es: "mIU/L" },
+  "labs.t4Unit": { en: "ng/dL", es: "ng/dL" },
+  "labs.t3Unit": { en: "pg/mL", es: "pg/mL" },
+  "labs.hint": {
+    en: "TSH, Free T3, and Free T4 are checked every 6–12 weeks. Logging them lets you see how your thyroid function correlates with training performance.",
+    es: "El TSH, T3 libre y T4 libre se controlan cada 6–12 semanas. Registrarlos te permite ver cómo tu función tiroidea se correlaciona con el rendimiento en entrenamiento.",
+  },
+  "labs.tshNormal": { en: "Normal TSH: 0.4–4.0 mIU/L", es: "TSH normal: 0.4–4.0 mIU/L" },
+
   // Seasonal awareness (southern hemisphere)
   "season.winterTitle": { en: "Winter training adjustment", es: "Ajuste de entrenamiento invernal" },
   "season.winterDesc": {
