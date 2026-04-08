@@ -216,14 +216,22 @@ export function applyDeload(targetSets: number): DeloadAdjustment {
 /**
  * Calculate weekly training volume from set logs.
  */
+export type OverreachingSeverity = "none" | "caution" | "warning";
+
 export interface WeeklyVolume {
   weekStart: string;
   volume: number;
-  overreaching: boolean;
+  overreaching: OverreachingSeverity;
+}
+
+export interface WellnessFlags {
+  hasSleepFlag?: boolean;
+  hasEnergyFlag?: boolean;
 }
 
 export function calculateWeeklyVolumes(
   setLogs: Array<{ date: string; weight: number; reps: number }>,
+  wellnessFlags?: WellnessFlags,
 ): WeeklyVolume[] {
   if (setLogs.length === 0) return [];
 
@@ -237,17 +245,37 @@ export function calculateWeeklyVolumes(
     weekMap.set(key, (weekMap.get(key) ?? 0) + log.weight * log.reps);
   }
 
+  // Threshold: 10% base, 8% when wellness flags active
+  const hasWellnessIssue = wellnessFlags?.hasSleepFlag || wellnessFlags?.hasEnergyFlag;
+  const spikeThreshold = hasWellnessIssue ? 1.08 : 1.10;
+
   // Sort by date and calculate overreaching
-  const weeks = Array.from(weekMap.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([weekStart, volume], i, arr) => {
-      const prevVolume = i > 0 ? arr[i - 1][1] : volume;
-      return {
-        weekStart,
-        volume,
-        overreaching: i > 0 && volume > prevVolume * 1.15,
-      };
-    });
+  const sorted = Array.from(weekMap.entries()).sort(([a], [b]) => a.localeCompare(b));
+
+  const weeks: WeeklyVolume[] = sorted.map(([weekStart, volume], i) => {
+    let severity: OverreachingSeverity = "none";
+
+    if (i > 0) {
+      const prevVolume = sorted[i - 1][1];
+
+      // Rule 1: Single-week spike above threshold
+      if (volume > prevVolume * spikeThreshold) {
+        severity = "warning";
+      }
+
+      // Rule 2: 3+ consecutive weeks of any increase (creeping overload)
+      if (severity === "none" && i >= 2) {
+        const threeWeeksIncreasing =
+          sorted[i][1] > sorted[i - 1][1] &&
+          sorted[i - 1][1] > sorted[i - 2][1];
+        if (threeWeeksIncreasing) {
+          severity = "caution";
+        }
+      }
+    }
+
+    return { weekStart, volume, overreaching: severity };
+  });
 
   return weeks.slice(-8); // Last 8 weeks
 }

@@ -229,14 +229,33 @@ describe("calculateWeeklyVolumes", () => {
     expect(result[0].volume).toBe(200); // 10*10 + 10*10
   });
 
-  it("detects overreaching (>15% increase)", () => {
+  it("detects overreaching warning (>10% increase)", () => {
     const logs = [
       { date: "2026-03-30", weight: 10, reps: 10 }, // Week 1: 100
       { date: "2026-04-06", weight: 10, reps: 12 }, // Week 2: 120 (20% increase)
     ];
     const result = calculateWeeklyVolumes(logs);
     expect(result).toHaveLength(2);
-    expect(result[1].overreaching).toBe(true);
+    expect(result[1].overreaching).toBe("warning");
+  });
+
+  it("detects overreaching with lower threshold when wellness flags active", () => {
+    const logs = [
+      { date: "2026-03-30", weight: 10, reps: 10 }, // Week 1: 100
+      { date: "2026-04-06", weight: 10, reps: 11 }, // Week 2: 110 (10% — normally fine, but 8% threshold with flags)
+    ];
+    const result = calculateWeeklyVolumes(logs, { hasEnergyFlag: true });
+    expect(result[1].overreaching).toBe("warning");
+  });
+
+  it("detects caution for 3 consecutive weeks of increase", () => {
+    const logs = [
+      { date: "2026-03-23", weight: 10, reps: 10 }, // Week 1: 100
+      { date: "2026-03-30", weight: 10, reps: 10.5 }, // Week 2: 105
+      { date: "2026-04-06", weight: 10, reps: 10.8 }, // Week 3: 108 (each <10%, but 3 consecutive)
+    ];
+    const result = calculateWeeklyVolumes(logs);
+    expect(result[2].overreaching).toBe("caution");
   });
 
   it("limits to last 8 weeks", () => {
