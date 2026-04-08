@@ -22,6 +22,8 @@ export default function SettingsPage() {
   const cycleEnabled = useCyclePhaseStore((s) => s.enabled);
   const enableCycle = useCyclePhaseStore((s) => s.enable);
   const disableCycle = useCyclePhaseStore((s) => s.disable);
+  const periodStartDates = useCyclePhaseStore((s) => s.periodStartDates);
+  const removePeriodStart = useCyclePhaseStore((s) => s.removePeriodStart);
   const cycleStartDate = useCycleStore((s) => s.cycleStartDate);
   const resetCycle = useCycleStore((s) => s.resetCycle);
   const sessions = useHistoryStore((s) => s.sessions);
@@ -31,6 +33,7 @@ export default function SettingsPage() {
   const [exported, setExported] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetDone, setResetDone] = useState(false);
+  const [showCycleDisableConfirm, setShowCycleDisableConfirm] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -146,16 +149,72 @@ export default function SettingsPage() {
 
       {/* Menstrual cycle tracking */}
       <Section title={t("settings.cycleTracking")}>
-        <button
-          onClick={() => (cycleEnabled ? disableCycle() : enableCycle())}
-          className={`w-full rounded-[10px] border py-2.5 min-h-[44px] text-[13px] font-semibold transition-colors ${
-            cycleEnabled
-              ? "border-sage bg-sage-bg text-sage"
-              : "border-border bg-surface2 text-muted-foreground"
-          }`}
-        >
-          {cycleEnabled ? `✓ ${t("settings.cycleEnabled")}` : t("settings.cycleDisabled")}
-        </button>
+        {cycleEnabled ? (
+          <>
+            {/* Period start dates list */}
+            {periodStartDates.length > 0 ? (
+              <div className="mb-3 space-y-1">
+                <p className="text-[11px] font-semibold tracking-[1px] uppercase text-muted-foreground font-mono mb-1.5">
+                  {t("settings.periodDates")}
+                </p>
+                {periodStartDates.slice(0, 6).map((date) => (
+                  <div key={date} className="flex items-center justify-between rounded-[10px] bg-surface2 border border-border px-3 py-2.5">
+                    <span className="font-mono text-[13px]">{date}</span>
+                    <button
+                      onClick={() => removePeriodStart(date)}
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-dt-red hover:bg-dt-red/10 transition-colors text-[13px] min-h-[44px] min-w-[44px]"
+                      aria-label={`Remove ${date}`}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[12px] text-muted-foreground mb-3">{t("settings.noPeriodDates")}</p>
+            )}
+
+            {/* Disable button with warning */}
+            {!showCycleDisableConfirm ? (
+              <button
+                onClick={() => setShowCycleDisableConfirm(true)}
+                className="w-full rounded-[10px] border border-dt-red/30 bg-dt-red/10 py-2.5 min-h-[44px] text-[13px] font-semibold text-dt-red transition-colors hover:bg-dt-red/20"
+              >
+                {t("settings.cycleDisabled")}
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-[13px] text-muted-foreground leading-relaxed">
+                  {t("settings.cycleDisableWarning")}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowCycleDisableConfirm(false)}
+                    className="flex-1 rounded-[10px] border border-border bg-surface2 py-2.5 min-h-[44px] text-[12px] font-semibold"
+                  >
+                    {t("common.cancel")}
+                  </button>
+                  <button
+                    onClick={() => {
+                      disableCycle();
+                      setShowCycleDisableConfirm(false);
+                    }}
+                    className="flex-1 rounded-[10px] bg-dt-red py-2.5 min-h-[44px] text-[12px] font-bold text-white"
+                  >
+                    {t("settings.cycleDisableConfirm")}
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <button
+            onClick={enableCycle}
+            className="w-full rounded-[10px] border border-border bg-surface2 py-2.5 min-h-[44px] text-[13px] font-semibold text-muted-foreground transition-colors hover:bg-surface3"
+          >
+            {t("settings.cycleDisabled")}
+          </button>
+        )}
         <p className="text-[11px] text-muted-foreground mt-2">{t("settings.cycleHint")}</p>
       </Section>
 
