@@ -231,6 +231,9 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
   const currentImageUrl = cachedGif ?? (showFrame2 && exercise?.gifUrl2 ? exercise.gifUrl2 : exercise?.gifUrl);
 
+  // Exit confirmation
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+
   // RPE picker state — shown after logging a set, before rest timer
   const [showRpePicker, setShowRpePicker] = useState(false);
   const [pendingRestTimer, setPendingRestTimer] = useState<{ duration: number; nextInfo: string | null } | null>(null);
@@ -363,7 +366,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
     <>
       {/* Header */}
       <div className="px-5 pt-5 flex items-center justify-between">
-        <button onClick={() => (window.location.href = "/")} className="text-[13px] text-muted-foreground">
+        <button onClick={() => setShowExitConfirm(true)} className="text-[13px] text-muted-foreground min-h-[44px] min-w-[44px]">
           {t("session.endSession")}
         </button>
         <div className="flex items-center gap-2">
@@ -532,6 +535,36 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
       {/* Rest timer overlay */}
       <RestTimer />
+
+      {/* Exit confirmation dialog */}
+      {showExitConfirm && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background/95 backdrop-blur-sm px-6">
+          <div className="w-full max-w-[340px] rounded-[20px] border border-border bg-card p-6 text-center">
+            <div className="text-4xl mb-3">⚠️</div>
+            <h3 className="font-heading text-lg font-bold mb-2">{t("session.exitConfirmTitle")}</h3>
+            <p className="text-[13px] text-muted-foreground leading-relaxed mb-5">
+              {t("session.exitConfirmDesc")}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowExitConfirm(false)}
+                className="flex-1 rounded-[12px] border border-border bg-surface2 py-3 min-h-[44px] text-[13px] font-semibold transition-colors hover:bg-surface3"
+              >
+                {t("common.cancel")}
+              </button>
+              <button
+                onClick={() => {
+                  store.reset();
+                  window.location.href = "/";
+                }}
+                className="flex-1 rounded-[12px] bg-dt-red py-3 min-h-[44px] text-[13px] font-bold text-white transition-colors hover:bg-dt-red/80"
+              >
+                {t("session.exitConfirmEnd")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
