@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import { useHistoryStore } from "@/store/history-store";
 import { useCycleStore } from "@/store/cycle-store";
+import { useSessionStore } from "@/store/session-store";
+import { useCyclePhaseStore } from "@/store/cycle-phase-store";
 import { useAuthStore } from "@/store/auth-store";
 import {
   fetchSessionsFromDb,
@@ -21,6 +23,10 @@ export function useHydrateFromDb() {
   useEffect(() => {
     if (lastHydratedUser.current === (activeUserId ?? null)) return;
     lastHydratedUser.current = activeUserId ?? null;
+
+    // Reset client-only stores on user switch to prevent data leakage
+    useSessionStore.getState().reset();
+    useCyclePhaseStore.getState().switchUser(activeUserId ?? null);
 
     (async () => {
       try {

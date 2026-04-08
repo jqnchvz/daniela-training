@@ -8,11 +8,13 @@ interface CyclePhaseState {
   enabled: boolean; // opt-in feature
   periodStartDates: string[]; // ISO date strings, most recent first
   defaultCycleLength: number;
+  activeUserId: string | null;
 
   enable: () => void;
   disable: () => void;
   logPeriodStart: (date: string) => void;
   removePeriodStart: (date: string) => void;
+  switchUser: (userId: string | null) => void;
   getCurrentPhase: () => {
     phase: CyclePhase;
     dayInCycle: number;
@@ -35,15 +37,56 @@ function getPhaseForDay(day: number): CyclePhase {
   return "luteal";
 }
 
+const PER_USER_KEY_PREFIX = "cycle-phase-store";
+
+function getUserKey(userId: string | null): string {
+  return userId ? `${PER_USER_KEY_PREFIX}-${userId}` : PER_USER_KEY_PREFIX;
+}
+
+function loadUserData(userId: string | null): { enabled: boolean; periodStartDates: string[] } {
+  try {
+    const raw = localStorage.getItem(getUserKey(userId));
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        enabled: parsed.state?.enabled ?? false,
+        periodStartDates: parsed.state?.periodStartDates ?? [],
+      };
+    }
+  } catch { /* ignore */ }
+  return { enabled: false, periodStartDates: [] };
+}
+
+function saveUserData(userId: string | null, state: CyclePhaseState) {
+  const key = getUserKey(userId);
+  const data = {
+    state: {
+      enabled: state.enabled,
+      periodStartDates: state.periodStartDates,
+      defaultCycleLength: state.defaultCycleLength,
+      activeUserId: userId,
+    },
+    version: 0,
+  };
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
 export const useCyclePhaseStore = create<CyclePhaseState>()(
   persist(
     (set, get) => ({
       enabled: false,
       periodStartDates: [],
       defaultCycleLength: 28,
+      activeUserId: null,
 
-      enable: () => set({ enabled: true }),
-      disable: () => set({ enabled: false, periodStartDates: [] }),
+      enable: () => {
+        set({ enabled: true });
+        saveUserData(get().activeUserId, get());
+      },
+      disable: () => {
+        set({ enabled: false, periodStartDates: [] });
+        saveUserData(get().activeUserId, get());
+      },
       logPeriodStart: (date: string) => {
         const existing = get().periodStartDates;
         if (existing.includes(date)) return;
@@ -51,17 +94,33 @@ export const useCyclePhaseStore = create<CyclePhaseState>()(
           (a, b) => new Date(b).getTime() - new Date(a).getTime(),
         );
         set({ periodStartDates: updated });
+        saveUserData(get().activeUserId, { ...get(), periodStartDates: updated });
       },
 
       removePeriodStart: (date: string) => {
+        const updated = get().periodStartDates.filter((d) => d !== date);
+        set({ periodStartDates: updated });
+        saveUserData(get().activeUserId, { ...get(), periodStartDates: updated });
+      },
+
+      switchUser: (userId: string | null) => {
+        // Save current user's data before switching
+        const current = get();
+        if (current.activeUserId !== userId) {
+          saveUserData(current.activeUserId, current);
+        }
+        // Load new user's data
+        const userData = loadUserData(userId);
         set({
-          periodStartDates: get().periodStartDates.filter((d) => d !== date),
+          activeUserId: userId,
+          enabled: userData.enabled,
+          periodStartDates: userData.periodStartDates,
         });
       },
 
       getCurrentPhase: () => {
-        const { periodStartDates } = get();
-        if (periodStartDates.length === 0) return null;
+        const { periodStartDates, enabled } = get();
+        if (!enabled || periodStartDates.length === 0) return null;
 
         const latest = periodStartDates[0];
         const today = new Date().toISOString().split("T")[0];
@@ -81,7 +140,6 @@ export const useCyclePhaseStore = create<CyclePhaseState>()(
         const { periodStartDates, defaultCycleLength } = get();
         if (periodStartDates.length < 2) return defaultCycleLength;
 
-        // periodStartDates is sorted most recent first
         const gaps: number[] = [];
         for (let i = 0; i < periodStartDates.length - 1; i++) {
           gaps.push(daysBetween(periodStartDates[i], periodStartDates[i + 1]));
