@@ -11,12 +11,25 @@ export function RestTimer() {
   const locale = useI18n((s) => s.locale);
   const [remaining, setRemaining] = useState(0);
   const [totalSeconds, setTotalSeconds] = useState(0);
+  const [skipDelay, setSkipDelay] = useState(30);
 
   useEffect(() => {
     if (!restTimerEnd) {
       setRemaining(0);
+      setSkipDelay(30);
       return;
     }
+
+    setSkipDelay(30);
+    const delayInterval = setInterval(() => {
+      setSkipDelay((prev) => {
+        if (prev <= 1) {
+          clearInterval(delayInterval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
     const total = Math.ceil((restTimerEnd - Date.now()) / 1000);
     setTotalSeconds(total);
@@ -36,7 +49,10 @@ export function RestTimer() {
 
     tick();
     const interval = setInterval(tick, 250);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      clearInterval(delayInterval);
+    };
   }, [restTimerEnd, setRestTimer]);
 
   if (!restTimerEnd && remaining <= 0) return null;
@@ -101,12 +117,18 @@ export function RestTimer() {
         </div>
       )}
 
-      <button
-        onClick={() => setRestTimer(null)}
-        className="rounded-full bg-surface2 border border-border px-8 py-3 text-sm font-semibold transition-colors hover:bg-surface3"
-      >
-        {t("rest.skipRest")}
-      </button>
+      {skipDelay > 0 ? (
+        <p className="text-sm text-muted-foreground/60">
+          {t("session.skipAvailableIn").replace("{n}", String(skipDelay))}
+        </p>
+      ) : (
+        <button
+          onClick={() => setRestTimer(null)}
+          className="rounded-full bg-surface2 border border-border px-8 py-3 text-sm font-semibold transition-colors hover:bg-surface3"
+        >
+          {t("rest.skipRest")}
+        </button>
+      )}
     </div>
   );
 }

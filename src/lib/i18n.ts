@@ -190,6 +190,7 @@ const translations: Record<string, Record<Locale, string>> = {
   "rest.rest": { en: "REST", es: "DESCANSO" },
   "rest.greatSet": { en: "Great set! Rest and\nprepare for the next one.", es: "¡Gran serie! Descansa y\nprepárate para la siguiente." },
   "rest.skipRest": { en: "Skip rest →", es: "Saltar descanso →" },
+  "session.skipAvailableIn": { en: "Skip available in {n}s", es: "Saltar disponible en {n}s" },
 
   // Progress
   "progress.title": { en: "Progress", es: "Progreso" },
