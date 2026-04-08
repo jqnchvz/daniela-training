@@ -10,6 +10,7 @@ import { EXERCISES, getExerciseById } from "@/lib/exercises";
 import { detectRedFlags, type CheckinData } from "@/lib/checkin";
 import { useAuthStore } from "@/store/auth-store";
 import { useT, useI18n, t as tFn } from "@/lib/i18n";
+import { useCyclePhaseStore } from "@/store/cycle-phase-store";
 
 export default function ProgressPage() {
   const sessions = useHistoryStore((s) => s.sessions);
@@ -61,6 +62,9 @@ export default function ProgressPage() {
 
   // Build weekly volume data
   const weeklyVolumes = getWeeklyVolumeData(sessions);
+
+  const cycleEnabled = useCyclePhaseStore((s) => s.enabled);
+  const periodStartDates = useCyclePhaseStore((s) => s.periodStartDates);
 
   const hasData = sessions.length > 0 || checkins.length > 0;
   const t = useT();
@@ -166,7 +170,7 @@ export default function ProgressPage() {
                 </select>
 
                 {exerciseHistory.length >= 2 ? (
-                  <StrengthChart data={exerciseHistory} />
+                  <StrengthChart data={exerciseHistory} periodStartDates={cycleEnabled ? periodStartDates : []} />
                 ) : (
                   <p className="text-xs text-muted-foreground text-center py-4">
                     {t("progress.needAtLeast2")}
@@ -234,7 +238,14 @@ export default function ProgressPage() {
                 {t("progress.wellnessTrend")}
               </p>
               <div className="rounded-[16px] border border-border bg-card p-[18px] mb-3">
-                <WellnessChart checkins={checkins.slice(0, 14).reverse()} />
+                <WellnessChart checkins={checkins.slice(0, 14).reverse()} periodStartDates={cycleEnabled ? periodStartDates : []} />
+                {cycleEnabled && periodStartDates.length > 0 && (
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className="text-[9px] text-muted-foreground uppercase tracking-[1px] font-mono">{tFn("cycle.phaseLegend")}:</span>
+                    <span className="flex items-center gap-1"><span className="inline-block w-3 h-2.5 rounded-sm bg-red-400/40" /><span className="text-[9px] text-muted-foreground">{tFn("cycle.legendMenstrual")}</span></span>
+                    <span className="flex items-center gap-1"><span className="inline-block w-3 h-2.5 rounded-sm bg-purple-400/30" /><span className="text-[9px] text-muted-foreground">{tFn("cycle.legendLuteal")}</span></span>
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -532,9 +543,78 @@ function getWeeklyVolumeData(sessions: CompletedSession[]): WeeklyVolumePoint[] 
     }));
 }
 
+// ─── Cycle phase band helpers ───────────────────────────────
+
+/**
+ * Given a date string and period start dates, return the cycle phase.
+ * Returns null if cycle tracking is off or no period dates are logged.
+ */
+function getCyclePhaseForDate(date: string, periodStartDates: string[]): "menstrual" | "follicular" | "ovulation" | "luteal" | null {
+  if (periodStartDates.length === 0) return null;
+  const msPerDay = 86400000;
+  const d = new Date(date + "T00:00:00").getTime();
+  // Find the most recent period start before or on this date
+  const relevant = periodStartDates
+    .filter((p) => new Date(p + "T00:00:00").getTime() <= d)
+    .sort((a, b) => new Date(b + "T00:00:00").getTime() - new Date(a + "T00:00:00").getTime());
+  if (relevant.length === 0) return null;
+  const latest = relevant[0];
+  const dayInCycle = Math.round(Math.abs(d - new Date(latest + "T00:00:00").getTime()) / msPerDay) + 1;
+  if (dayInCycle > 35) return null; // beyond a plausible cycle
+  if (dayInCycle <= 5) return "menstrual";
+  if (dayInCycle <= 13) return "follicular";
+  if (dayInCycle <= 16) return "ovulation";
+  return "luteal";
+}
+
+/**
+ * Build a list of x-ranges to shade on a chart for menstrual and luteal phases.
+ * dates: array of ISO date strings matching each data point x position.
+ * xForIndex: function mapping index → x coordinate in SVG space.
+ */
+function buildCycleBands(
+  dates: string[],
+  periodStartDates: string[],
+  xForIndex: (i: number) => number,
+  svgWidth: number,
+): Array<{ x: number; width: number; phase: "menstrual" | "luteal" }> {
+  if (periodStartDates.length === 0 || dates.length === 0) return [];
+  const bands: Array<{ x: number; width: number; phase: "menstrual" | "luteal" }> = [];
+  const slotWidth = dates.length > 1 ? svgWidth / (dates.length - 1) : svgWidth;
+
+  let currentBand: { startX: number; phase: "menstrual" | "luteal" } | null = null;
+
+  for (let i = 0; i < dates.length; i++) {
+    const phase = getCyclePhaseForDate(dates[i], periodStartDates);
+    const x = xForIndex(i);
+    const highlight = phase === "menstrual" || phase === "luteal" ? phase : null;
+
+    if (highlight) {
+      if (!currentBand || currentBand.phase !== highlight) {
+        if (currentBand) {
+          bands.push({ x: currentBand.startX, width: x - currentBand.startX, phase: currentBand.phase });
+        }
+        currentBand = { startX: Math.max(0, x - slotWidth / 2), phase: highlight };
+      }
+    } else {
+      if (currentBand) {
+        bands.push({ x: currentBand.startX, width: x - currentBand.startX, phase: currentBand.phase });
+        currentBand = null;
+      }
+    }
+  }
+
+  if (currentBand) {
+    const lastX = xForIndex(dates.length - 1);
+    bands.push({ x: currentBand.startX, width: lastX + slotWidth / 2 - currentBand.startX, phase: currentBand.phase });
+  }
+
+  return bands;
+}
+
 // ─── SVG Chart components ───────────────────────────────────
 
-function StrengthChart({ data }: { data: ExerciseDataPoint[] }) {
+function StrengthChart({ data, periodStartDates = [] }: { data: ExerciseDataPoint[]; periodStartDates?: string[] }) {
   const maxWeight = Math.max(...data.map((d) => d.maxWeight));
   const minWeight = Math.min(...data.map((d) => d.maxWeight));
   const range = maxWeight - minWeight || 1;
@@ -542,14 +622,18 @@ function StrengthChart({ data }: { data: ExerciseDataPoint[] }) {
   const height = 80;
   const padding = 5;
 
+  const xForIndex = (i: number) => data.length === 1 ? width / 2 : (i / (data.length - 1)) * (width - padding * 2) + padding;
+
   const points = data.map((d, i) => {
-    const x = data.length === 1 ? width / 2 : (i / (data.length - 1)) * (width - padding * 2) + padding;
+    const x = xForIndex(i);
     const y = height - padding - ((d.maxWeight - minWeight) / range) * (height - padding * 2 - 10);
     return { x, y, ...d };
   });
 
   const polyline = points.map((p) => `${p.x},${p.y}`).join(" ");
   const areaPath = `M ${points[0].x},${points[0].y} ${points.map((p) => `L ${p.x},${p.y}`).join(" ")} L ${points[points.length - 1].x},${height} L ${points[0].x},${height} Z`;
+
+  const cycleBands = buildCycleBands(data.map((d) => d.date), periodStartDates, xForIndex, width);
 
   return (
     <>
@@ -566,6 +650,17 @@ function StrengthChart({ data }: { data: ExerciseDataPoint[] }) {
             <stop offset="100%" stopColor="#9B8EC4" stopOpacity="0" />
           </linearGradient>
         </defs>
+        {cycleBands.map((band, i) => (
+          <rect
+            key={i}
+            x={band.x}
+            y={0}
+            width={Math.max(0, band.width)}
+            height={height}
+            fill={band.phase === "menstrual" ? "#F87171" : "#A78BFA"}
+            opacity={0.12}
+          />
+        ))}
         <path d={areaPath} fill="url(#strengthGrad)" />
         <polyline points={polyline} stroke="#9B8EC4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         {points.map((p, i) => (
@@ -676,20 +771,24 @@ function LissChart({ checkins }: { checkins: Array<{ date: string; walkMinutes: 
   );
 }
 
-function WellnessChart({ checkins }: { checkins: Array<{ date: string; energy: number; sleepQuality: number }> }) {
+function WellnessChart({ checkins, periodStartDates = [] }: { checkins: Array<{ date: string; energy: number; sleepQuality: number }>; periodStartDates?: string[] }) {
   const width = 300;
   const height = 80;
   const padding = 5;
 
+  const xForIndex = (i: number) => checkins.length === 1 ? width / 2 : (i / (checkins.length - 1)) * (width - padding * 2) + padding;
+
   const makePoints = (values: number[]) =>
     values.map((v, i) => {
-      const x = values.length === 1 ? width / 2 : (i / (values.length - 1)) * (width - padding * 2) + padding;
+      const x = xForIndex(i);
       const y = height - padding - ((v - 1) / 9) * (height - padding * 2 - 10);
       return `${x},${y}`;
     }).join(" ");
 
   const energyPoints = makePoints(checkins.map((c) => c.energy));
   const sleepPoints = makePoints(checkins.map((c) => c.sleepQuality));
+
+  const cycleBands = buildCycleBands(checkins.map((c) => c.date), periodStartDates, xForIndex, width);
 
   return (
     <svg
@@ -699,6 +798,17 @@ function WellnessChart({ checkins }: { checkins: Array<{ date: string; energy: n
       role="img"
       aria-label={tFn("progress.wellnessTrend")}
     >
+      {cycleBands.map((band, i) => (
+        <rect
+          key={i}
+          x={band.x}
+          y={0}
+          width={Math.max(0, band.width)}
+          height={height}
+          fill={band.phase === "menstrual" ? "#F87171" : "#A78BFA"}
+          opacity={0.12}
+        />
+      ))}
       <polyline points={energyPoints} stroke="#9B8EC4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       <polyline points={sleepPoints} stroke="#5a9fd4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2" />
       <line x1="10" y1="10" x2="25" y2="10" stroke="#9B8EC4" strokeWidth="2" />
