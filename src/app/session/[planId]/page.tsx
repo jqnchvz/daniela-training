@@ -420,7 +420,7 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
           const input = setInputs[i] || { weight: "0", reps: String(currentPlanExercise.reps) };
           return (
             <div key={i} className="flex items-center gap-2.5 py-2.5 border-b border-border last:border-b-0">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border shrink-0 transition-colors ${
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold border shrink-0 transition-colors ${
                 isDone ? "bg-sage-dim text-sage border-sage-dim" : "bg-surface2 text-muted-foreground border-border"
               }`}>
                 {i + 1}

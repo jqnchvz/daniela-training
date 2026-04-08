@@ -105,7 +105,7 @@ export default function HomePage() {
               }
               setShowUserMenu(!showUserMenu);
             }}
-            className="w-10 h-10 rounded-full bg-surface2 border border-border flex items-center justify-center text-xl"
+            className="w-12 h-12 rounded-full bg-surface2 border border-border flex items-center justify-center text-xl"
             title={t("auth.switchUser")}
           >
             {activeUserEmoji ?? "💪"}
@@ -210,7 +210,7 @@ export default function HomePage() {
               setPeriodLogged(true);
               setTimeout(() => setPeriodLogged(false), 2000);
             }}
-            className="mt-2 text-[11px] text-muted-foreground underline"
+            className="mt-2 inline-flex items-center justify-center rounded-[10px] border border-border bg-surface2 px-3 min-h-[44px] text-[12px] text-muted-foreground font-medium"
           >
             {periodLogged ? t("cycle.logged") : t("cycle.logPeriod")}
           </button>
@@ -233,7 +233,7 @@ export default function HomePage() {
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={() => setShowCycleExplainer(false)}
-                  className="flex-1 rounded-[10px] border border-border bg-surface2 py-2 text-[12px] font-semibold"
+                  className="flex-1 rounded-[10px] border border-border bg-surface2 py-2.5 min-h-[44px] text-[12px] font-semibold"
                 >
                   {t("common.cancel")}
                 </button>
@@ -246,7 +246,7 @@ export default function HomePage() {
                     setPeriodLogged(true);
                     setTimeout(() => setPeriodLogged(false), 2000);
                   }}
-                  className="flex-1 rounded-[10px] bg-sage py-2 text-[12px] font-bold text-primary-foreground"
+                  className="flex-1 rounded-[10px] bg-sage py-2.5 min-h-[44px] text-[12px] font-bold text-primary-foreground"
                 >
                   {t("cycle.enableAndLog")}
                 </button>
@@ -264,7 +264,7 @@ export default function HomePage() {
           </p>
           <button
             onClick={() => setEarlyDeloadDismissed(true)}
-            className="text-[11px] text-gold/70 font-semibold shrink-0 mt-0.5"
+            className="text-[12px] text-gold/70 font-semibold shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             {t("home.dismiss")}
           </button>

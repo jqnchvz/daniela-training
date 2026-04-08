@@ -10,14 +10,14 @@ export function ThemeToggle() {
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) return <div className="h-[38px] w-[38px]" />;
+  if (!mounted) return <div className="h-[48px] w-[48px]" />;
 
   return (
     <div className="flex gap-2">
       <LanguageToggle />
       <button
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="flex h-[38px] w-[38px] items-center justify-center rounded-full bg-surface2 border border-border text-base transition-colors hover:bg-surface3"
+        className="flex h-[48px] w-[48px] items-center justify-center rounded-full bg-surface2 border border-border text-base transition-colors hover:bg-surface3"
         aria-label="Toggle theme"
       >
         {theme === "dark" ? "☀️" : "🌙"}
@@ -32,7 +32,7 @@ function LanguageToggle() {
   return (
     <button
       onClick={() => setLocale(locale === "en" ? "es" : "en")}
-      className="flex h-[38px] px-2.5 items-center justify-center rounded-full bg-surface2 border border-border text-[11px] font-bold uppercase tracking-wider transition-colors hover:bg-surface3"
+      className="flex h-[48px] px-3.5 items-center justify-center rounded-full bg-surface2 border border-border text-[11px] font-bold uppercase tracking-wider transition-colors hover:bg-surface3"
     >
       {locale === "en" ? "ES" : "EN"}
     </button>
