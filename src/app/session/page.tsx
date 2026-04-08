@@ -80,6 +80,8 @@ export default function SessionPage() {
             >
               <button
                 onClick={() => setExpandedId(isExpanded ? null : plan.id)}
+                aria-expanded={isExpanded}
+                aria-controls={`session-plan-${plan.id}`}
                 className="w-full p-4 text-left"
               >
                 <div className="flex items-center justify-between">
@@ -107,7 +109,7 @@ export default function SessionPage() {
               </button>
 
               {isExpanded && (
-                <div className="border-t border-border">
+                <div id={`session-plan-${plan.id}`} className="border-t border-border">
                   {/* Warmup */}
                   <div className="px-4 pt-3 pb-2">
                     <p className="text-[10px] font-semibold tracking-[1.5px] uppercase text-sage font-mono mb-2">

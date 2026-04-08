@@ -186,6 +186,8 @@ export default function HomePage() {
       {phaseStatus ? (
         <button
           onClick={() => setStatusExpanded(!statusExpanded)}
+          aria-expanded={statusExpanded}
+          aria-controls="training-status-panel"
           className="mt-3 w-full flex items-center justify-between rounded-[12px] bg-secondary border border-border px-3.5 py-2 min-h-[44px] text-left"
         >
           <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
@@ -248,7 +250,7 @@ export default function HomePage() {
 
       {/* Expanded status details (when program active) */}
       {phaseStatus && statusExpanded && (
-        <div className="mt-1 rounded-[12px] border border-border bg-card p-3.5 space-y-2">
+        <div id="training-status-panel" className="mt-1 rounded-[12px] border border-border bg-card p-3.5 space-y-2">
           <p className="text-[11px] text-muted-foreground leading-relaxed">
             {phaseStatus.phase.phase === 1
               ? t("home.phaseStabilization")
@@ -595,9 +597,12 @@ export default function HomePage() {
 
 function RecoveryTip({ icon, title, desc, expandedDesc }: { icon: string; title: string; desc: string; expandedDesc?: string }) {
   const [expanded, setExpanded] = useState(false);
+  const panelId = `recovery-tip-${title.replace(/\s+/g, "-").toLowerCase()}`;
   return (
     <button
       onClick={() => expandedDesc && setExpanded(!expanded)}
+      aria-expanded={expandedDesc ? expanded : undefined}
+      aria-controls={expandedDesc ? panelId : undefined}
       className="flex items-start gap-2.5 text-left w-full rounded-[10px] py-1.5 px-1 -mx-1 transition-colors hover:bg-surface2/50"
     >
       <span className="text-lg shrink-0 mt-0.5">{icon}</span>
@@ -608,7 +613,7 @@ function RecoveryTip({ icon, title, desc, expandedDesc }: { icon: string; title:
         </div>
         <p className="text-[11px] text-muted-foreground leading-relaxed">{desc}</p>
         {expanded && expandedDesc && (
-          <p className="text-[11px] text-muted-foreground/70 leading-relaxed mt-1.5 border-t border-border pt-1.5">{expandedDesc}</p>
+          <p id={panelId} className="text-[11px] text-muted-foreground/70 leading-relaxed mt-1.5 border-t border-border pt-1.5">{expandedDesc}</p>
         )}
       </div>
     </button>
