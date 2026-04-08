@@ -22,6 +22,14 @@ export function RpePicker({ onSelect, onSkip }: RpePickerProps) {
 
   return (
     <div className="fixed inset-0 z-[190] flex flex-col items-center justify-center bg-background/95 backdrop-blur-[10px] px-6">
+      {/* Close button */}
+      <button
+        onClick={onSkip}
+        className="absolute top-4 right-4 flex items-center justify-center rounded-full bg-surface2 border border-border min-h-[44px] min-w-[44px] text-muted-foreground text-lg transition-colors hover:bg-surface3"
+        aria-label="Close"
+      >
+        ✕
+      </button>
       <p className="text-xs tracking-[2px] uppercase text-muted-foreground font-mono mb-2">
         {t("rpe.title")}
       </p>
