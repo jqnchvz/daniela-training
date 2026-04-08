@@ -105,7 +105,7 @@ export default function HomePage() {
               }
               setShowUserMenu(!showUserMenu);
             }}
-            className="w-10 h-10 rounded-full bg-surface2 border border-border flex items-center justify-center text-xl"
+            className="w-12 h-12 rounded-full bg-surface2 border border-border flex items-center justify-center text-xl"
             title={t("auth.switchUser")}
           >
             {activeUserEmoji ?? "💪"}
@@ -180,7 +180,7 @@ export default function HomePage() {
       ) : (
         <button
           onClick={cycle.startCycle}
-          className="mt-3 inline-flex items-center gap-2 rounded-full bg-sage-bg border border-sage-dim px-3.5 py-1.5 text-xs font-semibold text-sage transition-colors hover:bg-sage/20"
+          className="mt-3 inline-flex items-center gap-2 rounded-full bg-sage-bg border border-sage-dim px-3.5 py-2.5 min-h-[44px] text-xs font-semibold text-sage transition-colors hover:bg-sage/20"
         >
           <span className="h-2 w-2 rounded-full bg-sage" />
           {t("home.startProgram")}
@@ -210,7 +210,7 @@ export default function HomePage() {
               setPeriodLogged(true);
               setTimeout(() => setPeriodLogged(false), 2000);
             }}
-            className="mt-2 text-[11px] text-muted-foreground underline"
+            className="mt-2 inline-flex items-center justify-center rounded-[10px] border border-border bg-surface2 px-3 min-h-[44px] text-[12px] text-muted-foreground font-medium"
           >
             {periodLogged ? t("cycle.logged") : t("cycle.logPeriod")}
           </button>
@@ -220,7 +220,7 @@ export default function HomePage() {
           {!showCycleExplainer ? (
             <button
               onClick={() => setShowCycleExplainer(true)}
-              className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-surface2 border border-border px-3 py-1.5 text-[11px] text-muted-foreground"
+              className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-surface2 border border-border px-3 py-2.5 min-h-[44px] text-[11px] text-muted-foreground"
             >
               {t("cycle.startTracking")}
             </button>
@@ -233,7 +233,7 @@ export default function HomePage() {
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={() => setShowCycleExplainer(false)}
-                  className="flex-1 rounded-[10px] border border-border bg-surface2 py-2 text-[12px] font-semibold"
+                  className="flex-1 rounded-[10px] border border-border bg-surface2 py-2.5 min-h-[44px] text-[12px] font-semibold"
                 >
                   {t("common.cancel")}
                 </button>
@@ -246,7 +246,7 @@ export default function HomePage() {
                     setPeriodLogged(true);
                     setTimeout(() => setPeriodLogged(false), 2000);
                   }}
-                  className="flex-1 rounded-[10px] bg-sage py-2 text-[12px] font-bold text-primary-foreground"
+                  className="flex-1 rounded-[10px] bg-sage py-2.5 min-h-[44px] text-[12px] font-bold text-primary-foreground"
                 >
                   {t("cycle.enableAndLog")}
                 </button>
@@ -264,7 +264,7 @@ export default function HomePage() {
           </p>
           <button
             onClick={() => setEarlyDeloadDismissed(true)}
-            className="text-[11px] text-gold/70 font-semibold shrink-0 mt-0.5"
+            className="text-[12px] text-gold/70 font-semibold shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             {t("home.dismiss")}
           </button>
@@ -543,7 +543,7 @@ function LissActivityCard() {
       <div className="flex gap-2 mb-3">
         <button
           onClick={() => setDidStretching(!didStretching)}
-          className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+          className={`flex-1 rounded-[10px] border py-2.5 min-h-[44px] text-[13px] font-semibold transition-colors ${
             didStretching
               ? "border-sage bg-sage-bg text-sage"
               : "border-border bg-surface2 text-muted-foreground"
@@ -553,7 +553,7 @@ function LissActivityCard() {
         </button>
         <button
           onClick={() => setDidYoga(!didYoga)}
-          className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+          className={`flex-1 rounded-[10px] border py-2.5 min-h-[44px] text-[13px] font-semibold transition-colors ${
             didYoga
               ? "border-sage bg-sage-bg text-sage"
               : "border-border bg-surface2 text-muted-foreground"
@@ -566,7 +566,7 @@ function LissActivityCard() {
       {/* Save button */}
       <button
         onClick={handleSave}
-        className="w-full rounded-[12px] bg-sage py-2.5 text-[13px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
+        className="w-full rounded-[12px] bg-sage py-2.5 min-h-[44px] text-[13px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
       >
         {saved ? t("home.activitySaved") : t("home.logActivity")}
       </button>

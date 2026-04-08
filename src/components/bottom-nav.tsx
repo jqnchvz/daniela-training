@@ -36,7 +36,7 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={href}
-              className="flex flex-1 flex-col items-center gap-1 py-1"
+              className="flex flex-1 flex-col items-center gap-1 py-2 min-h-[48px] justify-center"
             >
               <span className="text-xl leading-none">{item.icon}</span>
               <span
