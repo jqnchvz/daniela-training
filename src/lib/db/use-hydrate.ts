@@ -62,6 +62,7 @@ export function useHydrateFromDb() {
               averageHr: s.averageHr ?? null,
               maxHr: s.maxHr ?? null,
               sessionRpe: s.sessionRpe ?? null,
+              cyclePhase: null,
             }))
           : [];
 

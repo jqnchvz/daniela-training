@@ -727,6 +727,8 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const addSession = useHistoryStore((s) => s.addSession);
   const incrementSessions = useCycleStore((s) => s.incrementSessions);
   const activeUserId = useAuthStore((s) => s.activeUserId);
+  const getCyclePhase = useCyclePhaseStore((s) => s.getCurrentPhase);
+  const cycleEnabled = useCyclePhaseStore((s) => s.enabled);
   const [energy, setEnergy] = useState(4);
   const [sleep, setSleep] = useState(3);
   const [soreness, setSoreness] = useState(1);
@@ -749,6 +751,7 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
     : 0;
 
   const handleComplete = () => {
+    const cyclePhaseInfo = cycleEnabled ? getCyclePhase() : null;
     // Save session to persistent history
     addSession({
       id: crypto.randomUUID(),
@@ -775,6 +778,7 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
       averageHr: averageHr ? Number(averageHr) : null,
       maxHr: maxHr ? Number(maxHr) : null,
       sessionRpe,
+      cyclePhase: cyclePhaseInfo?.phase ?? null,
     });
 
     incrementSessions();
