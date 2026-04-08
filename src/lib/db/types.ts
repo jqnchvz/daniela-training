@@ -78,6 +78,16 @@ export interface CycleResponse {
   updatedAt: string;
 }
 
+// ── GET /api/cycle-phase ───────────────────────────────────────────────────
+
+export interface CyclePhaseResponse {
+  id: string;
+  userId: string | null;
+  enabled: boolean;
+  periodStartDates: string[];
+  updatedAt: string;
+}
+
 // ── GET /api/users ─────────────────────────────────────────────────────────
 
 export interface UserResponse {
