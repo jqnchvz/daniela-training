@@ -561,6 +561,31 @@ const translations: Record<string, Record<Locale, string>> = {
     es: "El hipotiroidismo a menudo altera el ciclo menstrual. Rastrearlo te ayuda a entrenar mejor — la fase folicular (después del periodo) es ideal para entrenamiento más intenso, mientras que la fase lútea (antes del periodo) puede necesitar menor intensidad. La retención de agua varía 1-3 kg durante el ciclo, lo que explica fluctuaciones de peso que no son cambios reales de grasa.",
   },
   "cycle.enableAndLog": { en: "Enable & log today", es: "Activar y registrar hoy" },
+
+  // HANS-164: luteal/menstrual lite suggestion
+  "cycle.lutealLiteRecommended": { en: "Luteal phase — lighter intensity recommended", es: "Fase lútea — se recomienda intensidad reducida" },
+  "cycle.menstrualLiteRecommended": { en: "Menstrual phase — listen to your body", es: "Fase menstrual — escucha a tu cuerpo" },
+
+  // HANS-165: warmup tip
+  "cycle.warmupTip": {
+    en: "Cycle phase tip: Add 2-3 extra minutes to warm-up. Your body temperature regulation is lower during this phase.",
+    es: "Consejo de fase del ciclo: Agrega 2-3 minutos extra al calentamiento. La regulación de temperatura corporal es menor durante esta fase.",
+  },
+
+  // HANS-166: progress chart legend
+  "cycle.phaseLegend": { en: "Cycle phase overlay", es: "Superposición de fase del ciclo" },
+  "cycle.legendMenstrual": { en: "Menstrual", es: "Menstrual" },
+  "cycle.legendLuteal": { en: "Luteal", es: "Lútea" },
+
+  // HANS-168: period prompt in checkin
+  "cycle.periodStartToday": { en: "Did your period start today?", es: "¿Inició tu periodo hoy?" },
+  "cycle.periodStartDesc": { en: "Logs today as period start for cycle tracking", es: "Registra hoy como inicio del periodo para el seguimiento del ciclo" },
+
+  // HANS-170: settings period management
+  "settings.periodDates": { en: "Period start dates", es: "Fechas de inicio de periodo" },
+  "settings.noPeriodDates": { en: "No period dates logged yet.", es: "Sin fechas de periodo registradas aún." },
+  "settings.cycleDisableWarning": { en: "This will clear all period history. Are you sure?", es: "Esto eliminará todo el historial de períodos. ¿Estás segura?" },
+  "settings.cycleDisableConfirm": { en: "Yes, disable", es: "Sí, desactivar" },
 };
 
 export function t(key: string, locale?: Locale): string {
