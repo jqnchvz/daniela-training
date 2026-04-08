@@ -59,6 +59,8 @@ export function useHydrateFromDb() {
                 rpe: set.rpe,
               })),
               notes: s.notes ?? "",
+              averageHr: s.averageHr ?? null,
+              maxHr: s.maxHr ?? null,
             }))
           : [];
 

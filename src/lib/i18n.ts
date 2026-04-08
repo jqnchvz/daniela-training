@@ -446,6 +446,24 @@ const translations: Record<string, Record<Locale, string>> = {
   "auth.selectProfile": { en: "Select your profile", es: "Selecciona tu perfil" },
   "auth.createProfile": { en: "Create your profile to start training.", es: "Crea tu perfil para empezar a entrenar." },
 
+  // Heart rate tracking
+  "hr.title": { en: "Heart Rate (optional)", es: "Frecuencia cardíaca (opcional)" },
+  "hr.average": { en: "Avg HR", es: "FC promedio" },
+  "hr.max": { en: "Max HR", es: "FC máxima" },
+  "hr.averagePlaceholder": { en: "e.g. 130", es: "ej. 130" },
+  "hr.maxPlaceholder": { en: "e.g. 155", es: "ej. 155" },
+  "hr.bpm": { en: "bpm", es: "lpm" },
+  "hr.zoneTip": {
+    en: "Target zone 2–3 (60–75% max HR). For hypothyroid training, this sweet spot builds fitness without triggering thyroid suppression.",
+    es: "Zona objetivo 2–3 (60–75% FC máx). Para entrenamiento con hipotiroidismo, esta zona mejora el rendimiento sin suprimir la tiroides.",
+  },
+  "hr.zoneInfo": {
+    en: "Zone 2 (~60–70% max HR): aerobic base, fat burning, low cortisol. Zone 3 (~70–75%): fitness gains with manageable recovery. Avoid Zone 4–5 (>80%) frequently — elevated cortisol suppresses thyroid function.",
+    es: "Zona 2 (~60–70% FC máx): base aeróbica, quema grasa, cortisol bajo. Zona 3 (~70–75%): ganancias de condición física con recuperación manejable. Evita Zona 4–5 (>80%) con frecuencia — el cortisol elevado suprime la función tiroidea.",
+  },
+  "hr.trend": { en: "Heart rate trend", es: "Tendencia de frecuencia cardíaca" },
+  "hr.whyTitle": { en: "Why track HR?", es: "¿Por qué registrar la FC?" },
+
   // Days
   "day.mon": { en: "MON", es: "LUN" },
   "day.tue": { en: "TUE", es: "MAR" },
