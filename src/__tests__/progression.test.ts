@@ -99,6 +99,37 @@ describe("suggestProgression", () => {
     expect(result.message).toContain("Stalling");
   });
 
+  it("detects stall as deload when wellness red flags are active", () => {
+    const history = makeHistory({ reps: 8, targetReps: 10 }, 4);
+    const result = suggestProgression(history, null, { hasEnergyFlag: true });
+    expect(result.type).toBe("deload");
+    expect(result.message).toContain("recovery");
+  });
+
+  it("detects stall as deload when sleep flag active", () => {
+    const history = makeHistory({ reps: 8, targetReps: 10 }, 4);
+    const result = suggestProgression(history, null, { hasSleepFlag: true });
+    expect(result.type).toBe("deload");
+  });
+
+  it("detects stall as deload when soreness flag active", () => {
+    const history = makeHistory({ reps: 8, targetReps: 10 }, 4);
+    const result = suggestProgression(history, null, { hasSorenessFlag: true });
+    expect(result.type).toBe("deload");
+  });
+
+  it("suggests weight drop when stalling but wellness is normal", () => {
+    const history = makeHistory({ reps: 8, targetReps: 10 }, 4);
+    const result = suggestProgression(history, null, {
+      hasEnergyFlag: false,
+      hasMoodFlag: false,
+      hasSleepFlag: false,
+      hasSorenessFlag: false,
+    });
+    expect(result.type).toBe("stall");
+    expect(result.message).toContain("Stalling");
+  });
+
   it("does not detect stall if completing reps", () => {
     const history = makeHistory({ reps: 10, targetReps: 10 }, 4);
     const result = suggestProgression(history, null);
