@@ -17,6 +17,7 @@ import { t } from "@/lib/i18n";
 import { useAuthStore } from "@/store/auth-store";
 import { getDefaultWeight } from "@/lib/default-weights";
 import { useExerciseCache } from "@/lib/use-exercise-cache";
+import { useCyclePhaseStore } from "@/store/cycle-phase-store";
 
 export default function ActiveSessionPage({
   params,
@@ -66,6 +67,8 @@ function PreCheckPhase() {
   const locale = useI18n((s) => s.locale);
   const { energyPre, setEnergyPre, setPhase, sessionMode, setSessionMode } = useSessionStore();
   const checkins = useHistoryStore((s) => s.checkins);
+  const getCurrentPhase = useCyclePhaseStore((s) => s.getCurrentPhase);
+  const cycleEnabled = useCyclePhaseStore((s) => s.enabled);
 
   // Check soreness from latest check-in
   const redFlags = detectRedFlags(
@@ -73,13 +76,25 @@ function PreCheckPhase() {
   );
 
   const isLowEnergy = energyPre !== null && energyPre <= 4;
+  const cyclePhaseInfo = cycleEnabled ? getCurrentPhase() : null;
+  const isLuteal = cyclePhaseInfo?.phase === "luteal";
+  const isMenstrual = cyclePhaseInfo?.phase === "menstrual";
+  const isCycleLite = isLuteal || isMenstrual;
 
-  // Auto-select lite when energy drops to ≤ 4
+  // Track if user manually switched mode (overrides cycle suggestion)
+  const [userManuallyChoseMode, setUserManuallyChoseMode] = useState(false);
+
+  // Auto-select lite when energy drops to ≤ 4 or during luteal/menstrual phase
   useEffect(() => {
-    if (isLowEnergy && sessionMode === "full") {
+    if (!userManuallyChoseMode && (isLowEnergy || isCycleLite) && sessionMode === "full") {
       setSessionMode("lite");
     }
-  }, [isLowEnergy]);
+  }, [isLowEnergy, isCycleLite, userManuallyChoseMode]);
+
+  const handleSetMode = (mode: "full" | "lite") => {
+    setUserManuallyChoseMode(true);
+    setSessionMode(mode);
+  };
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
@@ -107,12 +122,22 @@ function PreCheckPhase() {
                 ⚡ {t("session.liteRecommended")}
               </p>
             )}
+            {isMenstrual && !isLowEnergy && (
+              <p className="text-[12px] text-dt-red font-semibold mb-2">
+                🩸 {t("cycle.menstrualLiteRecommended")}
+              </p>
+            )}
+            {isLuteal && !isMenstrual && !isLowEnergy && (
+              <p className="text-[12px] text-[var(--color-gold)] font-semibold mb-2">
+                🌙 {t("cycle.lutealLiteRecommended")}
+              </p>
+            )}
             <p className="text-[11px] text-muted-foreground/60 mb-3">
               {t("session.modeDescription")}
             </p>
             <div className="flex gap-2">
               <button
-                onClick={() => setSessionMode("full")}
+                onClick={() => handleSetMode("full")}
                 className={`flex-1 rounded-[10px] border py-2.5 min-h-[44px] text-[13px] font-semibold transition-colors ${
                   sessionMode === "full"
                     ? "bg-sage-bg text-sage border-sage-dim"
@@ -122,7 +147,7 @@ function PreCheckPhase() {
                 {t("session.fullSession")}
               </button>
               <button
-                onClick={() => setSessionMode("lite")}
+                onClick={() => handleSetMode("lite")}
                 className={`flex-1 rounded-[10px] border py-2.5 min-h-[44px] text-[13px] font-semibold transition-colors ${
                   sessionMode === "lite"
                     ? "bg-sage-bg text-sage border-sage-dim"
@@ -158,6 +183,10 @@ function WarmupPhase({ planId }: { planId: string }) {
   const checkedCount = warmupChecklist.filter(Boolean).length;
   const totalItems = protocol.warmup.length;
   const allChecked = checkedCount === totalItems;
+  const getCurrentPhase = useCyclePhaseStore((s) => s.getCurrentPhase);
+  const cycleEnabled = useCyclePhaseStore((s) => s.enabled);
+  const cyclePhaseInfo = cycleEnabled ? getCurrentPhase() : null;
+  const showWarmupTip = cyclePhaseInfo?.phase === "luteal" || cyclePhaseInfo?.phase === "menstrual";
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
@@ -169,6 +198,13 @@ function WarmupPhase({ planId }: { planId: string }) {
       <p className="text-sm text-muted-foreground mb-6 max-w-[280px] leading-relaxed">
         {t("session.warmupDesc")}
       </p>
+      {showWarmupTip && (
+        <div className="w-full max-w-[340px] mb-4 rounded-[12px] bg-dt-blue/10 border border-dt-blue/30 px-4 py-3 text-left">
+          <p className="text-[13px] text-dt-blue leading-relaxed">
+            💡 {t("cycle.warmupTip")}
+          </p>
+        </div>
+      )}
       <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left">
         <div className="flex flex-col gap-1">
           {protocol.warmup.map((item, i) => {
