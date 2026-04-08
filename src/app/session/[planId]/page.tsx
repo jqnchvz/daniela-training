@@ -768,6 +768,20 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         <ScoreRow label={t("home.soreness")} value={soreness} onChange={setSoreness} />
       </div>
 
+      {/* Session notes */}
+      <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left mb-4">
+        <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mb-2">
+          {t("session.notesLabel")}
+        </p>
+        <textarea
+          value={store.notes}
+          onChange={(e) => store.setNotes(e.target.value)}
+          placeholder={t("session.notesPlaceholder")}
+          rows={3}
+          className="w-full rounded-[10px] border border-border bg-surface2 px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground/60 resize-none focus:outline-none focus:border-sage"
+        />
+      </div>
+
       <button
         onClick={handleComplete}
         className="w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground"
