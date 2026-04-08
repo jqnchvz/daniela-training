@@ -16,11 +16,17 @@ export default function SessionPage() {
 
   const activePlanId = useSessionStore((s) => s.planId);
   const activePhase = useSessionStore((s) => s.phase);
+  const completedSets = useSessionStore((s) => s.completedSets);
+  const startedAt = useSessionStore((s) => s.startedAt);
   const resetSession = useSessionStore((s) => s.reset);
   const hasActiveSession = activePlanId && activePhase !== "pre-check";
   const activePlan = hasActiveSession
     ? WORKOUT_PLANS.find((p) => p.id === activePlanId)
     : null;
+  const exercisesCompleted = hasActiveSession ? new Set(completedSets.map((s) => s.exerciseId)).size : 0;
+  const elapsedMin = hasActiveSession && startedAt
+    ? Math.round((Date.now() - new Date(startedAt).getTime()) / 60000)
+    : 0;
 
   return (
     <div className="px-5 py-5">
@@ -30,8 +36,11 @@ export default function SessionPage() {
           <p className="text-[13px] font-semibold text-sage mb-1">
             {t("session.resumeBanner")}
           </p>
-          <p className="text-xs text-muted-foreground mb-3">
+          <p className="text-xs text-muted-foreground mb-1">
             {isEs ? getSessionProtocol(activePlan.id).nameEs : activePlan.name}
+          </p>
+          <p className="text-[11px] text-muted-foreground/70 mb-3">
+            {exercisesCompleted} {t("session.exercisesDone")} · {completedSets.length} sets · {elapsedMin} min
           </p>
           <div className="flex gap-2">
             <Link

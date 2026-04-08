@@ -126,6 +126,13 @@ const translations: Record<string, Record<Locale, string>> = {
   "session.rest": { en: "Rest", es: "Descanso" },
   "session.lastWt": { en: "Last wt.", es: "Último peso" },
   "session.endSession": { en: "← End", es: "← Fin" },
+  "session.exitConfirmTitle": { en: "End session?", es: "¿Terminar sesión?" },
+  "session.exitConfirmDesc": {
+    en: "Your logged sets will be saved, but the session will not be marked complete.",
+    es: "Tus series registradas se guardarán, pero la sesión no se marcará como completada.",
+  },
+  "session.exitConfirmEnd": { en: "End Session", es: "Terminar" },
+  "session.exercisesDone": { en: "exercises done", es: "ejercicios hechos" },
   "session.exerciseOf": { en: "Exercise {current} of {total}", es: "Ejercicio {current} de {total}" },
   "session.prev": { en: "‹ Prev", es: "‹ Anterior" },
   "session.skip": { en: "Skip →", es: "Saltar →" },

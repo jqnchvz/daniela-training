@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export type SessionPhase = "pre-check" | "warmup" | "working" | "cooldown" | "summary";
 
@@ -62,6 +63,7 @@ const initialState = {
 };
 
 export const useSessionStore = create<SessionState>()(
+  persist(
   (set) => ({
     ...initialState,
 
@@ -116,4 +118,6 @@ export const useSessionStore = create<SessionState>()(
     setNotes: (notes) => set({ notes }),
     reset: () => set(initialState),
   }),
+  { name: "hans-session-store" },
+  ),
 );
