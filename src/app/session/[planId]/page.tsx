@@ -703,7 +703,8 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
     ? (rpeSets.reduce((sum, s) => sum + s.rpe!, 0) / rpeSets.length).toFixed(1)
     : null;
 
-  const sessionStart = store.workingStartedAt ?? store.startedAt;
+  // Duration starts from when warmup begins (workingStartedAt), not pre-check
+  const sessionStart = store.workingStartedAt;
   const duration = sessionStart
     ? Math.round((Date.now() - new Date(sessionStart).getTime()) / 60000)
     : 0;
