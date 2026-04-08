@@ -14,7 +14,7 @@ export interface SessionHistory {
 }
 
 export interface ProgressionSuggestion {
-  type: "increase" | "maintain" | "stall" | "deload";
+  type: "increase" | "maintain" | "stall" | "deload" | "rest";
   message: string;
   suggestedWeight?: number;
   currentWeight: number;
@@ -27,6 +27,13 @@ export function roundToNearest2_5(weight: number): number {
   return Math.round(weight / 2.5) * 2.5;
 }
 
+export interface StallRedFlags {
+  hasEnergyFlag?: boolean;
+  hasMoodFlag?: boolean;
+  hasSleepFlag?: boolean;
+  hasSorenessFlag?: boolean;
+}
+
 /**
  * Suggest weight progression for an exercise based on recent history.
  *
@@ -36,10 +43,15 @@ export function roundToNearest2_5(weight: number): number {
  * - Average RPE <= 7 (if RPE data available)
  * - At least 14 days since last weight increase
  * - Increase is 5% rounded to nearest 2.5kg
+ *
+ * Stall logic:
+ * - If stalling AND wellness red flags are active → deload/recovery suggestion
+ * - If stalling AND wellness is fine → technique-limited, suggest weight drop
  */
 export function suggestProgression(
   history: SessionHistory[],
   lastWeightChangeDate: string | null,
+  redFlags?: StallRedFlags,
 ): ProgressionSuggestion {
   if (history.length === 0) {
     return {
@@ -71,6 +83,22 @@ export function suggestProgression(
     const targetReps = lastTwo[0].targetReps;
 
     if (allSameWeight && avgReps < targetReps) {
+      // Check wellness: if any red flag active, stall is likely recovery-related, not technique-limited
+      const hasWellnessIssue =
+        redFlags?.hasEnergyFlag ||
+        redFlags?.hasMoodFlag ||
+        redFlags?.hasSleepFlag ||
+        redFlags?.hasSorenessFlag;
+
+      if (hasWellnessIssue) {
+        return {
+          type: "deload",
+          message:
+            "Your wellness scores suggest your body needs recovery, not a weight drop. Consider a deload week — same exercises, half the sets, 60% weight.",
+          currentWeight,
+        };
+      }
+
       return {
         type: "stall",
         message: `Stalling at ${currentWeight}kg? Try dropping 10% to ${roundToNearest2_5(currentWeight * 0.9)}kg and focusing on form, or try a variation.`,
