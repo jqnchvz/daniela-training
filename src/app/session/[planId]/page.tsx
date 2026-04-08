@@ -694,6 +694,8 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
   const [energy, setEnergy] = useState(4);
   const [sleep, setSleep] = useState(3);
   const [soreness, setSoreness] = useState(1);
+  const [averageHr, setAverageHr] = useState<string>("");
+  const [maxHr, setMaxHr] = useState<string>("");
 
   const totalVolume = store.completedSets.reduce((sum, s) => sum + s.weight * s.reps, 0);
   const exercisesCompleted = new Set(store.completedSets.map((s) => s.exerciseId)).size;
@@ -733,6 +735,8 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         rpe: s.rpe,
       })),
       notes: store.notes,
+      averageHr: averageHr ? Number(averageHr) : null,
+      maxHr: maxHr ? Number(maxHr) : null,
     });
 
     incrementSessions();
@@ -767,6 +771,44 @@ function SummaryPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
         <ScoreRow label={t("home.energy")} value={energy} onChange={setEnergy} />
         <ScoreRow label={t("session.sleepLastNight")} value={sleep} onChange={setSleep} />
         <ScoreRow label={t("home.soreness")} value={soreness} onChange={setSoreness} />
+      </div>
+
+      {/* Heart rate (optional) */}
+      <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left mb-4">
+        <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mb-1">
+          {t("hr.title")}
+        </p>
+        <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
+          {t("hr.zoneTip")}
+        </p>
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <label className="text-[10px] text-muted-foreground mb-1 block">{t("hr.average")} ({t("hr.bpm")})</label>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={averageHr}
+              onChange={(e) => setAverageHr(e.target.value)}
+              placeholder={t("hr.averagePlaceholder")}
+              min={40}
+              max={220}
+              className="w-full rounded-lg border border-border bg-surface2 px-2 py-2 font-mono text-sm text-center min-h-[44px]"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="text-[10px] text-muted-foreground mb-1 block">{t("hr.max")} ({t("hr.bpm")})</label>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={maxHr}
+              onChange={(e) => setMaxHr(e.target.value)}
+              placeholder={t("hr.maxPlaceholder")}
+              min={40}
+              max={220}
+              className="w-full rounded-lg border border-border bg-surface2 px-2 py-2 font-mono text-sm text-center min-h-[44px]"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Session notes */}

@@ -40,6 +40,8 @@ export interface SessionResponse {
   sorenessScore: number | null;
   sessionMode: string;
   notes: string;
+  averageHr: number | null;
+  maxHr: number | null;
   createdAt: string;
   sets: SessionSetResponse[];
 }

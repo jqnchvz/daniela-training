@@ -177,6 +177,21 @@ export default function ProgressPage() {
             </>
           )}
 
+          {/* Heart rate trend */}
+          {sessions.some((s) => s.averageHr != null || s.maxHr != null) && (
+            <>
+              <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-muted-foreground font-mono mt-4 mb-2.5">
+                {t("hr.trend")}
+              </p>
+              <div className="rounded-[16px] border border-border bg-card p-[18px] mb-3">
+                <HrTrendChart sessions={sessions} />
+                <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">
+                  {t("hr.zoneTip")}
+                </p>
+              </div>
+            </>
+          )}
+
           {/* Weekly LISS cardio */}
           {checkins.some((c) => (c.walkMinutes ?? 0) > 0) && (
             <>
@@ -687,6 +702,64 @@ function WeightChart({ data }: { data: Array<{ date: string; weightKg: number | 
       <text x="16" y="11" fill="#7EC8A0" fontSize="8">{tFn("progress.weight")}</text>
       <line x1="60" y1="8" x2="75" y2="8" stroke="#7EC8A0" strokeWidth="2" />
       <text x="78" y="11" fill="#7EC8A0" fontSize="8">{tFn("progress.rollingAvg")}</text>
+    </svg>
+  );
+}
+
+function HrTrendChart({ sessions }: { sessions: CompletedSession[] }) {
+  const hrSessions = [...sessions]
+    .reverse()
+    .filter((s) => s.averageHr != null || s.maxHr != null)
+    .slice(-12);
+
+  if (hrSessions.length === 0) return null;
+
+  const width = 300;
+  const height = 80;
+  const padding = 5;
+
+  const avgValues = hrSessions.map((s) => s.averageHr);
+  const maxValues = hrSessions.map((s) => s.maxHr);
+  const allValues = [...avgValues, ...maxValues].filter((v): v is number => v != null);
+  if (allValues.length === 0) return null;
+
+  const minV = Math.max(50, Math.min(...allValues) - 5);
+  const maxV = Math.min(220, Math.max(...allValues) + 5);
+  const range = maxV - minV || 1;
+
+  const makePoints = (values: (number | null)[]) => {
+    const valid = values.map((v, i) => v != null ? { i, v } : null).filter(Boolean) as { i: number; v: number }[];
+    if (valid.length < 2) return null;
+    return valid.map(({ i, v }) => {
+      const x = hrSessions.length === 1 ? width / 2 : (i / (hrSessions.length - 1)) * (width - padding * 2) + padding;
+      const y = height - padding - ((v - minV) / range) * (height - padding * 2 - 10);
+      return `${x},${y}`;
+    }).join(" ");
+  };
+
+  const avgPts = makePoints(avgValues);
+  const maxPts = makePoints(maxValues);
+
+  // Target zone lines: 60-75% of 180 (approx max for general population)
+  const zone2y = height - padding - ((0.70 * 180 - minV) / range) * (height - padding * 2 - 10);
+  const zone3y = height - padding - ((0.75 * 180 - minV) / range) * (height - padding * 2 - 10);
+
+  return (
+    <svg
+      className="w-full h-20"
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
+      role="img"
+      aria-label={tFn("hr.trend")}
+    >
+      {/* Zone 2-3 band */}
+      <rect x={padding} y={zone3y} width={width - padding * 2} height={zone2y - zone3y} fill="#7EC8A0" opacity="0.08" />
+      <line x1={padding} y1={zone2y} x2={width - padding} y2={zone2y} stroke="#7EC8A0" strokeWidth="1" strokeDasharray="3 2" opacity="0.4" />
+      <line x1={padding} y1={zone3y} x2={width - padding} y2={zone3y} stroke="#7EC8A0" strokeWidth="1" strokeDasharray="3 2" opacity="0.4" />
+      {avgPts && <polyline points={avgPts} stroke="#9B8EC4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />}
+      {maxPts && <polyline points={maxPts} stroke="#E4A0A0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2" />}
+      {avgPts && <><line x1="10" y1="8" x2="22" y2="8" stroke="#9B8EC4" strokeWidth="2" /><text x="25" y="11" fill="#9B8EC4" fontSize="8">{tFn("hr.average")}</text></>}
+      {maxPts && <><line x1="75" y1="8" x2="87" y2="8" stroke="#E4A0A0" strokeWidth="2" strokeDasharray="4 2" /><text x="90" y="11" fill="#E4A0A0" fontSize="8">{tFn("hr.max")}</text></>}
     </svg>
   );
 }

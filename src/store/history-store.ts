@@ -17,6 +17,8 @@ export interface CompletedSession {
   sorenessScore: number | null;
   sets: CompletedSet[];
   notes: string;
+  averageHr: number | null;
+  maxHr: number | null;
 }
 
 export interface CompletedSet {
