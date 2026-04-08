@@ -378,14 +378,7 @@ export default function HomePage() {
                 {phaseStatus.phase.repsMax}
               </p>
             )}
-            <div className="flex gap-4 mt-4 mb-5">
-              <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                ⏱ ~{fullDuration} min
-              </span>
-              <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                📋 {todaysWorkout.exercises} {t("common.exercises")}
-              </span>
-            </div>
+            <div className="mt-5" />
             <Link
               href="/session"
               className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80 hover:-translate-y-0.5 active:translate-y-0"
