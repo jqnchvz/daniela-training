@@ -22,6 +22,7 @@ interface AuthState {
   login: (user: User) => void;
   logout: () => void;
   completeOnboarding: (level: ExperienceLevel) => void;
+  setExperienceLevel: (level: ExperienceLevel) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -60,6 +61,8 @@ export const useAuthStore = create<AuthState>()(
           onboardingComplete: true,
           experienceLevel: level,
         }),
+
+      setExperienceLevel: (level) => set({ experienceLevel: level }),
     }),
     { name: "auth-store" },
   ),
