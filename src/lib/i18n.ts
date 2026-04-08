@@ -101,6 +101,7 @@ const translations: Record<string, Record<Locale, string>> = {
   "session.liteActive": { en: "Lite mode", es: "Modo ligero" },
   "session.startWarmup": { en: "Start Warm-up →", es: "Iniciar Calentamiento →" },
   "session.doneWarmup": { en: "Done with Warm-up →", es: "Calentamiento Listo →" },
+  "session.completed": { en: "completed", es: "completados" },
   "session.warmupDesc": {
     en: "Prepare your body for today's session. Take your time — this is non-negotiable for hypothyroid recovery.",
     es: "Prepara tu cuerpo para la sesión de hoy. Tómate tu tiempo — esto no es negociable para la recuperación con hipotiroidismo.",
