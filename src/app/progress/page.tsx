@@ -38,6 +38,7 @@ export default function ProgressPage() {
     walkMinutes: c.walkMinutes ?? null,
     didStretching: c.didStretching ?? null,
     didYoga: c.didYoga ?? null,
+    tookMedication: c.tookMedication ?? null,
   }));
   const redFlags = detectRedFlags(checkinData);
 
@@ -82,6 +83,20 @@ export default function ProgressPage() {
               </>
             )}
           </p>
+        </div>
+      )}
+
+      {/* Medication adherence */}
+      {checkinData.some((c) => c.tookMedication !== null) && (
+        <div className="rounded-[12px] border border-border bg-card p-3 flex items-center justify-between mb-3">
+          <span className="text-sm font-semibold">{t("progress.medicationAdherence")}</span>
+          <span className="font-mono text-sm text-sage">
+            {redFlags.medicationAdherence7}%
+            {" "}
+            <span className="text-muted-foreground text-xs">
+              ({checkinData.filter((c) => c.tookMedication === true).length}/{checkinData.filter((c) => c.tookMedication !== null).length})
+            </span>
+          </span>
         </div>
       )}
 

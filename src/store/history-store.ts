@@ -40,6 +40,7 @@ export interface SavedCheckin {
   walkMinutes: number | null;
   didStretching: boolean | null;
   didYoga: boolean | null;
+  tookMedication: boolean | null;
 }
 
 export interface BodyMeasurement {

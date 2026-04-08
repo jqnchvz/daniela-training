@@ -23,6 +23,7 @@ export default function CheckinPage() {
   const [walkMinutes, setWalkMinutes] = useState(existing?.walkMinutes ?? 0);
   const [didStretching, setDidStretching] = useState(existing?.didStretching ?? false);
   const [didYoga, setDidYoga] = useState(existing?.didYoga ?? false);
+  const [tookMedication, setTookMedication] = useState(existing?.tookMedication ?? false);
   const [saved, setSaved] = useState(!!existing);
   const [editing, setEditing] = useState(false);
   const t = useT();
@@ -39,6 +40,7 @@ export default function CheckinPage() {
       setWalkMinutes(existing.walkMinutes ?? 0);
       setDidStretching(existing.didStretching ?? false);
       setDidYoga(existing.didYoga ?? false);
+      setTookMedication(existing.tookMedication ?? false);
       setSaved(true);
     }
   }, [existing, editing]);
@@ -57,6 +59,7 @@ export default function CheckinPage() {
       walkMinutes: walkMinutes || null,
       didStretching: didStretching || null,
       didYoga: didYoga || null,
+      tookMedication,
     });
     setSaved(true);
     setEditing(false);
@@ -78,9 +81,16 @@ export default function CheckinPage() {
             <ScoreDisplay label={t("checkin.mood")} value={mood} color="text-gold" />
             <ScoreDisplay label={t("home.soreness")} value={soreness} color="text-terra" />
           </div>
-          <p className="text-xs text-muted-foreground mt-3">
-            Sleep: {sleepHours}h {notes && `· ${notes}`}
-          </p>
+          <div className="flex items-center gap-2 mt-3">
+            <p className="text-xs text-muted-foreground">
+              Sleep: {sleepHours}h {notes && `· ${notes}`}
+            </p>
+            {existing?.tookMedication && (
+              <span className="rounded-full bg-sage-bg text-sage border border-sage-dim px-2.5 py-0.5 text-[11px] font-semibold">
+                💊 ✓
+              </span>
+            )}
+          </div>
         </div>
 
         <button
@@ -101,6 +111,24 @@ export default function CheckinPage() {
       </p>
 
       <div className="mt-6 space-y-6">
+        {/* Medication toggle — first thing in the morning */}
+        <div className="flex items-center justify-between rounded-[12px] border border-border bg-surface2 p-3.5">
+          <div>
+            <p className="font-semibold text-sm">{t("checkin.medication")}</p>
+            <p className="text-[11px] text-muted-foreground">{t("checkin.medicationDesc")}</p>
+          </div>
+          <button
+            onClick={() => setTookMedication(!tookMedication)}
+            className={`w-12 h-7 rounded-full transition-colors ${
+              tookMedication ? "bg-sage" : "bg-surface3"
+            } relative`}
+          >
+            <span className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform ${
+              tookMedication ? "translate-x-5" : "translate-x-0.5"
+            }`} />
+          </button>
+        </div>
+
         <EnergySlider value={energy} onChange={setEnergy} label={t("checkin.energyLevel")} />
 
         <SliderRow label={t("checkin.sleepQuality")} value={sleepQuality} onChange={setSleepQuality} low={t("checkin.poor")} high={t("checkin.great")} />

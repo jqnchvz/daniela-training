@@ -46,6 +46,7 @@ export const checkinSchema = z.object({
   walkMinutes: z.number().int().min(0).max(300).nullable().optional(),
   didStretching: z.boolean().nullable().optional(),
   didYoga: z.boolean().nullable().optional(),
+  tookMedication: z.boolean().nullable().optional(),
 });
 
 // ── Cycle State ─────────────────────────────────────────────────────────────

@@ -13,6 +13,7 @@ export interface CheckinData {
   walkMinutes: number | null;
   didStretching: boolean | null;
   didYoga: boolean | null;
+  tookMedication: boolean | null;
 }
 
 /**
@@ -24,6 +25,8 @@ export interface RedFlagResult {
   hasMoodFlag: boolean;
   hasSleepFlag: boolean;
   hasSorenessFlag: boolean;
+  hasMedicationFlag: boolean;
+  medicationAdherence7: number;
   latestSoreness: number;
   energyAvg7: number;
   energyAvg30: number;
@@ -59,11 +62,19 @@ export function detectRedFlags(checkins: CheckinData[]): RedFlagResult {
   // Soreness: flag when most recent check-in reports ≥ 8/10
   const latestSoreness = sorted.length > 0 ? sorted[0].soreness : 0;
 
+  // Medication adherence: flag when < 85% AND energy declining
+  const medCheckins7 = last7.filter(c => c.tookMedication !== null);
+  const medTaken7 = medCheckins7.filter(c => c.tookMedication === true).length;
+  const medicationAdherence7 = medCheckins7.length > 0 ? Math.round((medTaken7 / medCheckins7.length) * 100) : 100;
+  const hasMedicationFlag = medCheckins7.length >= 3 && medicationAdherence7 < 85 && energyAvg30 - energyAvg7 >= 1;
+
   return {
     hasEnergyFlag: last7.length >= 3 && last30.length >= 7 && energyAvg30 - energyAvg7 >= 2,
     hasMoodFlag: last7.length >= 3 && last30.length >= 7 && moodAvg30 - moodAvg7 >= 2,
     hasSleepFlag: sleepHours7.length >= 3 && sleepAvg7 < 7,
     hasSorenessFlag: sorted.length > 0 && latestSoreness >= 8,
+    hasMedicationFlag,
+    medicationAdherence7,
     latestSoreness,
     energyAvg7: Math.round(energyAvg7 * 10) / 10,
     energyAvg30: Math.round(energyAvg30 * 10) / 10,

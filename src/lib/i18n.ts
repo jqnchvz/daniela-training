@@ -208,6 +208,10 @@ const translations: Record<string, Record<Locale, string>> = {
   "checkin.none": { en: "None", es: "Ninguno" },
   "checkin.verySore": { en: "Very sore", es: "Muy adolorido" },
   "checkin.high": { en: "High", es: "Alto" },
+  "checkin.medication": { en: "Took medication today?", es: "¿Tomaste tu medicamento hoy?" },
+  "checkin.medicationDesc": { en: "Levothyroxine / thyroid medication", es: "Levotiroxina / medicamento tiroideo" },
+  "checkin.medicationYes": { en: "Yes", es: "Sí" },
+  "progress.medicationAdherence": { en: "Medication", es: "Medicamento" },
 
   // Auth
   "auth.welcome": { en: "Welcome", es: "Bienvenido" },

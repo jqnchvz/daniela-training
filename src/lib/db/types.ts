@@ -59,6 +59,7 @@ export interface CheckinResponse {
   walkMinutes: number | null;
   didStretching: boolean | null;
   didYoga: boolean | null;
+  tookMedication: boolean | null;
   createdAt: string;
 }
 

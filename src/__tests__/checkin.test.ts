@@ -24,6 +24,7 @@ function makeCheckin(
     walkMinutes: null,
     didStretching: null,
     didYoga: null,
+    tookMedication: null,
     ...overrides,
   };
 }

@@ -87,6 +87,7 @@ export const checkins = pgTable("checkins", {
   walkMinutes: integer("walk_minutes"),
   didStretching: boolean("did_stretching"),
   didYoga: boolean("did_yoga"),
+  tookMedication: boolean("took_medication"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

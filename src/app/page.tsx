@@ -469,6 +469,7 @@ function LissActivityCard() {
       walkMinutes,
       didStretching,
       didYoga,
+      tookMedication: existing?.tookMedication ?? null,
     });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);

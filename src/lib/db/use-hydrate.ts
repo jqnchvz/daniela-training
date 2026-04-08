@@ -70,6 +70,7 @@ export function useHydrateFromDb() {
               walkMinutes: c.walkMinutes ?? null,
               didStretching: c.didStretching ?? null,
               didYoga: c.didYoga ?? null,
+              tookMedication: c.tookMedication ?? null,
             }))
           : [];
 
