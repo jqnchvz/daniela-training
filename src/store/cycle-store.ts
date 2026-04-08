@@ -6,6 +6,8 @@ interface CycleState {
   extensionWeeks: number;
   lastDeloadDate: string | null;
   completedSessions: number;
+  deloadDismissedAt: string | null;
+  deloadWeekStart: string | null;
   loaded: boolean;
 
   hydrate: (data: Partial<Pick<CycleState, "cycleStartDate" | "extensionWeeks" | "lastDeloadDate" | "completedSessions">>) => void;
@@ -13,6 +15,8 @@ interface CycleState {
   incrementSessions: () => void;
   setLastDeload: (date: string) => void;
   extendPhase: (weeks: number) => void;
+  dismissDeload: () => void;
+  startDeloadWeek: () => void;
   resetCycle: () => void;
 }
 
@@ -22,6 +26,8 @@ export const useCycleStore = create<CycleState>()(
     extensionWeeks: 0,
     lastDeloadDate: null,
     completedSessions: 0,
+    deloadDismissedAt: null,
+    deloadWeekStart: null,
     loaded: false,
 
     hydrate: (data) =>
@@ -55,6 +61,16 @@ export const useCycleStore = create<CycleState>()(
 
     extendPhase: (weeks) => {
       set((s) => ({ extensionWeeks: s.extensionWeeks + weeks }));
+      syncCycleAfterUpdate();
+    },
+
+    dismissDeload: () => {
+      set({ deloadDismissedAt: new Date().toISOString() });
+    },
+
+    startDeloadWeek: () => {
+      const today = new Date().toISOString().split("T")[0];
+      set({ deloadWeekStart: today, lastDeloadDate: today, deloadDismissedAt: null });
       syncCycleAfterUpdate();
     },
 

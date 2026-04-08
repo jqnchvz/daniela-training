@@ -22,7 +22,13 @@ import { fetchUsers } from "@/lib/db/sync";
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
-  const [earlyDeloadDismissed, setEarlyDeloadDismissed] = useState(false);
+  const deloadDismissedAt = useCycleStore((s) => s.deloadDismissedAt);
+  const dismissDeload = useCycleStore((s) => s.dismissDeload);
+  const startDeloadWeek = useCycleStore((s) => s.startDeloadWeek);
+  const deloadWeekStart = useCycleStore((s) => s.deloadWeekStart);
+  const deloadDismissedRecently = deloadDismissedAt
+    ? Date.now() - new Date(deloadDismissedAt).getTime() < 7 * 24 * 60 * 60 * 1000
+    : false;
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [periodLogged, setPeriodLogged] = useState(false);
@@ -321,18 +327,35 @@ export default function HomePage() {
         </Link>
       )}
 
+      {/* Active deload week banner */}
+      {deloadWeekStart && (
+        <div className="mt-3 rounded-[12px] bg-sage-bg border border-sage-dim px-4 py-3">
+          <p className="text-[13px] text-sage leading-relaxed">
+            🧘 {t("home.deloadActive")}
+          </p>
+        </div>
+      )}
+
       {/* Early deload suggestion */}
-      {deloadStatus?.earlyDeloadSuggested && !earlyDeloadDismissed && (
-        <div className="mt-3 rounded-[12px] bg-gold-bg border border-gold/30 px-4 py-3 flex items-start gap-3">
-          <p className="text-[13px] text-gold leading-relaxed flex-1">
+      {deloadStatus?.earlyDeloadSuggested && !deloadDismissedRecently && !deloadWeekStart && (
+        <div className="mt-3 rounded-[12px] bg-gold-bg border border-gold/30 p-4">
+          <p className="text-[13px] text-gold leading-relaxed mb-3">
             ⚠️ {t("home.earlyDeload")}
           </p>
-          <button
-            onClick={() => setEarlyDeloadDismissed(true)}
-            className="text-[12px] text-gold/70 font-semibold shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
-          >
-            {t("home.dismiss")}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={dismissDeload}
+              className="flex-1 rounded-[10px] border border-gold/30 py-2.5 min-h-[44px] text-[12px] font-semibold text-gold/70"
+            >
+              {t("home.dismiss")}
+            </button>
+            <button
+              onClick={startDeloadWeek}
+              className="flex-1 rounded-[10px] bg-gold py-2.5 min-h-[44px] text-[12px] font-bold text-primary-foreground"
+            >
+              {t("home.startDeload")}
+            </button>
+          </div>
         </div>
       )}
 

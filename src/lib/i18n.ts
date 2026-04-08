@@ -111,6 +111,8 @@ const translations: Record<string, Record<Locale, string>> = {
     es: "Tus registros recientes muestran energía o ánimo en descenso. Considera tomar una semana de descarga antes.",
   },
   "home.dismiss": { en: "Dismiss", es: "Descartar" },
+  "home.startDeload": { en: "Start deload week", es: "Iniciar semana de descarga" },
+  "home.deloadActive": { en: "Deload week active — lighter weights, fewer sets, focus on recovery.", es: "Semana de descarga activa — pesos ligeros, menos series, enfoque en recuperación." },
 
   // Session
   "session.resumeBanner": { en: "Session in progress", es: "Sesión en curso" },
