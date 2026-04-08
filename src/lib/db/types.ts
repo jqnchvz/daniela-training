@@ -42,6 +42,7 @@ export interface SessionResponse {
   notes: string;
   averageHr: number | null;
   maxHr: number | null;
+  sessionRpe: number | null;
   createdAt: string;
   sets: SessionSetResponse[];
 }

@@ -19,6 +19,7 @@ export interface CompletedSession {
   notes: string;
   averageHr: number | null;
   maxHr: number | null;
+  sessionRpe: number | null;
 }
 
 export interface CompletedSet {
