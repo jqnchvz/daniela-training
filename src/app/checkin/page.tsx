@@ -12,7 +12,7 @@ export default function CheckinPage() {
   const activeUserId = useAuthStore((s) => s.activeUserId);
 
   const today = new Date().toISOString().split("T")[0];
-  const existing = getCheckinForDate(today);
+  const existing = getCheckinForDate(today, activeUserId ?? undefined);
 
   const [energy, setEnergy] = useState(existing?.energy ?? 5);
   const [sleepQuality, setSleepQuality] = useState(existing?.sleepQuality ?? 5);

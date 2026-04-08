@@ -482,7 +482,7 @@ function LissActivityCard() {
   const history = useHistoryStore();
   const activeUserId = useAuthStore((s) => s.activeUserId);
   const today = new Date().toISOString().split("T")[0];
-  const existing = history.getCheckinForDate(today);
+  const existing = history.getCheckinForDate(today, activeUserId ?? undefined);
 
   const [walkMinutes, setWalkMinutes] = useState(existing?.walkMinutes ?? 0);
   const [didStretching, setDidStretching] = useState(existing?.didStretching ?? false);

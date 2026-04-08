@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { enqueueWrite } from "@/lib/write-queue";
+import { useAuthStore } from "@/store/auth-store";
 
 export interface CompletedSession {
   id: string;
@@ -69,7 +70,7 @@ interface HistoryState {
   getMeasurementsForUser: (userId?: string) => BodyMeasurement[];
   getSessionsByWeek: (userId?: string) => { thisWeek: number; total: number };
   getLatestCheckin: (userId?: string) => SavedCheckin | null;
-  getCheckinForDate: (date: string) => SavedCheckin | null;
+  getCheckinForDate: (date: string, userId?: string) => SavedCheckin | null;
   getLastWeightForExercise: (exerciseId: string, userId?: string) => number | null;
   getSessionsForUser: (userId?: string) => CompletedSession[];
   getCheckinsForUser: (userId?: string) => SavedCheckin[];
@@ -92,7 +93,7 @@ export const useHistoryStore = create<HistoryState>()(
     addSession: (session) => {
       set((s) => ({ sessions: [session, ...s.sessions] }));
       // Write to DB with retry queue
-      enqueueWrite("/api/sessions", session);
+      enqueueWrite("/api/sessions", session, useAuthStore.getState().activeUserId ?? undefined);
     },
 
     addCheckin: (checkin) => {
@@ -100,7 +101,7 @@ export const useHistoryStore = create<HistoryState>()(
         const filtered = s.checkins.filter((c) => c.date !== checkin.date);
         return { checkins: [checkin, ...filtered] };
       });
-      enqueueWrite("/api/checkins", checkin);
+      enqueueWrite("/api/checkins", checkin, useAuthStore.getState().activeUserId ?? undefined);
     },
 
     addMeasurement: (m) => {
@@ -159,8 +160,8 @@ export const useHistoryStore = create<HistoryState>()(
       return sorted[0] ?? null;
     },
 
-    getCheckinForDate: (date) =>
-      get().checkins.find((c) => c.date === date) ?? null,
+    getCheckinForDate: (date, userId) =>
+      get().checkins.find((c) => c.date === date && (!userId || !c.userId || c.userId === userId)) ?? null,
 
     getLastWeightForExercise: (exerciseId, userId) => {
       const sessions = userId

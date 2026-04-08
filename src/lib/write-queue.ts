@@ -1,4 +1,4 @@
-const STORAGE_KEY = "hans-write-queue";
+const STORAGE_KEY_PREFIX = "hans-write-queue";
 
 interface QueuedWrite {
   url: string;
@@ -6,17 +6,21 @@ interface QueuedWrite {
   timestamp: number;
 }
 
-function readQueue(): QueuedWrite[] {
+function getStorageKey(userId?: string): string {
+  return userId ? `${STORAGE_KEY_PREFIX}-${userId}` : STORAGE_KEY_PREFIX;
+}
+
+function readQueue(userId?: string): QueuedWrite[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(getStorageKey(userId));
     return raw ? (JSON.parse(raw) as QueuedWrite[]) : [];
   } catch {
     return [];
   }
 }
 
-function writeQueue(items: QueuedWrite[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+function writeQueue(items: QueuedWrite[], userId?: string): void {
+  localStorage.setItem(getStorageKey(userId), JSON.stringify(items));
 }
 
 /**
@@ -25,6 +29,7 @@ function writeQueue(items: QueuedWrite[]): void {
 export async function enqueueWrite(
   url: string,
   body: unknown,
+  userId?: string,
 ): Promise<void> {
   try {
     const res = await fetch(url, {
@@ -34,17 +39,17 @@ export async function enqueueWrite(
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
   } catch {
-    const queue = readQueue();
+    const queue = readQueue(userId);
     queue.push({ url, body, timestamp: Date.now() });
-    writeQueue(queue);
+    writeQueue(queue, userId);
   }
 }
 
 /**
  * Retry all pending writes. Successful ones are removed; failed ones stay.
  */
-export async function flushQueue(): Promise<void> {
-  const queue = readQueue();
+export async function flushQueue(userId?: string): Promise<void> {
+  const queue = readQueue(userId);
   if (queue.length === 0) return;
 
   const remaining: QueuedWrite[] = [];
@@ -63,12 +68,12 @@ export async function flushQueue(): Promise<void> {
     }
   }
 
-  writeQueue(remaining);
+  writeQueue(remaining, userId);
 }
 
 /**
  * Return the number of pending writes in the queue.
  */
-export function getPendingCount(): number {
-  return readQueue().length;
+export function getPendingCount(userId?: string): number {
+  return readQueue(userId).length;
 }

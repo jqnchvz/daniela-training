@@ -40,14 +40,20 @@ export const useAuthStore = create<AuthState>()(
           activeUserEmoji: user.avatarEmoji,
         }),
 
-      logout: () =>
+      logout: () => {
+        // Reset dependent stores before clearing auth state
+        const { useSessionStore } = require("@/store/session-store");
+        const { useCyclePhaseStore } = require("@/store/cycle-phase-store");
+        useSessionStore.getState().reset();
+        useCyclePhaseStore.getState().switchUser(null);
         set({
           activeUserId: null,
           activeUserName: null,
           activeUserEmoji: null,
           onboardingComplete: false,
           experienceLevel: null,
-        }),
+        });
+      },
 
       completeOnboarding: (level) =>
         set({

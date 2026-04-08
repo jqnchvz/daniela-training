@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import type { Locale } from "@/lib/i18n";
 
 export type CyclePhase = "menstrual" | "follicular" | "ovulation" | "luteal";
@@ -72,8 +71,7 @@ function saveUserData(userId: string | null, state: CyclePhaseState) {
 }
 
 export const useCyclePhaseStore = create<CyclePhaseState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       enabled: false,
       periodStartDates: [],
       defaultCycleLength: 28,
@@ -151,8 +149,6 @@ export const useCyclePhaseStore = create<CyclePhaseState>()(
         return Math.max(21, Math.min(40, avg));
       },
     }),
-    { name: "cycle-phase-store" },
-  ),
 );
 
 const phaseLabels: Record<CyclePhase, Record<Locale, string>> = {
