@@ -5,9 +5,12 @@ import type { Locale } from "@/lib/i18n";
 export type CyclePhase = "menstrual" | "follicular" | "ovulation" | "luteal";
 
 interface CyclePhaseState {
+  enabled: boolean; // opt-in feature
   periodStartDates: string[]; // ISO date strings, most recent first
   defaultCycleLength: number;
 
+  enable: () => void;
+  disable: () => void;
   logPeriodStart: (date: string) => void;
   removePeriodStart: (date: string) => void;
   getCurrentPhase: () => {
@@ -35,9 +38,12 @@ function getPhaseForDay(day: number): CyclePhase {
 export const useCyclePhaseStore = create<CyclePhaseState>()(
   persist(
     (set, get) => ({
+      enabled: false,
       periodStartDates: [],
       defaultCycleLength: 28,
 
+      enable: () => set({ enabled: true }),
+      disable: () => set({ enabled: false, periodStartDates: [] }),
       logPeriodStart: (date: string) => {
         const existing = get().periodStartDates;
         if (existing.includes(date)) return;

@@ -406,6 +406,12 @@ const translations: Record<string, Record<Locale, string>> = {
   "cycle.startTracking": { en: "🩸 Start cycle tracking", es: "🩸 Iniciar seguimiento del ciclo" },
   "cycle.lutealSuggestion": { en: "Late luteal phase — consider lite mode if energy is low", es: "Fase lútea tardía — considera el modo lite si la energía es baja" },
   "cycle.logged": { en: "Period logged!", es: "¡Periodo registrado!" },
+  "cycle.explainerTitle": { en: "Why track your cycle?", es: "¿Por qué seguir tu ciclo?" },
+  "cycle.explainerDesc": {
+    en: "Hypothyroidism often disrupts the menstrual cycle. Tracking it helps you train smarter — the follicular phase (after your period) is best for heavier training, while the luteal phase (before your period) may need lighter intensity. Water retention also varies 1-3 kg across the cycle, which explains weight fluctuations that aren't real fat changes.",
+    es: "El hipotiroidismo a menudo altera el ciclo menstrual. Rastrearlo te ayuda a entrenar mejor — la fase folicular (después del periodo) es ideal para entrenamiento más intenso, mientras que la fase lútea (antes del periodo) puede necesitar menor intensidad. La retención de agua varía 1-3 kg durante el ciclo, lo que explica fluctuaciones de peso que no son cambios reales de grasa.",
+  },
+  "cycle.enableAndLog": { en: "Enable & log today", es: "Activar y registrar hoy" },
 };
 
 export function t(key: string, locale?: Locale): string {
