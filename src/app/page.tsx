@@ -38,6 +38,8 @@ export default function HomePage() {
   const login = useAuthStore((s) => s.login);
   const weekStats = history.getSessionsByWeek(activeUserId ?? undefined);
   const latestCheckin = history.getLatestCheckin(activeUserId ?? undefined);
+  const todayStr = new Date().toISOString().split("T")[0];
+  const todaysCheckin = history.getCheckinForDate(todayStr, activeUserId ?? undefined);
   const cyclePhaseEnabled = useCyclePhaseStore((s) => s.enabled);
   const cyclePhase = useCyclePhaseStore((s) => s.getCurrentPhase)();
   const logPeriodStart = useCyclePhaseStore((s) => s.logPeriodStart);
@@ -302,6 +304,21 @@ export default function HomePage() {
             </div>
           )}
         </>
+      )}
+
+      {/* Check-in prompt */}
+      {mounted && !todaysCheckin && (
+        <Link
+          href="/checkin"
+          className="mt-3 flex items-center gap-3 rounded-[16px] border border-sage-dim bg-sage-bg p-4 transition-colors hover:bg-sage-bg/80"
+        >
+          <span className="text-2xl">💚</span>
+          <div className="flex-1">
+            <p className="text-[13px] font-semibold text-sage">{t("checkin.prompt")}</p>
+            <p className="text-[11px] text-muted-foreground">{t("checkin.promptAction")}</p>
+          </div>
+          <span className="text-muted-foreground text-sm">→</span>
+        </Link>
       )}
 
       {/* Early deload suggestion */}
