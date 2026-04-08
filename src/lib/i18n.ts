@@ -31,6 +31,8 @@ const translations: Record<string, Record<Locale, string>> = {
   "common.min": { en: "min", es: "min" },
   "common.exercises": { en: "exercises", es: "ejercicios" },
   "common.cancel": { en: "Cancel", es: "Cancelar" },
+  "checkin.prompt": { en: "How are you feeling today?", es: "¿Cómo te sientes hoy?" },
+  "checkin.promptAction": { en: "Complete your daily check-in", es: "Completa tu registro diario" },
   "settings.back": { en: "Back", es: "Volver" },
   "settings.title": { en: "Settings", es: "Ajustes" },
   "settings.profile": { en: "Profile", es: "Perfil" },
