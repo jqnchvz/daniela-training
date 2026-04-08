@@ -144,8 +144,11 @@ function PreCheckPhase() {
 function WarmupPhase({ planId }: { planId: string }) {
   const t = useT();
   const locale = useI18n((s) => s.locale);
-  const { setPhase } = useSessionStore();
+  const { setPhase, toggleWarmup, warmupChecklist } = useSessionStore();
   const protocol = getSessionProtocol(planId);
+  const checkedCount = warmupChecklist.filter(Boolean).length;
+  const totalItems = protocol.warmup.length;
+  const allChecked = checkedCount === totalItems;
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
@@ -158,23 +161,41 @@ function WarmupPhase({ planId }: { planId: string }) {
         {t("session.warmupDesc")}
       </p>
       <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left">
-        <div className="flex flex-col gap-3">
-          {protocol.warmup.map((item, i) => (
-            <div key={i} className="flex items-center justify-between text-[13px]">
-              <span className="flex items-center gap-2.5">
-                <span>{item.icon}</span>
-                <span>{locale === "es" ? item.textEs : item.text}</span>
-              </span>
-              <span className="text-[10px] text-muted-foreground font-mono shrink-0 ml-2">
-                {item.duration}
-              </span>
-            </div>
-          ))}
+        <div className="flex flex-col gap-1">
+          {protocol.warmup.map((item, i) => {
+            const checked = warmupChecklist[i] ?? false;
+            return (
+              <button
+                key={i}
+                onClick={() => toggleWarmup(i)}
+                className={`flex items-center justify-between text-[13px] rounded-[10px] px-3 py-3 min-h-[48px] transition-colors text-left ${
+                  checked ? "bg-sage-bg/50" : "hover:bg-surface2"
+                }`}
+              >
+                <span className={`flex items-center gap-2.5 ${checked ? "text-muted-foreground" : ""}`}>
+                  <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-[10px] shrink-0 transition-colors ${
+                    checked ? "border-sage bg-sage text-primary-foreground" : "border-border"
+                  }`}>
+                    {checked && "✓"}
+                  </span>
+                  <span className={checked ? "line-through opacity-60" : ""}>{locale === "es" ? item.textEs : item.text}</span>
+                </span>
+                <span className="text-[10px] text-muted-foreground font-mono shrink-0 ml-2">
+                  {item.duration}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
+      <p className="text-[11px] text-muted-foreground mt-3">
+        {checkedCount}/{totalItems} {t("session.completed")}
+      </p>
       <button
         onClick={() => setPhase("working")}
-        className="mt-6 w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
+        className={`mt-3 w-full max-w-[340px] rounded-[16px] px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground transition-all ${
+          allChecked ? "bg-sage hover:bg-sage/80" : "bg-sage/40"
+        }`}
       >
         {t("session.doneWarmup")}
       </button>
@@ -520,6 +541,9 @@ function CooldownPhase({ planId }: { planId: string }) {
   const locale = useI18n((s) => s.locale);
   const store = useSessionStore();
   const protocol = getSessionProtocol(planId);
+  const checkedCount = store.cooldownChecklist.filter(Boolean).length;
+  const totalItems = protocol.cooldown.length;
+  const allChecked = checkedCount === totalItems;
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
@@ -532,23 +556,41 @@ function CooldownPhase({ planId }: { planId: string }) {
         {t("session.cooldownDesc")}
       </p>
       <div className="w-full max-w-[340px] rounded-[16px] border border-border bg-card p-4 text-left">
-        <div className="flex flex-col gap-3">
-          {protocol.cooldown.map((item, i) => (
-            <div key={i} className="flex items-center justify-between text-[13px]">
-              <span className="flex items-center gap-2.5">
-                <span>{item.icon}</span>
-                <span>{locale === "es" ? item.textEs : item.text}</span>
-              </span>
-              <span className="text-[10px] text-muted-foreground font-mono shrink-0 ml-2">
-                {item.duration}
-              </span>
-            </div>
-          ))}
+        <div className="flex flex-col gap-1">
+          {protocol.cooldown.map((item, i) => {
+            const checked = store.cooldownChecklist[i] ?? false;
+            return (
+              <button
+                key={i}
+                onClick={() => store.toggleCooldown(i)}
+                className={`flex items-center justify-between text-[13px] rounded-[10px] px-3 py-3 min-h-[48px] transition-colors text-left ${
+                  checked ? "bg-dt-blue/10" : "hover:bg-surface2"
+                }`}
+              >
+                <span className={`flex items-center gap-2.5 ${checked ? "text-muted-foreground" : ""}`}>
+                  <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-[10px] shrink-0 transition-colors ${
+                    checked ? "border-dt-blue bg-dt-blue text-primary-foreground" : "border-border"
+                  }`}>
+                    {checked && "✓"}
+                  </span>
+                  <span className={checked ? "line-through opacity-60" : ""}>{locale === "es" ? item.textEs : item.text}</span>
+                </span>
+                <span className="text-[10px] text-muted-foreground font-mono shrink-0 ml-2">
+                  {item.duration}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
+      <p className="text-[11px] text-muted-foreground mt-3">
+        {checkedCount}/{totalItems} {t("session.completed")}
+      </p>
       <button
         onClick={() => store.setPhase("summary")}
-        className="mt-6 w-full max-w-[340px] rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground"
+        className={`mt-3 w-full max-w-[340px] rounded-[16px] px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground transition-all ${
+          allChecked ? "bg-sage hover:bg-sage/80" : "bg-sage/40"
+        }`}
       >
         {t("session.completeSession")}
       </button>
