@@ -15,6 +15,7 @@ import { getDeloadStatus } from "@/lib/progression";
 import { detectRedFlags } from "@/lib/checkin";
 import { useCycleStore } from "@/store/cycle-store";
 import { useHistoryStore } from "@/store/history-store";
+import { useCyclePhaseStore } from "@/store/cycle-phase-store";
 import { useT, useI18n } from "@/lib/i18n";
 import { useAuthStore, type User } from "@/store/auth-store";
 import { fetchUsers } from "@/lib/db/sync";
@@ -24,6 +25,7 @@ export default function HomePage() {
   const [earlyDeloadDismissed, setEarlyDeloadDismissed] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [periodLogged, setPeriodLogged] = useState(false);
   const t = useT();
   const locale = useI18n((s) => s.locale);
   const isEs = locale === "es";
@@ -36,6 +38,8 @@ export default function HomePage() {
   const login = useAuthStore((s) => s.login);
   const weekStats = history.getSessionsByWeek(activeUserId ?? undefined);
   const latestCheckin = history.getLatestCheckin(activeUserId ?? undefined);
+  const cyclePhase = useCyclePhaseStore((s) => s.getCurrentPhase)();
+  const logPeriodStart = useCyclePhaseStore((s) => s.logPeriodStart);
 
   // Compute early deload suggestion from red flags
   const redFlags = detectRedFlags(
@@ -179,6 +183,35 @@ export default function HomePage() {
           {t("home.startProgram")}
         </button>
       )}
+
+      {/* Menstrual cycle phase badge */}
+      {cyclePhase && (
+        <div className="mt-2">
+          <div className="inline-flex items-center gap-2 rounded-full bg-surface2 border border-border px-3 py-1 text-[11px] text-muted-foreground">
+            <span>{cyclePhase.phase === "menstrual" ? "🔴" : cyclePhase.phase === "follicular" ? "🌱" : cyclePhase.phase === "ovulation" ? "🌸" : "🌙"}</span>
+            <span>{t(`cycle.${cyclePhase.phase}`)} · {t("cycle.day")} {cyclePhase.dayInCycle}</span>
+          </div>
+          {cyclePhase.phase === "luteal" && cyclePhase.dayInCycle >= 22 && (
+            <p className="text-[11px] text-muted-foreground/70 mt-1 ml-1">
+              {t("cycle.lutealSuggestion")}
+            </p>
+          )}
+        </div>
+      )}
+      <button
+        onClick={() => {
+          const today = new Date().toISOString().split("T")[0];
+          logPeriodStart(today);
+          setPeriodLogged(true);
+          setTimeout(() => setPeriodLogged(false), 2000);
+        }}
+        className={cyclePhase
+          ? "mt-2 text-[11px] text-muted-foreground underline"
+          : "mt-2 inline-flex items-center gap-1.5 rounded-full bg-surface2 border border-border px-3 py-1.5 text-[11px] text-muted-foreground"
+        }
+      >
+        {periodLogged ? t("cycle.logged") : cyclePhase ? t("cycle.logPeriod") : t("cycle.startTracking")}
+      </button>
 
       {/* Early deload suggestion */}
       {deloadStatus?.earlyDeloadSuggested && !earlyDeloadDismissed && (

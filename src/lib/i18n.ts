@@ -391,6 +391,17 @@ const translations: Record<string, Record<Locale, string>> = {
   "progress.weeklyLiss": { en: "Weekly LISS cardio", es: "Cardio LISS semanal" },
   "progress.lissTarget": { en: "150 min target", es: "Objetivo 150 min" },
   "progress.lissMinutes": { en: "min", es: "min" },
+
+  // Cycle phase tracking
+  "cycle.day": { en: "Day", es: "Día" },
+  "cycle.menstrual": { en: "Menstrual", es: "Menstrual" },
+  "cycle.follicular": { en: "Follicular", es: "Folicular" },
+  "cycle.ovulation": { en: "Ovulation", es: "Ovulación" },
+  "cycle.luteal": { en: "Luteal", es: "Lútea" },
+  "cycle.logPeriod": { en: "Log period start", es: "Registrar inicio de periodo" },
+  "cycle.startTracking": { en: "🩸 Start cycle tracking", es: "🩸 Iniciar seguimiento del ciclo" },
+  "cycle.lutealSuggestion": { en: "Late luteal phase — consider lite mode if energy is low", es: "Fase lútea tardía — considera el modo lite si la energía es baja" },
+  "cycle.logged": { en: "Period logged!", es: "¡Periodo registrado!" },
 };
 
 export function t(key: string, locale?: Locale): string {
