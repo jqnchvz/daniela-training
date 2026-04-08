@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useSessionStore } from "@/store/session-store";
-import { useI18n, useT } from "@/lib/i18n";
+import { useT } from "@/lib/i18n";
 
 export function RestTimer() {
   const restTimerEnd = useSessionStore((s) => s.restTimerEnd);
   const restTimerNextInfo = useSessionStore((s) => s.restTimerNextInfo);
   const setRestTimer = useSessionStore((s) => s.setRestTimer);
-  const locale = useI18n((s) => s.locale);
+  const t = useT();
   const [remaining, setRemaining] = useState(0);
   const [totalSeconds, setTotalSeconds] = useState(0);
   const [skipDelay, setSkipDelay] = useState(30);
@@ -62,8 +62,6 @@ export function RestTimer() {
   const circumference = 2 * Math.PI * 45;
   const progress = totalSeconds > 0 ? remaining / totalSeconds : 0;
   const dashOffset = circumference * (1 - progress);
-
-  const t = useT();
 
   return (
     <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-background/95 backdrop-blur-[10px]">
