@@ -43,6 +43,8 @@ export default function HomePage() {
   const logPeriodStart = useCyclePhaseStore((s) => s.logPeriodStart);
   const enableCyclePhase = useCyclePhaseStore((s) => s.enable);
   const [showCycleExplainer, setShowCycleExplainer] = useState(false);
+  const [showStartConfirm, setShowStartConfirm] = useState(false);
+  const experienceLevel = useAuthStore((s) => s.experienceLevel);
 
   // Compute early deload suggestion from red flags
   const redFlags = detectRedFlags(
@@ -187,13 +189,50 @@ export default function HomePage() {
           </p>
         </div>
       ) : (
-        <button
-          onClick={cycle.startCycle}
-          className="mt-3 inline-flex items-center gap-2 rounded-full bg-sage-bg border border-sage-dim px-3.5 py-2.5 min-h-[44px] text-xs font-semibold text-sage transition-colors hover:bg-sage/20"
-        >
-          <span className="h-2 w-2 rounded-full bg-sage" />
-          {t("home.startProgram")}
-        </button>
+        <div className="mt-3 rounded-[16px] border border-sage-dim bg-gradient-to-br from-sage-bg to-card p-4">
+          <p className="font-heading text-[15px] font-bold">{t("home.startProgramTitle")}</p>
+          <p className="text-[12px] text-muted-foreground leading-relaxed mt-1.5 mb-3">
+            {t("home.startProgramDesc2")}
+          </p>
+          <div className="flex gap-2 text-[11px] text-sage font-semibold mb-3">
+            <span className="rounded-full bg-sage-bg border border-sage-dim px-2.5 py-1">1. {t("home.phaseStabilization")}</span>
+            <span className="rounded-full bg-sage-bg border border-sage-dim px-2.5 py-1">2. {t("home.phaseHypertrophy")}</span>
+            <span className="rounded-full bg-sage-bg border border-sage-dim px-2.5 py-1">3. {t("home.phaseStrength")}</span>
+          </div>
+          {experienceLevel && (
+            <p className="text-[11px] text-muted-foreground mb-3">
+              📊 {t("home.personalizedTo")} {t(`settings.${experienceLevel}`)}
+            </p>
+          )}
+          {!showStartConfirm ? (
+            <button
+              onClick={() => setShowStartConfirm(true)}
+              className="w-full rounded-[16px] bg-sage px-4 py-4 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
+            >
+              {t("home.startProgram")}
+            </button>
+          ) : (
+            <div className="rounded-[12px] border border-border bg-surface2 p-3.5">
+              <p className="text-[13px] text-foreground leading-relaxed mb-3">
+                {t("home.startConfirmDesc")}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowStartConfirm(false)}
+                  className="flex-1 rounded-[10px] border border-border bg-card py-2.5 min-h-[44px] text-[12px] font-semibold"
+                >
+                  {t("home.notYet")}
+                </button>
+                <button
+                  onClick={() => { cycle.startCycle(); setShowStartConfirm(false); }}
+                  className="flex-1 rounded-[10px] bg-sage py-2.5 min-h-[44px] text-[12px] font-bold text-primary-foreground"
+                >
+                  {t("home.letsGo")}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Menstrual cycle tracking (opt-in) */}
