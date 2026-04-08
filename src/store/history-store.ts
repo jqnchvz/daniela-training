@@ -20,6 +20,7 @@ export interface CompletedSession {
   averageHr: number | null;
   maxHr: number | null;
   sessionRpe: number | null;
+  cyclePhase: string | null;
 }
 
 export interface CompletedSet {
