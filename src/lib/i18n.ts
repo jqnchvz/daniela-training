@@ -68,7 +68,22 @@ const translations: Record<string, Record<Locale, string>> = {
   "home.goodMorning": { en: "Good morning", es: "Buenos días" },
   "home.goodAfternoon": { en: "Good afternoon", es: "Buenas tardes" },
   "home.goodEvening": { en: "Good evening", es: "Buenas noches" },
-  "home.startProgram": { en: "Start your 16-week program →", es: "Inicia tu programa de 16 semanas →" },
+  "home.startProgram": { en: "Begin Training Plan →", es: "Comenzar Plan →" },
+  "home.startProgramTitle": { en: "Ready to start training?", es: "¿Lista para entrenar?" },
+  "home.startProgramDesc2": {
+    en: "A 16-week progressive program with 3 sessions per week, tailored for hypothyroid recovery.",
+    es: "Un programa progresivo de 16 semanas con 3 sesiones por semana, adaptado para la recuperación hipotiroidea.",
+  },
+  "home.personalizedTo": { en: "Personalized to your level:", es: "Personalizado a tu nivel:" },
+  "home.startConfirmDesc": {
+    en: "This will start your 16-week training cycle with 3 sessions per week. You can adjust your plan anytime.",
+    es: "Esto iniciará tu ciclo de 16 semanas con 3 sesiones por semana. Puedes ajustar tu plan en cualquier momento.",
+  },
+  "home.letsGo": { en: "Let's go!", es: "¡Vamos!" },
+  "home.notYet": { en: "Not yet", es: "Aún no" },
+  "home.phase1Short": { en: "1. Stabilization", es: "1. Estabilización" },
+  "home.phase2Short": { en: "2. Hypertrophy", es: "2. Hipertrofia" },
+  "home.phase3Short": { en: "3. Strength", es: "3. Fuerza" },
   "home.startProgramDesc": {
     en: "Start your 16-week training cycle to track phase progress, deload reminders, and progressive overload.",
     es: "Inicia tu ciclo de entrenamiento de 16 semanas para seguir el progreso de fases, descargas y sobrecarga progresiva.",
