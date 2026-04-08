@@ -162,6 +162,8 @@ const translations: Record<string, Record<Locale, string>> = {
   "session.howDidItFeel": { en: "How did it feel?", es: "¿Cómo te sentiste?" },
   "session.sleepLastNight": { en: "Sleep last night", es: "Sueño anoche" },
   "session.backToDashboard": { en: "Back to Dashboard", es: "Volver al Inicio" },
+  "session.notesLabel": { en: "Session notes", es: "Notas de sesión" },
+  "session.notesPlaceholder": { en: "How did it go? Anything to remember for next time?", es: "¿Cómo fue? ¿Algo para recordar la próxima vez?" },
   "session.sets": { en: "Sets", es: "Series" },
   "session.reps": { en: "Reps", es: "Reps" },
   "session.rest": { en: "Rest", es: "Descanso" },
