@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useAuthStore, type ExperienceLevel } from "@/store/auth-store";
 import { useI18n, useT } from "@/lib/i18n";
 import { useCyclePhaseStore } from "@/store/cycle-phase-store";
+import { useCycleStore } from "@/store/cycle-store";
 import { useHistoryStore } from "@/store/history-store";
 
 const LEVELS: ExperienceLevel[] = ["beginner", "intermediate", "advanced"];
@@ -21,11 +22,15 @@ export default function SettingsPage() {
   const cycleEnabled = useCyclePhaseStore((s) => s.enabled);
   const enableCycle = useCyclePhaseStore((s) => s.enable);
   const disableCycle = useCyclePhaseStore((s) => s.disable);
+  const cycleStartDate = useCycleStore((s) => s.cycleStartDate);
+  const resetCycle = useCycleStore((s) => s.resetCycle);
   const sessions = useHistoryStore((s) => s.sessions);
   const checkins = useHistoryStore((s) => s.checkins);
 
   const [mounted, setMounted] = useState(false);
   const [exported, setExported] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [resetDone, setResetDone] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -152,6 +157,50 @@ export default function SettingsPage() {
           {cycleEnabled ? `✓ ${t("settings.cycleEnabled")}` : t("settings.cycleDisabled")}
         </button>
         <p className="text-[11px] text-muted-foreground mt-2">{t("settings.cycleHint")}</p>
+      </Section>
+
+      {/* Training phase */}
+      <Section title={t("settings.trainingPhase")}>
+        {cycleStartDate ? (
+          <>
+            {!showResetConfirm ? (
+              <button
+                onClick={() => setShowResetConfirm(true)}
+                className="w-full rounded-[12px] border border-dt-red/30 bg-dt-red/10 py-2.5 min-h-[44px] text-[13px] font-semibold text-dt-red transition-colors hover:bg-dt-red/20"
+              >
+                {resetDone ? `✓ ${t("settings.phaseReset")}` : t("settings.resetPhase")}
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-[13px] text-muted-foreground leading-relaxed">
+                  {t("settings.resetPhaseConfirm")}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowResetConfirm(false)}
+                    className="flex-1 rounded-[10px] border border-border bg-surface2 py-2.5 min-h-[44px] text-[12px] font-semibold"
+                  >
+                    {t("common.cancel")}
+                  </button>
+                  <button
+                    onClick={() => {
+                      resetCycle();
+                      setShowResetConfirm(false);
+                      setResetDone(true);
+                      setTimeout(() => setResetDone(false), 2000);
+                    }}
+                    className="flex-1 rounded-[10px] bg-dt-red py-2.5 min-h-[44px] text-[12px] font-bold text-white"
+                  >
+                    {t("settings.resetPhaseBtn")}
+                  </button>
+                </div>
+              </div>
+            )}
+            <p className="text-[11px] text-muted-foreground mt-2">{t("settings.resetPhaseHint")}</p>
+          </>
+        ) : (
+          <p className="text-[13px] text-muted-foreground">{t("settings.noActivePhase")}</p>
+        )}
       </Section>
 
       {/* Data */}

@@ -52,7 +52,7 @@ export const useAuthStore = create<AuthState>()(
           activeUserName: null,
           activeUserEmoji: null,
           onboardingComplete: false,
-          experienceLevel: null,
+          // Keep experienceLevel so returning users skip onboarding
         });
       },
 
