@@ -52,6 +52,7 @@ export default function HomePage() {
   const enableCyclePhase = useCyclePhaseStore((s) => s.enable);
   const [showCycleExplainer, setShowCycleExplainer] = useState(false);
   const [showStartConfirm, setShowStartConfirm] = useState(false);
+  const [statusExpanded, setStatusExpanded] = useState(false);
   const experienceLevel = useAuthStore((s) => s.experienceLevel);
 
   // Compute early deload suggestion from red flags
@@ -180,22 +181,23 @@ export default function HomePage() {
         <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
       )}
 
-      {/* Phase badge */}
+      {/* Training status (collapsed) */}
       {phaseStatus ? (
-        <div className="mt-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-secondary border border-border px-3.5 py-1.5 text-xs font-semibold text-muted-foreground">
+        <button
+          onClick={() => setStatusExpanded(!statusExpanded)}
+          className="mt-3 w-full flex items-center justify-between rounded-[12px] bg-secondary border border-border px-3.5 py-2 min-h-[44px] text-left"
+        >
+          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
             <span className="h-2 w-2 rounded-full bg-sage" />
-            {t("home.phase")} {phaseStatus.phase.phase} · {t("home.week")} {phaseStatus.weekNumber} {t("home.of")}{" "}
-            {phaseStatus.totalWeeks}
+            <span>{t("home.phase")} {phaseStatus.phase.phase} · {t("home.week")} {phaseStatus.weekNumber}/{phaseStatus.totalWeeks}</span>
+            {cyclePhaseEnabled && cyclePhase && (
+              <span className="text-[10px] text-muted-foreground/60">
+                · {cyclePhase.phase === "menstrual" ? "🔴" : cyclePhase.phase === "follicular" ? "🌱" : cyclePhase.phase === "ovulation" ? "🌸" : "🌙"} {t(`cycle.${cyclePhase.phase}`)}
+              </span>
+            )}
           </div>
-          <p className="text-[11px] text-muted-foreground/70 mt-1 ml-1">
-            {phaseStatus.phase.phase === 1
-              ? t("home.phaseStabilization")
-              : phaseStatus.phase.phase === 2
-                ? t("home.phaseHypertrophy")
-                : t("home.phaseStrength")}
-          </p>
-        </div>
+          <span className="text-[10px] text-muted-foreground">{statusExpanded ? "▲" : "▼"}</span>
+        </button>
       ) : (
         <div className="mt-3 rounded-[16px] border border-sage-dim bg-gradient-to-br from-sage-bg to-card p-4">
           <p className="font-heading text-[15px] font-bold">{t("home.startProgramTitle")}</p>
@@ -243,73 +245,102 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Menstrual cycle tracking (opt-in) */}
-      {cyclePhaseEnabled ? (
-        <>
-          {cyclePhase && (
-            <div className="mt-2">
-              <div className="inline-flex items-center gap-2 rounded-full bg-surface2 border border-border px-3 py-1 text-[11px] text-muted-foreground">
-                <span>{cyclePhase.phase === "menstrual" ? "🔴" : cyclePhase.phase === "follicular" ? "🌱" : cyclePhase.phase === "ovulation" ? "🌸" : "🌙"}</span>
-                <span>{t(`cycle.${cyclePhase.phase}`)} · {t("cycle.day")} {cyclePhase.dayInCycle}</span>
-              </div>
-              {cyclePhase.phase === "luteal" && cyclePhase.dayInCycle >= 22 && (
-                <p className="text-[11px] text-muted-foreground/70 mt-1 ml-1">
-                  {t("cycle.lutealSuggestion")}
-                </p>
-              )}
+      {/* Expanded status details (when program active) */}
+      {phaseStatus && statusExpanded && (
+        <div className="mt-1 rounded-[12px] border border-border bg-card p-3.5 space-y-2">
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            {phaseStatus.phase.phase === 1
+              ? t("home.phaseStabilization")
+              : phaseStatus.phase.phase === 2
+                ? t("home.phaseHypertrophy")
+                : t("home.phaseStrength")}
+          </p>
+          {cyclePhaseEnabled && cyclePhase && (
+            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+              <span>{cyclePhase.phase === "menstrual" ? "🔴" : cyclePhase.phase === "follicular" ? "🌱" : cyclePhase.phase === "ovulation" ? "🌸" : "🌙"}</span>
+              <span>{t(`cycle.${cyclePhase.phase}`)} · {t("cycle.day")} {cyclePhase.dayInCycle}</span>
             </div>
           )}
-          <button
-            onClick={() => {
-              const today = new Date().toISOString().split("T")[0];
-              logPeriodStart(today);
-              setPeriodLogged(true);
-              setTimeout(() => setPeriodLogged(false), 2000);
-            }}
-            className="mt-2 inline-flex items-center justify-center rounded-[10px] border border-border bg-surface2 px-3 min-h-[44px] text-[12px] text-muted-foreground font-medium"
-          >
-            {periodLogged ? t("cycle.logged") : t("cycle.logPeriod")}
-          </button>
-        </>
-      ) : (
-        <>
-          {!showCycleExplainer ? (
+          {cyclePhaseEnabled && (
             <button
-              onClick={() => setShowCycleExplainer(true)}
-              className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-surface2 border border-border px-3 py-2.5 min-h-[44px] text-[11px] text-muted-foreground"
+              onClick={() => {
+                const today = new Date().toISOString().split("T")[0];
+                logPeriodStart(today);
+                setPeriodLogged(true);
+                setTimeout(() => setPeriodLogged(false), 2000);
+              }}
+              className="inline-flex items-center justify-center rounded-[10px] border border-border bg-surface2 px-3 min-h-[44px] text-[12px] text-muted-foreground font-medium"
             >
-              {t("cycle.startTracking")}
+              {periodLogged ? t("cycle.logged") : t("cycle.logPeriod")}
             </button>
-          ) : (
-            <div className="mt-2 rounded-[12px] border border-border bg-card p-3.5">
-              <p className="font-semibold text-[13px]">{t("cycle.explainerTitle")}</p>
-              <p className="text-[11px] text-muted-foreground leading-relaxed mt-1">
-                {t("cycle.explainerDesc")}
-              </p>
-              <div className="flex gap-2 mt-3">
-                <button
-                  onClick={() => setShowCycleExplainer(false)}
-                  className="flex-1 rounded-[10px] border border-border bg-surface2 py-2.5 min-h-[44px] text-[12px] font-semibold"
-                >
-                  {t("common.cancel")}
-                </button>
-                <button
-                  onClick={() => {
-                    enableCyclePhase();
-                    setShowCycleExplainer(false);
-                    const today = new Date().toISOString().split("T")[0];
-                    logPeriodStart(today);
-                    setPeriodLogged(true);
-                    setTimeout(() => setPeriodLogged(false), 2000);
-                  }}
-                  className="flex-1 rounded-[10px] bg-sage py-2.5 min-h-[44px] text-[12px] font-bold text-primary-foreground"
-                >
-                  {t("cycle.enableAndLog")}
-                </button>
-              </div>
-            </div>
           )}
-        </>
+        </div>
+      )}
+
+      {/* Menstrual cycle tracking (opt-in) — only when no active program */}
+      {!phaseStatus && (
+        cyclePhaseEnabled ? (
+          <>
+            {cyclePhase && (
+              <div className="mt-2">
+                <div className="inline-flex items-center gap-2 rounded-full bg-surface2 border border-border px-3 py-1 text-[11px] text-muted-foreground">
+                  <span>{cyclePhase.phase === "menstrual" ? "🔴" : cyclePhase.phase === "follicular" ? "🌱" : cyclePhase.phase === "ovulation" ? "🌸" : "🌙"}</span>
+                  <span>{t(`cycle.${cyclePhase.phase}`)} · {t("cycle.day")} {cyclePhase.dayInCycle}</span>
+                </div>
+              </div>
+            )}
+            <button
+              onClick={() => {
+                const today = new Date().toISOString().split("T")[0];
+                logPeriodStart(today);
+                setPeriodLogged(true);
+                setTimeout(() => setPeriodLogged(false), 2000);
+              }}
+              className="mt-2 inline-flex items-center justify-center rounded-[10px] border border-border bg-surface2 px-3 min-h-[44px] text-[12px] text-muted-foreground font-medium"
+            >
+              {periodLogged ? t("cycle.logged") : t("cycle.logPeriod")}
+            </button>
+          </>
+        ) : (
+          <>
+            {!showCycleExplainer ? (
+              <button
+                onClick={() => setShowCycleExplainer(true)}
+                className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-surface2 border border-border px-3 py-2.5 min-h-[44px] text-[11px] text-muted-foreground"
+              >
+                {t("cycle.startTracking")}
+              </button>
+            ) : (
+              <div className="mt-2 rounded-[12px] border border-border bg-card p-3.5">
+                <p className="font-semibold text-[13px]">{t("cycle.explainerTitle")}</p>
+                <p className="text-[11px] text-muted-foreground leading-relaxed mt-1">
+                  {t("cycle.explainerDesc")}
+                </p>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => setShowCycleExplainer(false)}
+                    className="flex-1 rounded-[10px] border border-border bg-surface2 py-2.5 min-h-[44px] text-[12px] font-semibold"
+                  >
+                    {t("common.cancel")}
+                  </button>
+                  <button
+                    onClick={() => {
+                      enableCyclePhase();
+                      setShowCycleExplainer(false);
+                      const today = new Date().toISOString().split("T")[0];
+                      logPeriodStart(today);
+                      setPeriodLogged(true);
+                      setTimeout(() => setPeriodLogged(false), 2000);
+                    }}
+                    className="flex-1 rounded-[10px] bg-sage py-2.5 min-h-[44px] text-[12px] font-bold text-primary-foreground"
+                  >
+                    {t("cycle.enableAndLog")}
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )
       )}
 
       {/* Check-in prompt */}
