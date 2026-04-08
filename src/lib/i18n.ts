@@ -402,6 +402,8 @@ const translations: Record<string, Record<Locale, string>> = {
     en: "Pushing through low energy can spike cortisol and further suppress thyroid function.",
     es: "Forzar con poca energía puede elevar el cortisol y suprimir más la función tiroidea.",
   },
+  "session.liteRecommended": { en: "Low energy — Lite mode recommended", es: "Energía baja — Modo ligero recomendado" },
+  "session.modeDescription": { en: "Choose your session intensity. Lite mode uses compound exercises only.", es: "Elige la intensidad de tu sesión. El modo ligero usa solo ejercicios compuestos." },
 
   // Session [planId] — hypothyroid info
   "hypo.whyTheseValues": { en: "Why these values?", es: "¿Por qué estos valores?" },

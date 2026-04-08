@@ -72,7 +72,14 @@ function PreCheckPhase() {
     checkins.map((c) => ({ ...c, sleepHours: c.sleepHours ?? null })),
   );
 
-  const showModeSelector = energyPre !== null && energyPre <= 4;
+  const isLowEnergy = energyPre !== null && energyPre <= 4;
+
+  // Auto-select lite when energy drops to ≤ 4
+  useEffect(() => {
+    if (isLowEnergy && sessionMode === "full") {
+      setSessionMode("lite");
+    }
+  }, [isLowEnergy]);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
@@ -93,18 +100,20 @@ function PreCheckPhase() {
       <div className="w-full max-w-[320px]">
         <EnergySlider value={energyPre} onChange={setEnergyPre} label={t("session.energyQuestion")} />
 
-        {showModeSelector && (
+        {energyPre !== null && (
           <div className="mt-5 rounded-[12px] border border-border bg-card p-4 text-left">
-            <p className="text-[13px] text-muted-foreground mb-1">
-              {t("session.lowEnergyPrompt")}
-            </p>
+            {isLowEnergy && (
+              <p className="text-[12px] text-gold font-semibold mb-2">
+                ⚡ {t("session.liteRecommended")}
+              </p>
+            )}
             <p className="text-[11px] text-muted-foreground/60 mb-3">
-              {t("session.lowEnergyWarning")}
+              {t("session.modeDescription")}
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setSessionMode("full")}
-                className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+                className={`flex-1 rounded-[10px] border py-2.5 min-h-[44px] text-[13px] font-semibold transition-colors ${
                   sessionMode === "full"
                     ? "bg-sage-bg text-sage border-sage-dim"
                     : "bg-surface2 text-muted-foreground border-border"
@@ -114,7 +123,7 @@ function PreCheckPhase() {
               </button>
               <button
                 onClick={() => setSessionMode("lite")}
-                className={`flex-1 rounded-[10px] border py-2.5 text-[13px] font-semibold transition-colors ${
+                className={`flex-1 rounded-[10px] border py-2.5 min-h-[44px] text-[13px] font-semibold transition-colors ${
                   sessionMode === "lite"
                     ? "bg-sage-bg text-sage border-sage-dim"
                     : "bg-surface2 text-muted-foreground border-border"
