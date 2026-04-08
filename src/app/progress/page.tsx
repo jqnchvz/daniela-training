@@ -101,7 +101,11 @@ export default function ProgressPage() {
       )}
 
       {!hasData ? (
-        <div className="rounded-[16px] border border-border bg-card p-8 text-center">
+        <div
+          className="rounded-[16px] border border-border bg-card p-8 text-center"
+          role="img"
+          aria-label={t("progress.noData")}
+        >
           <p className="text-4xl mb-3">📈</p>
           <p className="font-heading text-lg font-bold mb-2">{t("progress.noData")}</p>
           <p className="text-sm text-muted-foreground">
@@ -416,7 +420,13 @@ function StrengthChart({ data }: { data: ExerciseDataPoint[] }) {
 
   return (
     <>
-      <svg className="w-full h-20" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+      <svg
+        className="w-full h-20"
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={`${tFn("progress.strengthTrend")}: ${data[0].maxWeight} kg → ${data[data.length - 1].maxWeight} kg`}
+      >
         <defs>
           <linearGradient id="strengthGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#9B8EC4" stopOpacity="0.3" />
@@ -452,7 +462,12 @@ function VolumeChart({ data }: { data: WeeklyVolumePoint[] }) {
   const barWidth = Math.min(30, (width - 20) / data.length - 4);
 
   return (
-    <svg className="w-full h-20" viewBox={`0 0 ${width} ${height}`}>
+    <svg
+      className="w-full h-20"
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label={tFn("progress.weeklyVolume")}
+    >
       {data.map((d, i) => {
         const barHeight = maxVol > 0 ? (d.volume / maxVol) * (height - 20) : 0;
         const x = 10 + i * ((width - 20) / data.length) + ((width - 20) / data.length - barWidth) / 2;
@@ -497,7 +512,12 @@ function LissChart({ checkins }: { checkins: Array<{ date: string; walkMinutes: 
 
   return (
     <>
-      <svg className="w-full h-20" viewBox={`0 0 ${width} ${height}`}>
+      <svg
+        className="w-full h-20"
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label={tFn("progress.weeklyLiss")}
+      >
         {/* Target line at 150 min */}
         <line x1="5" y1={targetY} x2={width - 5} y2={targetY} stroke="#8A847E" strokeWidth="1" strokeDasharray="4 3" opacity="0.5" />
         <text x={width - 5} y={targetY - 3} fill="#8A847E" fontSize="7" fontFamily="JetBrains Mono" textAnchor="end">150</text>
@@ -539,7 +559,13 @@ function WellnessChart({ checkins }: { checkins: Array<{ date: string; energy: n
   const sleepPoints = makePoints(checkins.map((c) => c.sleepQuality));
 
   return (
-    <svg className="w-full h-20" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+    <svg
+      className="w-full h-20"
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
+      role="img"
+      aria-label={tFn("progress.wellnessTrend")}
+    >
       <polyline points={energyPoints} stroke="#9B8EC4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       <polyline points={sleepPoints} stroke="#5a9fd4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2" />
       <line x1="10" y1="10" x2="25" y2="10" stroke="#9B8EC4" strokeWidth="2" />
@@ -594,7 +620,13 @@ function MeasurementsChart({ data }: { data: Array<{ date: string; waist: number
   const thighPts = makePoints(data.map((d) => d.thigh));
 
   return (
-    <svg className="w-full h-20" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+    <svg
+      className="w-full h-20"
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
+      role="img"
+      aria-label={tFn("progress.bodyMetrics")}
+    >
       {waistPts && <polyline points={waistPts} stroke="#9B8EC4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />}
       {hipPts && <polyline points={hipPts} stroke="#E4A0A0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />}
       {thighPts && <polyline points={thighPts} stroke="#5a9fd4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />}
@@ -640,7 +672,13 @@ function WeightChart({ data }: { data: Array<{ date: string; weightKg: number | 
   const avgPolyline = rollingAvg.map((p) => `${p.x},${p.y}`).join(" ");
 
   return (
-    <svg className="w-full h-[60px]" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+    <svg
+      className="w-full h-[60px]"
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
+      role="img"
+      aria-label={tFn("progress.weightTrend")}
+    >
       <polyline points={avgPolyline} stroke="#7EC8A0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       {coords.map((c, idx) => (
         <circle key={idx} cx={c.x} cy={c.y} r={3} fill="#7EC8A0" opacity="0.5" />
