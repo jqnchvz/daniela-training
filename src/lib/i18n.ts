@@ -373,6 +373,26 @@ const translations: Record<string, Record<Locale, string>> = {
     en: "Chronic stress elevates cortisol and suppresses thyroid. Deep breathing, meditation, or time in nature.",
     es: "El estrés crónico eleva el cortisol y suprime la tiroides. Respiración profunda, meditación o tiempo en la naturaleza.",
   },
+  "recovery.walkExpanded": {
+    en: "Keep it gentle — zone 2 heart rate (you can hold a conversation). Walking outdoors gives extra benefits from sunlight, which supports vitamin D synthesis important for thyroid function. Log your walk below!",
+    es: "Mantenlo suave — zona 2 de frecuencia cardíaca (puedes mantener una conversación). Caminar al aire libre da beneficios extra por la luz solar, que apoya la síntesis de vitamina D importante para la función tiroidea. ¡Registra tu caminata abajo!",
+  },
+  "recovery.stretchExpanded": {
+    en: "Focus on hip flexors, hamstrings, and thoracic spine. Hold each stretch 30-60 seconds. Yoga flows like cat-cow and child's pose are especially good for nervous system recovery. Log it below!",
+    es: "Enfócate en flexores de cadera, isquiotibiales y columna torácica. Mantén cada estiramiento 30-60 segundos. Flujos de yoga como gato-vaca y postura del niño son especialmente buenos para la recuperación del sistema nervioso. ¡Regístralo abajo!",
+  },
+  "recovery.sleepExpanded": {
+    en: "Aim for consistent bed/wake times. Avoid screens 1 hour before bed. Keep the room cool (18-20°C). With hypothyroidism, quality sleep is when your body produces most of the T3/T4 hormones needed for recovery.",
+    es: "Apunta a horarios consistentes de acostarse/levantarse. Evita pantallas 1 hora antes de dormir. Mantén la habitación fresca (18-20°C). Con hipotiroidismo, el sueño de calidad es cuando tu cuerpo produce la mayoría de las hormonas T3/T4 necesarias para la recuperación.",
+  },
+  "recovery.nutritionExpanded": {
+    en: "Prioritize 1.6-2g protein per kg of bodyweight. Include selenium-rich foods (Brazil nuts, fish) and zinc (pumpkin seeds, eggs) to support thyroid conversion. Stay hydrated — dehydration worsens fatigue.",
+    es: "Prioriza 1.6-2g de proteína por kg de peso corporal. Incluye alimentos ricos en selenio (nueces de Brasil, pescado) y zinc (semillas de calabaza, huevos) para apoyar la conversión tiroidea. Mantente hidratada — la deshidratación empeora la fatiga.",
+  },
+  "recovery.stressExpanded": {
+    en: "Try box breathing: inhale 4s, hold 4s, exhale 4s, hold 4s. Even 5 minutes of meditation reduces cortisol measurably. Nature exposure for 20+ minutes significantly lowers stress hormones — combine it with your walk!",
+    es: "Prueba la respiración cuadrada: inhala 4s, retén 4s, exhala 4s, retén 4s. Incluso 5 minutos de meditación reduce el cortisol de forma medible. La exposición a la naturaleza por 20+ minutos reduce significativamente las hormonas del estrés — ¡combínalo con tu caminata!",
+  },
 
   // Session page (picker)
   "session.startPlan": { en: "▶ Start", es: "▶ Iniciar" },
