@@ -405,7 +405,7 @@ export default function HomePage() {
                     ? "border-border bg-surface2"
                     : day.isWorkout
                       ? "border-border bg-card"
-                      : "border-border bg-card opacity-40"
+                      : "border-border bg-card"
               }`}
             >
               <p className="text-[9px] font-semibold tracking-[1px] uppercase text-muted-foreground">
@@ -428,6 +428,10 @@ export default function HomePage() {
           );
         })}
       </div>
+      {/* Week strip legend */}
+      <p className="text-[9px] text-muted-foreground/60 mt-1.5 text-center tracking-[0.5px]">
+        💪 Training · 🚶 Active rest · 🧘 Stretch
+      </p>
 
       {/* Today's workout card */}
       <div className="mt-4 rounded-[20px] border border-sage-dim bg-gradient-to-br from-sage-bg to-card p-[22px] relative overflow-hidden">
