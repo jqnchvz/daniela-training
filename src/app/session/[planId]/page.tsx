@@ -233,6 +233,8 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
 
   // Exit confirmation
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  // Skip exercise confirmation
+  const [showSkipConfirm, setShowSkipConfirm] = useState(false);
 
   // RPE picker state — shown after logging a set, before rest timer
   const [showRpePicker, setShowRpePicker] = useState(false);
@@ -523,7 +525,13 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
           </button>
         )}
         <button
-          onClick={handleNextExercise}
+          onClick={() => {
+            if (allSetsDone) {
+              handleNextExercise();
+            } else {
+              setShowSkipConfirm(true);
+            }
+          }}
           className="flex-1 rounded-[16px] bg-sage py-3.5 font-heading text-[15px] font-bold text-primary-foreground transition-all hover:bg-sage/80"
         >
           {allSetsDone ? t("session.nextExercise") : t("session.skip")}
@@ -560,6 +568,42 @@ function WorkingPhase({ plan }: { plan: (typeof WORKOUT_PLANS)[number] }) {
                 className="flex-1 rounded-[12px] bg-dt-red py-3 min-h-[44px] text-[13px] font-bold text-white transition-colors hover:bg-dt-red/80"
               >
                 {t("session.exitConfirmEnd")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Skip exercise confirmation dialog */}
+      {showSkipConfirm && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background/95 backdrop-blur-sm px-6">
+          <div className="w-full max-w-[340px] rounded-[20px] border border-border bg-card p-6 text-center">
+            <div className="text-4xl mb-3">⏭️</div>
+            <h3 className="font-heading text-lg font-bold mb-2">
+              {setsForExercise.length === 0
+                ? t("session.skipConfirmTitle")
+                : t("session.skipPartialTitle")}
+            </h3>
+            <p className="text-[13px] text-muted-foreground leading-relaxed mb-5">
+              {setsForExercise.length === 0
+                ? `${locale === "es" ? exercise?.nameEs : exercise?.name} — ${t("session.skipConfirmDesc")}`
+                : `${locale === "es" ? exercise?.nameEs : exercise?.name} — ${setsForExercise.length}/${currentPlanExercise.sets} ${t("session.setsCompleted")}`}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowSkipConfirm(false)}
+                className="flex-1 rounded-[12px] border border-border bg-surface2 py-3 min-h-[44px] text-[13px] font-semibold transition-colors hover:bg-surface3"
+              >
+                {t("common.cancel")}
+              </button>
+              <button
+                onClick={() => {
+                  setShowSkipConfirm(false);
+                  handleNextExercise();
+                }}
+                className="flex-1 rounded-[12px] bg-gold py-3 min-h-[44px] text-[13px] font-bold text-primary-foreground transition-colors hover:bg-gold/80"
+              >
+                {t("session.skipConfirmBtn")}
               </button>
             </div>
           </div>
